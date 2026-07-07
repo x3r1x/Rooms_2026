@@ -1,21 +1,27 @@
-import {lastState} from "../model/gameModel";
+import {lastState} from "../model/gameModel.js";
 import { keys } from './listeners.js';
 export function updateGame(elapsedTime, state) {
     //TODO: написать игру =)
     let dx = 0;
     let dy = 0;
-    let speed = 0.5;
-    if (keys['w']){
+
+    let speed = 0.1;
+    if (keys['w'] || keys['ц'] || keys['arrowup']) {
         dy -= 1
     }
-    if (keys['s']){
+    if (keys['s'] || keys['ы'] || keys['arrowdown']){
         dy += 1
     }
-    if (keys['a']){
+    if (keys['a'] || keys['ф'] || keys['arrowleft']){
         dx -= 1
     }
-    if (keys['d']){
+    if (keys['d'] || keys['в'] || keys['arrowright']){
         dx += 1
+    }
+    let lengthVector = (Math.sqrt(dx * dx + dy * dy));
+    if (lengthVector > 0) {
+        dx /= lengthVector;
+        dy /= lengthVector;
     }
     //Отладочный код для перемещения квадратика
     state.square.x += dx * speed * elapsedTime;

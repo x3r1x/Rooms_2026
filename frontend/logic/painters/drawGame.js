@@ -6,5 +6,5 @@ export function drawGame(canvas, context, state) {
 
     //Отладочный код для перемещения квадратика
     context.fillStyle = "#FFFFFF";
-    context.fillRect(state.square.x, state.square.y, 50, 50);
+    context.fillRect(state.square.x, state.square.y, 20, 20);
 }
