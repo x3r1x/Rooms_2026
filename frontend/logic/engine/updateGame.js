@@ -1,9 +1,20 @@
 import {lastState} from "../model/gameModel.js";
 import { keys } from './listeners.js';
+import {isBulletOutOfBounds} from "./cleaner.js";
+
+
 export function updateGame(elapsedTime, state) {
     //TODO: написать игру =)
     let dx = 0;
     let dy = 0;
+     state.bullets = state.bullets.filter(bullet => {
+        bullet.x += Math.cos(bullet.direction) * elapsedTime * 1.5;
+        bullet.y += Math.sin(bullet.direction) * elapsedTime * 1.5;
+
+        return !isBulletOutOfBounds(bullet);
+    })
+
+    console.log(state.bullets);
 
     let speed = 0.1;
     if (keys['w'] || keys['ц'] || keys['arrowup']) {

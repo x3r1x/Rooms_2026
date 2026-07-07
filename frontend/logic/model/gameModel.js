@@ -1,8 +1,25 @@
 export const lastState = {
     lastTime: 0,
-    //Отладочный код для перемещения квадратика
-    square: {
-        x: 0,
-        y: 0
-    }
+    dot: {
+        x: 650,
+        y: 250
+    },
+    bullets: []
 };
+
+export const bulletDrawProperties = {
+    x: 10,
+    y: 50,
+    color: "#cdcbcb"
+};
+
+/*
+
+interface bullet
+{
+    x: number,
+    y: number,
+    direction: number - в радианах, от -PI до PI
+}
+
+ */
