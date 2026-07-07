@@ -1,0 +1,6 @@
+#настройки подключения и публичная часть ssh
+/config/.
+!/config/ssh/id_ed25519.pub
+
+#исполняемые файлы для вм
+/backend/cmd/server/server
