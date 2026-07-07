@@ -8,6 +8,7 @@ export function initListeners(canvas) {
         keys[event.key.toLowerCase()] = true;
         console.log("key " + event.key);
     });
+
     window.addEventListener('keyup', function(event) {
         keys[event.key.toLowerCase()] = false;
     });

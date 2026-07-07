@@ -1,25 +1,10 @@
+import {GAME_CONSTANTS} from "../gameConstants.js";
+
 export const lastState = {
     lastTime: 0,
     square: {
-        x: 650,
-        y: 250
+        x: GAME_CONSTANTS.SQUARE_START_X,
+        y: GAME_CONSTANTS.SQUARE_START_Y
     },
     bullets: []
 };
-
-export const bulletDrawProperties = {
-    x: 10,
-    y: 50,
-    color: "#cdcbcb"
-};
-
-/*
-
-interface bullet
-{
-    x: number,
-    y: number,
-    direction: number - в радианах, от -PI до PI
-}
-
- */

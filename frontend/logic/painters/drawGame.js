@@ -1,5 +1,6 @@
 import {drawBackground} from "./background.js";
 import {drawBullets} from "./drawBullets.js";
+import {GAME_CONSTANTS} from "../gameConstants.js";
 
 export function drawGame(canvas, context, state) {
     drawBackground(canvas, context);
@@ -11,5 +12,5 @@ export function drawGame(canvas, context, state) {
 
 function drawSquare(canvas, context, state) {
     context.fillStyle = "#FFFFFF";
-    context.fillRect(state.square.x, state.square.y, 20, 20);
+    context.fillRect(state.square.x, state.square.y, GAME_CONSTANTS.SQUARE_VISUAL_SIZE, GAME_CONSTANTS.SQUARE_VISUAL_SIZE);
 }

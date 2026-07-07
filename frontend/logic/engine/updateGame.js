@@ -1,37 +1,35 @@
 import {keys} from './listeners.js';
-import {isBulletOutOfBounds} from "./cleaner.js";
+import {updateBullets} from "./bullet.js";
+import {updatePlayer} from "./player.js";
 
 export function updateGame(elapsedTime, state) {
-    let dx = 0;
-    let dy = 0;
+    const playerDirection = {
+        x: 0,
+        y: 0
+    }
 
-    state.bullets = state.bullets.filter(bullet => {
-        bullet.x += Math.cos(bullet.direction) * elapsedTime * 1.5;
-        bullet.y += Math.sin(bullet.direction) * elapsedTime * 1.5;
+    updateBullets(elapsedTime, state)
+    updateDirection(playerDirection);
+    updatePlayer(playerDirection, elapsedTime, state);
+}
 
-        return !isBulletOutOfBounds(bullet);
-    })
-
-    let speed = 0.1;
+function updateDirection(direction) {
     if (keys['w'] || keys['ц'] || keys['arrowup']) {
-        dy -= 1
+        direction.y -= 1
     }
     if (keys['s'] || keys['ы'] || keys['arrowdown']) {
-        dy += 1
+        direction.y += 1
     }
     if (keys['a'] || keys['ф'] || keys['arrowleft']) {
-        dx -= 1
+        direction.x -= 1
     }
     if (keys['d'] || keys['в'] || keys['arrowright']) {
-        dx += 1
-    }
-    let lengthVector = (Math.sqrt(dx * dx + dy * dy));
-    if (lengthVector > 0) {
-        dx /= lengthVector;
-        dy /= lengthVector;
+        direction.x += 1
     }
 
-    //Отладочный код для перемещения квадратика
-    state.square.x += dx * speed * elapsedTime;
-    state.square.y += dy * speed * elapsedTime;
+    let vectorLength = (Math.sqrt(direction.x * direction.x + direction.y * direction.y));
+    if (vectorLength > 0) {
+        direction.x /= vectorLength;
+        direction.y /= vectorLength;
+    }
 }

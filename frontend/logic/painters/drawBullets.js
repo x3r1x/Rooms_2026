@@ -1,23 +1,13 @@
-import {bulletDrawProperties} from "../model/gameModel.js";
+import {GAME_CONSTANTS} from "../gameConstants.js";
 
 export function drawBullets(canvas, context, state) {
     state.bullets.forEach(function (bullet) {
         context.save();
-        context.translate(bullet.x + bulletDrawProperties.x / 2, bullet.y + bulletDrawProperties.y / 2);
+        context.translate(bullet.x + GAME_CONSTANTS.BULLET_WIDTH / 2, bullet.y + GAME_CONSTANTS.BULLET_HEIGHT / 2);
         context.rotate(bullet.direction + Math.PI / 2);
-        context.fillStyle = bulletDrawProperties.color;
-        context.fillRect(-bulletDrawProperties.x / 2, -bulletDrawProperties.y / 2, bulletDrawProperties.x, bulletDrawProperties.y);
+        context.fillStyle = GAME_CONSTANTS.BULLET_COLOR;
+        context.fillRect(-GAME_CONSTANTS.BULLET_WIDTH / 2, -GAME_CONSTANTS.BULLET_HEIGHT / 2,
+            GAME_CONSTANTS.BULLET_WIDTH, GAME_CONSTANTS.BULLET_HEIGHT);
         context.restore();
     })
 }
-
-/*
-
-interface bullet
-{
-    x: number,
-    y: number,
-    direction: number - в радианах, от -PI до PI
-}
-
- */
