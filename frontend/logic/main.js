@@ -1,6 +1,7 @@
 import {lastState} from "./model/gameModel.js";
 import {updateGame} from "./engine/updateGame.js";
 import {drawGame} from "./painters/drawGame.js";
+import {initListeners} from "./engine/listeners.js";
 
 export const canvas = document.getElementById("canvas");
 const context = canvas.getContext('2d');
@@ -8,6 +9,8 @@ const context = canvas.getContext('2d');
 function loadGame() {
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
+
+    initListeners(canvas);
 
     lastState.lastTime = performance.now();
     requestAnimationFrame(startGameLoop);

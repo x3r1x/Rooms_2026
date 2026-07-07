@@ -1,6 +1,6 @@
 export const lastState = {
     lastTime: 0,
-    dot: {
+    square: {
         x: 650,
         y: 250
     },
