@@ -1,7 +1,13 @@
-export function updateGame(elapsedTime, state) {
-    //TODO: написать игру =)
+import {isBulletOutOfBounds} from "./cleaner.js";
 
-    //Отладочный код для перемещения квадратика
-    state.square.x += 0.01 * elapsedTime;
-    state.square.y += 0.005 * elapsedTime;
+
+export function updateGame(elapsedTime, state) {
+     state.bullets = state.bullets.filter(bullet => {
+        bullet.x += Math.cos(bullet.direction) * elapsedTime * 1.5;
+        bullet.y += Math.sin(bullet.direction) * elapsedTime * 1.5;
+
+        return !isBulletOutOfBounds(bullet);
+    })
+
+    console.log(state.bullets);
 }
