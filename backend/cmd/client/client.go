@@ -38,6 +38,6 @@ func main() {
 			fmt.Println(err)
 			continue
 		}
-		fmt.Println("The golang Gophler answer you: ", string(buffer[:n]))
+		fmt.Println("The golang Gopher answer you: ", string(buffer[:n]))
 	}
 }
