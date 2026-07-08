@@ -2,8 +2,10 @@ import {lastState} from "./model/gameModel.js";
 import {updateGame} from "./engine/updateGame.js";
 import {drawGame} from "./painters/drawGame.js";
 import {initListeners} from "./engine/listeners.js";
+import {initSocket} from "./di/server.js";
 
 export const canvas = document.getElementById("canvas");
+export let socket = null;
 const context = canvas.getContext('2d');
 
 function loadGame() {
@@ -11,6 +13,7 @@ function loadGame() {
     canvas.height = canvas.clientHeight;
 
     initListeners(canvas);
+    socket = initSocket()
 
     lastState.lastTime = performance.now();
     requestAnimationFrame(startGameLoop);
@@ -20,7 +23,7 @@ function startGameLoop() {
     const currentTime = performance.now();
     const elapsedTime = currentTime - lastState.lastTime;
 
-    updateGame(elapsedTime, lastState);
+    updateGame(elapsedTime, lastState, socket);
     drawGame(canvas, context, lastState);
 
     lastState.lastTime = currentTime;

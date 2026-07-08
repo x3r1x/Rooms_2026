@@ -2,7 +2,7 @@ import {keys} from './listeners.js';
 import {updateBullets} from "./bullet.js";
 import {updatePlayer} from "./player.js";
 
-export function updateGame(elapsedTime, state) {
+export function updateGame(elapsedTime, state, socket) {
     const playerDirection = {
         x: 0,
         y: 0
@@ -11,6 +11,10 @@ export function updateGame(elapsedTime, state) {
     updateBullets(elapsedTime, state)
     updateDirection(playerDirection);
     updatePlayer(playerDirection, elapsedTime, state);
+
+    if (socket !== null && socket.readyState === 1) {
+        socket.send(`My position: (${state.square.x};${state.square.y})`);
+    }
 }
 
 function updateDirection(direction) {

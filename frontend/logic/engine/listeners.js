@@ -6,7 +6,6 @@ export const keys = {};
 export function initListeners(canvas) {
     window.addEventListener('keydown', function(event) {
         keys[event.key.toLowerCase()] = true;
-        console.log("key " + event.key);
     });
 
     window.addEventListener('keyup', function(event) {
@@ -21,7 +20,7 @@ export function initListeners(canvas) {
         const direction = Math.atan2(y - lastState.square.y, x - lastState.square.x);
 
         //FIXME: those numbers are that magic that even Harry Potter himself is shaking
-        createBullet(lastState, direction, lastState.square.x - 5, lastState.square.y - 20)
+        createBullet(lastState, direction, lastState.square.x + 2.5, lastState.square.y - 12.5)
     });
 }
 
