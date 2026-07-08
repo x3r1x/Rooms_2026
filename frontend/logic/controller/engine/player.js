@@ -1,4 +1,4 @@
-import {GAME_CONSTANTS} from "../gameConstants.js";
+import {GAME_CONSTANTS} from "../../model/gameConstants.js";
 
 export function updatePlayer(direction, elapsedTime, state) {
     state.player.x += direction.x * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;

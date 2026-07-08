@@ -1,4 +1,4 @@
-import {GAME_CONSTANTS} from "../gameConstants.js";
+import {GAME_CONSTANTS} from "./gameConstants.js";
 
 export const lastState = {
     lastTime: 0,

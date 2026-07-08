@@ -1,7 +1,7 @@
-import {lastState} from "../model/gameModel.js";
+import {lastState} from "../../model/gameModel.js";
 import {createBullet} from "../factory/createBullet.js";
 import {updatePlayerDirection} from "./player.js";
-import {GAME_CONSTANTS} from "../gameConstants.js";
+import {GAME_CONSTANTS} from "../../model/gameConstants.js";
 
 export const keys = {};
 
