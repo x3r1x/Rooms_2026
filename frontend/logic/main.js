@@ -1,4 +1,4 @@
-import {lastState} from "./model/gameModel.js";
+import {initLastState, lastState} from "./model/gameModel.js";
 import {updateGame} from "./engine/updateGame.js";
 import {drawGame} from "./painters/drawGame.js";
 import {initListeners} from "./engine/listeners.js";
@@ -15,7 +15,7 @@ function loadGame() {
     initListeners(canvas);
     socket = initSocket()
 
-    lastState.lastTime = performance.now();
+    initLastState(performance.now(), crypto.randomUUID());
     requestAnimationFrame(startGameLoop);
 }
 

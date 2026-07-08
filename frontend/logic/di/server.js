@@ -1,3 +1,6 @@
+import {updatePlayers} from "../engine/player.js";
+import {lastState} from "../model/gameModel.js";
+
 export function initSocket() {
     const socket = new WebSocket("ws://84.201.159.214:8080/ws");
 
@@ -6,7 +9,7 @@ export function initSocket() {
     }
 
     socket.onmessage = function (event) {
-        console.log(`Пришло сообщение - ${event.data}!`);
+        parseMessage(event.data, lastState);
     }
 
     socket.onerror = function (error) {
@@ -14,4 +17,18 @@ export function initSocket() {
     }
 
     return socket;
+}
+
+export function sendMessage(socket, playerInfo) {
+    const message = {
+        "player": playerInfo
+    }
+
+    socket.send(JSON.stringify(message));
+}
+
+function parseMessage(message, state) {
+    let parsedMessage = JSON.parse(message);
+
+    updatePlayers(parsedMessage["players"], state)
 }
