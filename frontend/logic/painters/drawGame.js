@@ -11,11 +11,11 @@ export function drawGame(canvas, context, state) {
 }
 
 function drawPlayer(canvas, context, state) {
-    const player = state.player;
     const sprite = GAME_SPRITES.PLAYER_GOES;
     const size = GAME_CONSTANTS.PLAYER_VISUAL_SIZE;
     context.save();
     context.translate(state.player.x, state.player.y);
-    context.rotate(state.player.direction + Math.PI / 2);
-    context.drawImage(sprite, player.x, player.y, size, size);
-    context.restore();}
+    context.rotate(state.player.direction);
+    context.drawImage(sprite, -size/2, -size/2, size, size);
+    context.restore();
+}
