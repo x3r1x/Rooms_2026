@@ -5,3 +5,7 @@ export function updatePlayer(direction, elapsedTime, state) {
     state.player.y += direction.y * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;
 }
 
+export function updatePlayerDirection(newDirection, state) {
+    state.player.direction = newDirection;
+}
+

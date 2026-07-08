@@ -5,6 +5,7 @@ export const lastState = {
     player: {
         x: GAME_CONSTANTS.PLAYER_START_X,
         y: GAME_CONSTANTS.PLAYER_START_Y,
+        direction: 0
     },
     bullets: []
 };
