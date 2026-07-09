@@ -6,23 +6,41 @@ import (
 	"log"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
 
+type BulletSpawn struct {
+	X float64 `json:"x"`
+	Y float64 `json:"y"`
+}
+
 type ClientMessage struct {
 	Player struct {
-		X  float64 `json:"x"`
-		Y  float64 `json:"y"`
-		ID string  `json:"id"`
+		X       float64       `json:"x"`
+		Y       float64       `json:"y"`
+		ID      string        `json:"id"`
+		Bullets []BulletSpawn `json:"bullets"`
 	} `json:"player"`
 }
 
+type BulletState struct {
+	ID    string  `json:"id"`
+	Owner string  `json:"owner"`
+	X     float64 `json:"x"`
+	Y     float64 `json:"y"`
+	VX    float64 `json:"vx"`
+	VY    float64 `json:"vy"`
+	Life  int     `json:"-"`
+}
+
 type PlayerState struct {
-	X    float64         `json:"x"`
-	Y    float64         `json:"y"`
-	ID   string          `json:"id"`
-	Conn *websocket.Conn `json:"-"`
+	X       float64         `json:"x"`
+	Y       float64         `json:"y"`
+	ID      string          `json:"id"`
+	Bullets []BulletState   `json:"bullets"`
+	Conn    *websocket.Conn `json:"-"`
 }
 
 type ServerMessage struct {
@@ -35,14 +53,20 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-var clients = make(map[string]*PlayerState)
-var mutex sync.Mutex
+var (
+	clients      = make(map[string]*PlayerState)
+	bullets      = make(map[string]*BulletState)
+	mutex        sync.Mutex
+	BULLET_SPEED = 15.0
+	BULLET_TIME  = 60
+)
 
 // TODO: постепенно перевести на обмен данных между клиентом и сервером на сырые байты.
-// TODO: уменьшить обмен, чтобы уменьшить нагрузку
+// TODO: уменьшить объем обмена, чтобы уменьшить нагрузку
 // TODO: разбить на файлы, для нормального поддержания
 // TODO: нужна обратная мапа для подключений для упрощения поиска и мониторинга
 // TODO: коллизия для пуль и их непосредственная обработка
+// TODO: создать отдельный цикл на обработку пуль и движения, наконец добиться нормального распределения
 func handleWebsocket(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -59,6 +83,7 @@ func handleWebsocket(w http.ResponseWriter, r *http.Request) {
 	var currentID string
 
 	for {
+		//TODO: добавить коллизии
 		_, p, err := conn.ReadMessage()
 		if err != nil {
 			log.Println(err)
@@ -84,6 +109,29 @@ func handleWebsocket(w http.ResponseWriter, r *http.Request) {
 				Conn: conn,
 			}
 		}
+		for _, spawn := range msg.Player.Bullets {
+			bulletID := fmt.Sprintf("%s_b_%d", msg.Player.ID, time.Now().UnixNano())
+			bullets[bulletID] = &BulletState{
+				ID:    bulletID,
+				Owner: msg.Player.ID,
+				X:     spawn.X,
+				Y:     spawn.Y,
+				//зашлушка ввиде данных скоростей
+				//избавиться от заглушек в обработчике скорости
+				VX:   BULLET_SPEED,
+				VY:   BULLET_SPEED,
+				Life: BULLET_TIME,
+			}
+		}
+		//подвигали пульку
+		for id, b := range bullets {
+			b.X += b.VX
+			b.Y += b.VY
+			b.Life--
+			if b.Life <= 0 {
+				delete(bullets, id)
+			}
+		}
 		if state, ok := clients[currentID]; ok {
 			state.X = msg.Player.X
 			state.Y = msg.Player.Y
@@ -92,9 +140,16 @@ func handleWebsocket(w http.ResponseWriter, r *http.Request) {
 			Players: make([]PlayerState, 0, len(clients)),
 		}
 		for _, player := range clients {
+			myBullets := make([]BulletState, 0)
+			for _, bullet := range bullets {
+				if bullet.Owner == player.ID {
+					myBullets = append(myBullets, *bullet)
+				}
+			}
 			serverMessage.Players = append(serverMessage.Players, PlayerState{
-				X: player.X, Y: player.Y, ID: player.ID,
+				X: player.X, Y: player.Y, ID: player.ID, Bullets: myBullets,
 			})
+
 		}
 		mutex.Unlock()
 		broadcast(serverMessage)
