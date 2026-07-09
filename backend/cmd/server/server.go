@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math"
 	"net/http"
 	"sync"
 	"time"
@@ -12,8 +13,8 @@ import (
 )
 
 type BulletSpawn struct {
-	X float64 `json:"x"`
-	Y float64 `json:"y"`
+	VX float64 `json:"vx"`
+	VY float64 `json:"vy"`
 }
 
 type ClientMessage struct {
@@ -54,15 +55,16 @@ var upgrader = websocket.Upgrader{
 }
 
 var (
-	clients      = make(map[string]*PlayerState)
-	bullets      = make(map[string]*BulletState)
-	mutex        sync.Mutex
-	BULLET_SPEED = 15.0
-	BULLET_TIME  = 60
+	clients     = make(map[string]*PlayerState)
+	bullets     = make(map[string]*BulletState)
+	mutex       sync.Mutex
+	BULLET_TIME = 60
 )
 
-// TODO: постепенно перевести на обмен данных между клиентом и сервером на сырые байты.
+const MAX_BULLET_SPEED = 15.0
+
 // TODO: уменьшить объем обмена, чтобы уменьшить нагрузку
+// TODO: постепенно перевести на обмен данных между клиентом и сервером на сырые байты.
 // TODO: разбить на файлы, для нормального поддержания
 // TODO: нужна обратная мапа для подключений для упрощения поиска и мониторинга
 // TODO: коллизия для пуль и их непосредственная обработка
@@ -110,28 +112,23 @@ func handleWebsocket(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		for _, spawn := range msg.Player.Bullets {
+			speed := math.Sqrt(spawn.VX*spawn.VX + spawn.VY*spawn.VY)
+			if speed > MAX_BULLET_SPEED || speed <= 0 {
+				log.Println("Invalid speed for bullet: ", currentID, speed)
+				continue
+			}
 			bulletID := fmt.Sprintf("%s_b_%d", msg.Player.ID, time.Now().UnixNano())
 			bullets[bulletID] = &BulletState{
 				ID:    bulletID,
 				Owner: msg.Player.ID,
-				X:     spawn.X,
-				Y:     spawn.Y,
-				//зашлушка ввиде данных скоростей
-				//избавиться от заглушек в обработчике скорости
-				VX:   BULLET_SPEED,
-				VY:   BULLET_SPEED,
-				Life: BULLET_TIME,
+				X:     clients[currentID].X,
+				Y:     clients[currentID].Y,
+				VX:    spawn.VX,
+				VY:    spawn.VY,
+				Life:  BULLET_TIME,
 			}
 		}
-		//подвигали пульку
-		for id, b := range bullets {
-			b.X += b.VX
-			b.Y += b.VY
-			b.Life--
-			if b.Life <= 0 {
-				delete(bullets, id)
-			}
-		}
+
 		if state, ok := clients[currentID]; ok {
 			state.X = msg.Player.X
 			state.Y = msg.Player.Y
@@ -191,8 +188,25 @@ func broadcast(message ServerMessage) {
 	}
 }
 
+func gameLoop() {
+	ticker := time.NewTicker(16 * time.Millisecond)
+	for range ticker.C {
+		mutex.Lock()
+		for id, b := range bullets {
+			b.X += b.VX
+			b.Y += b.VY
+			b.Life--
+			if b.Life <= 0 {
+				delete(bullets, id)
+			}
+		}
+		mutex.Unlock()
+	}
+}
+
 // scp -i "C:\Users\maxim\.ssh\id_ed25519.pub" server yc-user@84.201.159.214:/home/yc-user/
 func main() {
+	go gameLoop()
 	http.HandleFunc("/ws", handleWebsocket)
 	fmt.Println("server listening at port 8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
