@@ -12,15 +12,17 @@ import (
 
 type ClientMessage struct {
 	Player struct {
-		X float64 `json:"x"`
-		Y float64 `json:"y"`
+		X  float64 `json:"x"`
+		Y  float64 `json:"y"`
+		ID string  `json:"id"`
 	} `json:"player"`
 }
 
 type PlayerState struct {
-	X        float64 `json:"x"`
-	Y        float64 `json:"y"`
-	Nickname string  `json:"nickname"`
+	X    float64         `json:"x"`
+	Y    float64         `json:"y"`
+	ID   string          `json:"id"`
+	Conn *websocket.Conn `json:"-"`
 }
 
 type ServerMessage struct {
@@ -33,14 +35,14 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-var clients = make(map[*websocket.Conn]*PlayerState)
+var clients = make(map[string]*PlayerState)
 var mutex sync.Mutex
 var playerCounter int
 
 // TODO: постепенно перевести на обмен данных между клиентом и сервером на сырые байты.
 // TODO: уменьшить обмен, чтобы уменьшить нагрузку
 // TODO: разбить на файлы, для нормального поддержания
-
+// TODO: нужна обратная мапа для подключений для упрощения поиска и мониторинга
 func handleWebsocket(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -53,45 +55,49 @@ func handleWebsocket(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 	fmt.Println("New connection established.")
-	playerCounter++
-	newState := &PlayerState{
-		Nickname: fmt.Sprintf("player%d", playerCounter),
-	}
-	mutex.Lock()
-	clients[conn] = newState
-	mutex.Unlock()
 
-	fmt.Println("New user is here. Players on server", len(clients))
+	var currentID string
+
 	for {
 		_, p, err := conn.ReadMessage()
 		if err != nil {
 			log.Println(err)
 			mutex.Lock()
-			delete(clients, conn)
+			if currentID != "" {
+				delete(clients, conn)
+				fmt.Println("Client disconnected. ID: ", currentID)
+			}
 			mutex.Unlock()
-			fmt.Println("Closing connection. Player leave")
 			break
 		}
-
 		var msg ClientMessage
 		if err := json.Unmarshal(p, &msg); err != nil {
 			log.Println(err)
 			continue
 		}
+
 		mutex.Lock()
-		if state, ok := clients[conn]; ok {
+		if currentID == "" && msg.Player.ID != "" {
+			currentID = msg.Player.ID
+			clients[currentID] = &PlayerState{
+				ID:   currentID,
+				Conn: conn,
+			}
+		}
+		if state, ok := clients[currentID]; ok {
 			state.X = msg.Player.X
 			state.Y = msg.Player.Y
 		}
-		serverMsg := ServerMessage{
+		serverMessage := ServerMessage{
 			Players: make([]PlayerState, 0, len(clients)),
 		}
-		for _, client := range clients {
-			serverMsg.Players = append(serverMsg.Players, *client)
+		for _, player := range clients {
+			serverMessage.Players = append(serverMessage.Players, PlayerState{
+				X: player.X, Y: player.Y, ID: player.ID,
+			})
 		}
 		mutex.Unlock()
-
-		broadcast(serverMsg)
+		broadcast(serverMessage)
 	}
 }
 
@@ -102,14 +108,25 @@ func broadcast(message ServerMessage) {
 		return
 	}
 	mutex.Lock()
-	defer mutex.Unlock()
-	for client := range clients {
-		err := client.WriteMessage(websocket.TextMessage, data)
+	conns := make([]*websocket.Conn, 0, len(clients))
+	for _, player := range clients {
+		conns = append(conns, player.Conn)
+	}
+	mutex.Unlock()
+	for _, conn := range conns {
+		err := conn.WriteMessage(websocket.TextMessage, data)
 		if err != nil {
-			log.Println(err)
-			client.Close()
-			delete(clients, client)
+			for id, p := range clients {
+				if p.Conn == conn {
+					delete(clients, id)
+
+					fmt.Println("Client disconnected. ID: ", id)
+					break
+				}
+			}
 		}
+		mutex.Unlock()
+		conn.Close()
 	}
 }
 
