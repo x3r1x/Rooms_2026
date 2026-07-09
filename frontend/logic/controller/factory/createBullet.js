@@ -4,5 +4,6 @@ export function createBullet(state, bulletDirection, shotX, shotY) {
         y: shotY,
         direction: bulletDirection
     };
-    state.bullets.push(newBullet);
+
+    state.player.bullets.push(newBullet);
 }

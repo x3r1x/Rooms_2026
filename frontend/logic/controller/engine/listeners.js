@@ -11,11 +11,11 @@ export function initListeners(canvas) {
 }
 
 function initWindowListeners() {
-    window.addEventListener('keydown', function(event) {
+    window.addEventListener('keydown', function (event) {
         keys[event.key.toLowerCase()] = true;
     });
 
-    window.addEventListener('keyup', function(event) {
+    window.addEventListener('keyup', function (event) {
         keys[event.key.toLowerCase()] = false;
     });
 }
@@ -29,7 +29,7 @@ function initCanvasListeners(canvas) {
         const direction = Math.atan2(y - lastState.player.y, x - lastState.player.x);
 
         const localX = GAME_CONSTANTS.PLAYER_VISUAL_SIZE / 2;
-        const localY = GAME_CONSTANTS.PLAYER_VISUAL_SIZE / 2 - (GAME_CONSTANTS.BULLET_WIDTH+(GAME_CONSTANTS.PLAYER_VISUAL_SIZE*0.1));
+        const localY = GAME_CONSTANTS.PLAYER_VISUAL_SIZE / 2 - (GAME_CONSTANTS.BULLET_WIDTH + (GAME_CONSTANTS.PLAYER_VISUAL_SIZE * 0.1));
 
         const rotatedX = localX * Math.cos(direction) - localY * Math.sin(direction);
         const rotatedY = localX * Math.sin(direction) + localY * Math.cos(direction);
