@@ -1,9 +1,14 @@
-import {GAME_CONSTANTS} from "../../model/gameLogic/gameConstants.js";
+import {GAME_CONSTANTS} from "../../model/gameConstants.js";
 
 export function updatePlayer(direction, elapsedTime, state) {
-    state.square.x += direction.x * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;
-    state.square.y += direction.y * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;
+    state.player.x += direction.x * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;
+    state.player.y += direction.y * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;
 }
+
+export function updatePlayerDirection(newDirection, state) {
+    state.player.direction = newDirection;
+}
+
 
 export function updatePlayers(playersArray, state) {
     state.enemies = [];

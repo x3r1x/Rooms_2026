@@ -1,8 +1,7 @@
-import {initLastState, lastState} from "./model/gameLogic/gameModel.js";
-import {updateGame} from "./controller/engine/updateGame.js";
-import {drawGame} from "./view/painters/drawGame.js";
-import {initListeners} from "./controller/engine/listeners.js";
-import {initSocket} from "./model/di/server.js";
+import {lastState} from "./model/gameModel.js";
+import {updateGame} from "./engine/updateGame.js";
+import {drawGame} from "./painters/drawGame.js";
+import {initListeners} from "./engine/listeners.js";
 
 export const canvas = document.getElementById("canvas");
 export let socket = null;
@@ -15,6 +14,8 @@ function loadGame() {
     initListeners(canvas);
     socket = initSocket()
 
+    GAME_SPRITES.PLAYER_GOES.src = GAME_CONSTANTS.PLAYER_SKIN_BLUE;
+    GAME_SPRITES.BULLET_FLIES.src = GAME_CONSTANTS.BULLET_SKIN;
     initLastState(performance.now(), crypto.randomUUID());
     requestAnimationFrame(startGameLoop);
 }
