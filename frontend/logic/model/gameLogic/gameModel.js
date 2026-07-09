@@ -2,9 +2,9 @@ import {GAME_CONSTANTS} from "./gameConstants.js";
 
 export const lastState = {
     lastTime: null,
-    square: {
-        x: GAME_CONSTANTS.SQUARE_START_X,
-        y: GAME_CONSTANTS.SQUARE_START_Y,
+    player: {
+        x: GAME_CONSTANTS.PLAYER_START_X,
+        y: GAME_CONSTANTS.PLAYER_START_Y,
         id: null
     },
     enemies: [],
@@ -13,5 +13,5 @@ export const lastState = {
 
 export function initLastState(dateNow, playerId) {
     lastState.lastTime = dateNow;
-    lastState.square.id = playerId;
+    lastState.player.id = playerId;
 }

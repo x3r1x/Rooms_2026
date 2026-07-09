@@ -1,6 +1,6 @@
 import {drawBackground} from "./background.js";
 import {drawBullets} from "./drawBullets.js";
-import {GAME_CONSTANTS, GAME_SPRITES} from "../../model/gameConstants.js";
+import {GAME_CONSTANTS, GAME_SPRITES} from "../../model/gameLogic/gameConstants.js";
 
 export function drawGame(canvas, context, state) {
     drawBackground(canvas, context);
@@ -22,6 +22,6 @@ function drawPlayers(canvas, context, state) {
     context.fillStyle = "#ff0000";
 
     state.enemies.forEach(function (enemy) {
-        context.fillRect(enemy.x, enemy.y, GAME_CONSTANTS.SQUARE_VISUAL_SIZE, GAME_CONSTANTS.SQUARE_VISUAL_SIZE);
+        context.fillRect(enemy.x, enemy.y, GAME_CONSTANTS.PLAYER_VISUAL_SIZE, GAME_CONSTANTS.PLAYER_VISUAL_SIZE);
     })
 }

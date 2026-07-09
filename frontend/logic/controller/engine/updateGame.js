@@ -14,7 +14,7 @@ export function updateGame(elapsedTime, state, socket) {
     updatePlayer(playerDirection, elapsedTime, state);
 
     if (socket !== null && socket.readyState === 1) {
-        sendMessage(socket, state.square);
+        sendMessage(socket, state.player);
     }
 }
 

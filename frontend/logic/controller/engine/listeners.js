@@ -1,7 +1,7 @@
-import {lastState} from "../../model/gameModel.js";
 import {createBullet} from "../factory/createBullet.js";
 import {updatePlayerDirection} from "./player.js";
-import {GAME_CONSTANTS} from "../../model/gameConstants.js";
+import {lastState} from "../../model/gameLogic/gameModel.js";
+import {GAME_CONSTANTS} from "../../model/gameLogic/gameConstants.js";
 
 export const keys = {};
 
@@ -38,7 +38,6 @@ function initCanvasListeners(canvas) {
         const bulletStartY = lastState.player.y + rotatedY;
         createBullet(lastState, direction, bulletStartX, bulletStartY);
     });
-}
 
     canvas.addEventListener('mousemove', function (event) {
         const canvasRect = canvas.getBoundingClientRect();
