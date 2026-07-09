@@ -1,8 +1,8 @@
-import {initLastState, lastState} from "./model/gameModel.js";
-import {updateGame} from "./engine/updateGame.js";
-import {drawGame} from "./painters/drawGame.js";
-import {initListeners} from "./engine/listeners.js";
-import {initSocket} from "./di/server.js";
+import {initLastState, lastState} from "./model/gameLogic/gameModel.js";
+import {updateGame} from "./controller/engine/updateGame.js";
+import {drawGame} from "./view/painters/drawGame.js";
+import {initListeners} from "./controller/engine/listeners.js";
+import {initSocket} from "./model/di/server.js";
 
 export const canvas = document.getElementById("canvas");
 export let socket = null;

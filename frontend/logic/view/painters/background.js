@@ -1,4 +1,4 @@
-import {GAME_CONSTANTS} from "../gameConstants.js";
+import {GAME_CONSTANTS} from "../../model/gameLogic/gameConstants.js";
 
 export function drawBackground(canvas, context) {
     context.fillStyle = '#1a1a2e';

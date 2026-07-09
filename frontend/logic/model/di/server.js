@@ -1,5 +1,5 @@
-import {updatePlayers} from "../engine/player.js";
-import {lastState} from "../model/gameModel.js";
+import {updatePlayers} from "../../controller/engine/player.js";
+import {lastState} from "../gameLogic/gameModel.js";
 
 export function initSocket() {
     const socket = new WebSocket("ws://84.201.159.214:8080/ws");

@@ -1,6 +1,6 @@
 import {drawBackground} from "./background.js";
 import {drawBullets} from "./drawBullets.js";
-import {GAME_CONSTANTS} from "../gameConstants.js";
+import {GAME_CONSTANTS} from "../../model/gameLogic/gameConstants.js";
 
 export function drawGame(canvas, context, state) {
     drawBackground(canvas, context);

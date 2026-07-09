@@ -1,4 +1,4 @@
-import {lastState} from "../model/gameModel.js";
+import {lastState} from "../../model/gameLogic/gameModel.js";
 
 export function createBullet(state, bulletDirection, shotX, shotY) {
     const newBullet = {

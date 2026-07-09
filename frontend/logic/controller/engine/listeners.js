@@ -1,4 +1,4 @@
-import {lastState} from "../model/gameModel.js";
+import {lastState} from "../../model/gameLogic/gameModel.js";
 import {createBullet} from "../factory/createBullet.js";
 
 export const keys = {};

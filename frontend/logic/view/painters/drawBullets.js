@@ -1,4 +1,4 @@
-import {GAME_CONSTANTS} from "../gameConstants.js";
+import {GAME_CONSTANTS} from "../../model/gameLogic/gameConstants.js";
 
 export function drawBullets(canvas, context, state) {
     state.bullets.forEach(function (bullet) {

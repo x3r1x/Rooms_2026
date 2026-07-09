@@ -1,7 +1,7 @@
 import {keys} from './listeners.js';
 import {updateBullets} from "./bullet.js";
 import {updatePlayer} from "./player.js";
-import {sendMessage} from "../di/server.js";
+import {sendMessage} from "../../model/di/server.js";
 
 export function updateGame(elapsedTime, state, socket) {
     const playerDirection = {
