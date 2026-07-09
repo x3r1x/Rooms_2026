@@ -7,11 +7,14 @@ export const GAME_CONSTANTS = {
     PLAYER_START_X: 650,
     PLAYER_START_Y: 400,
     PLAYER_SKIN_BLUE: 'assets/images/manBlue_gun.png',
-    BULLET_SKIN: 'assets/images/bullet_classic.png',
 
     BULLET_WIDTH: 5,
     BULLET_HEIGHT: 25,
     BULLET_COLOR: "#cdcbcb",
+    BULLET_SKIN: 'assets/images/bullet_classic.png',
+
+    ENEMY_SKIN: 'assets/images/hitman1_gun.png',
+    ENEMY_BULLET_SKIN: 'assets/images/enemy_bullet_classic.png'
 }
 
 export const GAME_SPRITES = {
@@ -21,4 +24,7 @@ export const GAME_SPRITES = {
 
     BULLET_HIT: new Image(),
     BULLET_FLIES: new Image(),
+
+    ENEMY_GOES: new Image(),
+    ENEMY_BULLET_FLIES: new Image()
 }

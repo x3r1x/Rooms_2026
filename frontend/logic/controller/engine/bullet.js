@@ -1,5 +1,5 @@
 import {canvas} from "../../main.js";
-import {GAME_CONSTANTS} from "../../model/gameLogic/gameConstants.js";
+import {GAME_CONSTANTS} from "../../model/game/gameConstants.js";
 
 export function updateBullets(elapsedTime, state) {
     state.bullets = state.bullets.filter(bullet => {

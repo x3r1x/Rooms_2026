@@ -5,6 +5,7 @@ export const lastState = {
     player: {
         x: GAME_CONSTANTS.PLAYER_START_X,
         y: GAME_CONSTANTS.PLAYER_START_Y,
+        direction: null,
         id: null
     },
     enemies: [],
@@ -14,4 +15,5 @@ export const lastState = {
 export function initLastState(dateNow, playerId) {
     lastState.lastTime = dateNow;
     lastState.player.id = playerId;
+    lastState.player.direction = 0;
 }

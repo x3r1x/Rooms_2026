@@ -1,5 +1,5 @@
-import {updatePlayers} from "../../controller/engine/player.js";
-import {lastState} from "../gameLogic/gameModel.js";
+import {updateEnemies} from "../../controller/engine/player.js";
+import {lastState} from "../game/gameModel.js";
 
 export function initSocket() {
     const socket = new WebSocket("ws://84.201.159.214:8080/ws");
@@ -30,5 +30,5 @@ export function sendMessage(socket, playerInfo) {
 function parseMessage(message, state) {
     let parsedMessage = JSON.parse(message);
 
-    updatePlayers(parsedMessage["players"], state)
+    updateEnemies(parsedMessage["players"], state)
 }
