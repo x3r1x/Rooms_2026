@@ -4,3 +4,4 @@
 
 #исполняемые файлы для вм
 /backend/cmd/server/server
+/backend/cmd/server/server_test_for_user_update

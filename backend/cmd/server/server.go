@@ -37,12 +37,12 @@ var upgrader = websocket.Upgrader{
 
 var clients = make(map[string]*PlayerState)
 var mutex sync.Mutex
-var playerCounter int
 
 // TODO: постепенно перевести на обмен данных между клиентом и сервером на сырые байты.
 // TODO: уменьшить обмен, чтобы уменьшить нагрузку
 // TODO: разбить на файлы, для нормального поддержания
 // TODO: нужна обратная мапа для подключений для упрощения поиска и мониторинга
+// TODO: коллизия для пуль и их непосредственная обработка
 func handleWebsocket(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -64,7 +64,7 @@ func handleWebsocket(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 			mutex.Lock()
 			if currentID != "" {
-				delete(clients, conn)
+				delete(clients, currentID)
 				fmt.Println("Client disconnected. ID: ", currentID)
 			}
 			mutex.Unlock()
@@ -107,15 +107,18 @@ func broadcast(message ServerMessage) {
 		log.Println(err)
 		return
 	}
+
 	mutex.Lock()
 	conns := make([]*websocket.Conn, 0, len(clients))
 	for _, player := range clients {
 		conns = append(conns, player.Conn)
 	}
 	mutex.Unlock()
+
 	for _, conn := range conns {
 		err := conn.WriteMessage(websocket.TextMessage, data)
 		if err != nil {
+			mutex.Lock()
 			for id, p := range clients {
 				if p.Conn == conn {
 					delete(clients, id)
@@ -124,9 +127,12 @@ func broadcast(message ServerMessage) {
 					break
 				}
 			}
+			mutex.Unlock()
+			err = conn.Close()
+			if err != nil {
+				log.Println(err)
+			}
 		}
-		mutex.Unlock()
-		conn.Close()
 	}
 }
 
