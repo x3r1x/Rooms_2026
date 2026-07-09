@@ -36,6 +36,7 @@ function initCanvasListeners(canvas) {
 
         const bulletStartX = lastState.player.x + rotatedX;
         const bulletStartY = lastState.player.y + rotatedY;
+        updatePlayerDirection(direction, lastState);
         createBullet(lastState, direction, bulletStartX, bulletStartY);
     });
 
