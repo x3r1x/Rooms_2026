@@ -3,10 +3,11 @@ import {GAME_CONSTANTS} from "../../model/game/gameConstants.js";
 export function updatePlayer(direction, elapsedTime, state) {
     state.player.x += direction.x * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;
     state.player.y += direction.y * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;
+    updatePlayerDirection(state);
 }
 
-export function updatePlayerDirection(newDirection, state) {
-    state.player.direction = newDirection;
+export function updatePlayerDirection(state) {
+    state.player.direction = Math.atan2(state.mousePosition.y - state.player.y, state.mousePosition.x - state.player.x);
 }
 
 

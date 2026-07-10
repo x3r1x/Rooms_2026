@@ -1,5 +1,4 @@
 import {createBullet} from "../factory/createBullet.js";
-import {updatePlayerDirection} from "./player.js";
 import {lastState} from "../../model/game/gameModel.js";
 import {GAME_CONSTANTS} from "../../model/game/gameConstants.js";
 
@@ -36,7 +35,7 @@ function initCanvasListeners(canvas) {
 
         const bulletStartX = lastState.player.x + rotatedX;
         const bulletStartY = lastState.player.y + rotatedY;
-        updatePlayerDirection(direction, lastState);
+
         createBullet(lastState, direction, bulletStartX, bulletStartY);
     });
 
@@ -45,8 +44,8 @@ function initCanvasListeners(canvas) {
 
         const x = event.clientX - canvasRect.left;
         const y = event.clientY - canvasRect.top;
-        const direction = Math.atan2(y - lastState.player.y, x - lastState.player.x);
 
-        updatePlayerDirection(direction, lastState);
+        lastState.mousePosition.x = x;
+        lastState.mousePosition.y = y;
     })
 }
