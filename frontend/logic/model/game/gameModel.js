@@ -8,6 +8,8 @@ export const lastState = {
         direction: null,
         id: null
     },
+    map: [],
+    mapCollisian: [],
     enemies: [],
     bullets: []
 };
