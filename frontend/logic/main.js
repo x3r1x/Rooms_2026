@@ -16,7 +16,6 @@ async function loadData() {
 }
 
 async function loadGame() {
-function loadGame() {
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
 
