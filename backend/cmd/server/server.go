@@ -11,29 +11,20 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type BulletSpawn struct {
-	VX float64 `json:"vx"`
-	VY float64 `json:"vy"`
-}
-
 type ClientMessage struct {
 	Player struct {
-		X         float64       `json:"x"`
-		Y         float64       `json:"y"`
-		DIRECTION float64       `json:"direction"`
-		ID        string        `json:"id"`
-		Bullets   []BulletSpawn `json:"bullets"`
+		X         float64  `json:"x"`
+		Y         float64  `json:"y"`
+		DIRECTION float64  `json:"direction"`
+		ID        string   `json:"id"`
+		Bullets   []Bullet `json:"bullets"`
 	} `json:"player"`
 }
 
-type BulletState struct {
-	ID    string  `json:"id"`
-	Owner string  `json:"owner"`
-	X     float64 `json:"x"`
-	Y     float64 `json:"y"`
-	VX    float64 `json:"vx"`
-	VY    float64 `json:"vy"`
-	Life  int     `json:"-"`
+type Bullet struct {
+	X         float64 `json:"x"`
+	Y         float64 `json:"y"`
+	DIRECTION float64 `json:"direction"`
 }
 
 type PlayerState struct {
@@ -41,7 +32,7 @@ type PlayerState struct {
 	Y         float64         `json:"y"`
 	DIRECTION float64         `json:"direction"`
 	ID        string          `json:"id"`
-	Bullets   []BulletState   `json:"bullets"`
+	Bullets   []Bullet        `json:"bullets"`
 	Conn      *websocket.Conn `json:"-"`
 	Mu        sync.Mutex      `json:"-"`
 }
@@ -57,10 +48,8 @@ var upgrader = websocket.Upgrader{
 }
 
 var (
-	clients     = make(map[string]*PlayerState)
-	bullets     = make(map[string]*BulletState)
-	mutex       sync.Mutex
-	BULLET_TIME = 60
+	clients = make(map[string]*PlayerState)
+	mutex   sync.Mutex
 )
 
 const MAX_BULLET_SPEED = 15.0
@@ -106,39 +95,24 @@ func handleWebsocket(w http.ResponseWriter, r *http.Request) {
 		}
 
 		mutex.Lock()
+
 		if currentID == "" && msg.Player.ID != "" {
 			currentID = msg.Player.ID
 			clients[currentID] = &PlayerState{
-				ID:   currentID,
-				Conn: conn,
+				ID:        currentID,
+				X:         msg.Player.X,
+				Y:         msg.Player.Y,
+				DIRECTION: msg.Player.DIRECTION,
+				Bullets:   msg.Player.Bullets,
+				Conn:      conn,
 			}
 		}
-		for _, spawn := range msg.Player.Bullets {
-			var spawnX, spawnY float64
-			if state, ok := clients[currentID]; ok {
-				spawnX = state.X
-				spawnY = state.Y
-			} else {
-				spawnX = msg.Player.X
 
-			}
-			//TODO: отредачить создание пуль, на атомик
-			//TODO: решить проблему спавна
-			bulletID := fmt.Sprintf("%s_b_%d", msg.Player.ID, time.Now().UnixNano())
-			bullets[bulletID] = &BulletState{
-				ID:    bulletID,
-				Owner: msg.Player.ID,
-				X:     spawnX,
-				Y:     spawnY,
-				VX:    spawn.VX,
-				VY:    spawn.VY,
-				Life:  BULLET_TIME,
-			}
-			if state, ok := clients[currentID]; ok {
-				state.X = msg.Player.X
-				state.Y = msg.Player.Y
-				state.DIRECTION = msg.Player.DIRECTION
-			}
+		if state, ok := clients[currentID]; ok {
+			state.X = msg.Player.X
+			state.Y = msg.Player.Y
+			state.DIRECTION = msg.Player.DIRECTION
+			state.Bullets = msg.Player.Bullets
 		}
 
 		mutex.Unlock()
@@ -158,7 +132,7 @@ func broadcast(message ServerMessage) {
 		conns = append(conns, player)
 	}
 	mutex.Unlock()
-	deadClients := []*PlayerState{}
+	var deadClients []*PlayerState
 	for _, player := range conns {
 		player.Mu.Lock()
 		err := player.Conn.WriteMessage(websocket.TextMessage, data)
@@ -185,28 +159,13 @@ func gameLoop() {
 	ticker := time.NewTicker(16 * time.Millisecond)
 	for range ticker.C {
 		mutex.Lock()
-		for id, b := range bullets {
-			b.X += b.VX
-			b.Y += b.VY
-			b.Life--
-			if b.Life <= 0 {
-				delete(bullets, id)
-			}
-		}
 		serverMessage := ServerMessage{
 			Players: make([]PlayerState, 0, len(clients)),
 		}
 		for _, player := range clients {
-			myBullets := make([]BulletState, 0)
-			for _, bullet := range bullets {
-				if bullet.Owner == player.ID {
-					myBullets = append(myBullets, *bullet)
-				}
-			}
 			serverMessage.Players = append(serverMessage.Players, PlayerState{
-				X: player.X, Y: player.Y, DIRECTION: player.DIRECTION, ID: player.ID, Bullets: myBullets,
+				X: player.X, Y: player.Y, DIRECTION: player.DIRECTION, ID: player.ID, Bullets: player.Bullets,
 			})
-
 		}
 		mutex.Unlock()
 		broadcast(serverMessage)
