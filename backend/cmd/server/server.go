@@ -28,13 +28,12 @@ type ClientMessage struct {
 }
 
 type BulletState struct {
-	ID    string  `json:"id"`
-	Owner string  `json:"owner"`
-	X     float64 `json:"x"`
-	Y     float64 `json:"y"`
-	VX    float64 `json:"vx"`
-	VY    float64 `json:"vy"`
-	Life  int     `json:"-"`
+	ID        string  `json:"id"`
+	Owner     string  `json:"owner"`
+	X         float64 `json:"x"`
+	Y         float64 `json:"y"`
+	DIRECTION float64 `json:"direction"`
+	Life      int     `json:"-"`
 }
 
 type PlayerState struct {
@@ -113,21 +112,20 @@ func handleWebsocket(w http.ResponseWriter, r *http.Request) {
 				Conn: conn,
 			}
 		}
-		for _, spawn := range msg.Player.Bullets {
-			speed := math.Sqrt(spawn.VX*spawn.VX + spawn.VY*spawn.VY)
-			if speed > MAX_BULLET_SPEED || speed <= 0 {
-				log.Println("Invalid speed for bullet: ", currentID, speed)
-				continue
-			}
+		for range msg.Player.Bullets {
+			//speed := math.Sqrt(spawn.VX*spawn.VX + spawn.VY*spawn.VY)
+			//if speed > MAX_BULLET_SPEED || speed <= 0 {
+			//	log.Println("Invalid speed for bullet: ", currentID, speed)
+			//	continue
+			//}
 			bulletID := fmt.Sprintf("%s_b_%d", msg.Player.ID, time.Now().UnixNano())
 			bullets[bulletID] = &BulletState{
-				ID:    bulletID,
-				Owner: msg.Player.ID,
-				X:     clients[currentID].X,
-				Y:     clients[currentID].Y,
-				VX:    spawn.VX,
-				VY:    spawn.VY,
-				Life:  BULLET_TIME,
+				ID:        bulletID,
+				Owner:     msg.Player.ID,
+				X:         clients[currentID].X,
+				Y:         clients[currentID].Y,
+				DIRECTION: bullets[bulletID].DIRECTION,
+				Life:      BULLET_TIME,
 			}
 		}
 
@@ -196,8 +194,8 @@ func gameLoop() {
 	for range ticker.C {
 		mutex.Lock()
 		for id, b := range bullets {
-			b.X += b.VX
-			b.Y += b.VY
+			b.X += math.Acos(b.DIRECTION)
+			b.Y += math.Asin(b.DIRECTION)
 			b.Life--
 			if b.Life <= 0 {
 				delete(bullets, id)
