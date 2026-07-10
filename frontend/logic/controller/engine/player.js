@@ -13,12 +13,7 @@ export function updatePlayerDirection(newDirection, state) {
 export function updateEnemies(playersArray, state) {
     state.enemies = [];
     playersArray.forEach(function (enemy) {
-        if (playersArray.player.id !== enemy.id) {
-            //TODO: убрать, когда на беке начнёт посылаться direction
-            if (!("direction" in enemy)) {
-                enemy.direction = 0;
-            }
-
+        if (state.player.id !== enemy.id) {
             state.enemies.push(enemy);
         }
     })
