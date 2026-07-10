@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"math"
 	"net/http"
 	"sync"
 	"time"
@@ -44,6 +43,7 @@ type PlayerState struct {
 	ID        string          `json:"id"`
 	Bullets   []BulletState   `json:"bullets"`
 	Conn      *websocket.Conn `json:"-"`
+	Mu        sync.Mutex      `json:"-"`
 }
 
 type ServerMessage struct {
@@ -114,27 +114,84 @@ func handleWebsocket(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		for _, spawn := range msg.Player.Bullets {
-			speed := math.Sqrt(spawn.VX*spawn.VX + spawn.VY*spawn.VY)
-			if speed > MAX_BULLET_SPEED || speed <= 0 {
-				log.Println("Invalid speed for bullet: ", currentID, speed)
-				continue
+			var spawnX, spawnY float64
+			if state, ok := clients[currentID]; ok {
+				spawnX = state.X
+				spawnY = state.Y
+			} else {
+				spawnX = msg.Player.X
+
 			}
+			//TODO: отредачить создание пуль, на атомик
+			//TODO: решить проблему спавна
 			bulletID := fmt.Sprintf("%s_b_%d", msg.Player.ID, time.Now().UnixNano())
 			bullets[bulletID] = &BulletState{
 				ID:    bulletID,
 				Owner: msg.Player.ID,
-				X:     clients[currentID].X,
-				Y:     clients[currentID].Y,
+				X:     spawnX,
+				Y:     spawnY,
 				VX:    spawn.VX,
 				VY:    spawn.VY,
 				Life:  BULLET_TIME,
 			}
+			if state, ok := clients[currentID]; ok {
+				state.X = msg.Player.X
+				state.Y = msg.Player.Y
+				state.DIRECTION = msg.Player.DIRECTION
+			}
 		}
 
-		if state, ok := clients[currentID]; ok {
-			state.X = msg.Player.X
-			state.Y = msg.Player.Y
-			state.DIRECTION = msg.Player.DIRECTION
+		mutex.Unlock()
+	}
+}
+
+func broadcast(message ServerMessage) {
+	data, err := json.Marshal(message)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	mutex.Lock()
+	conns := make([]*PlayerState, 0, len(clients))
+	for _, player := range clients {
+		conns = append(conns, player)
+	}
+	mutex.Unlock()
+	deadClients := []*PlayerState{}
+	for _, player := range conns {
+		player.Mu.Lock()
+		err := player.Conn.WriteMessage(websocket.TextMessage, data)
+		player.Mu.Unlock()
+		if err != nil {
+			deadClients = append(deadClients, player)
+		}
+	}
+	if len(deadClients) > 0 {
+		mutex.Lock()
+		for _, deadClient := range deadClients {
+			delete(clients, deadClient.ID)
+			fmt.Println("Client disconnected. ID: ", deadClient.ID)
+			err = deadClient.Conn.Close()
+			if err != nil {
+				log.Println(err)
+			}
+		}
+		mutex.Unlock()
+	}
+}
+
+func gameLoop() {
+	ticker := time.NewTicker(16 * time.Millisecond)
+	for range ticker.C {
+		mutex.Lock()
+		for id, b := range bullets {
+			b.X += b.VX
+			b.Y += b.VY
+			b.Life--
+			if b.Life <= 0 {
+				delete(bullets, id)
+			}
 		}
 		serverMessage := ServerMessage{
 			Players: make([]PlayerState, 0, len(clients)),
@@ -153,57 +210,6 @@ func handleWebsocket(w http.ResponseWriter, r *http.Request) {
 		}
 		mutex.Unlock()
 		broadcast(serverMessage)
-	}
-}
-
-func broadcast(message ServerMessage) {
-	data, err := json.Marshal(message)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	mutex.Lock()
-	conns := make([]*websocket.Conn, 0, len(clients))
-	for _, player := range clients {
-		conns = append(conns, player.Conn)
-	}
-	mutex.Unlock()
-
-	for _, conn := range conns {
-		err := conn.WriteMessage(websocket.TextMessage, data)
-		if err != nil {
-			mutex.Lock()
-			for id, p := range clients {
-				if p.Conn == conn {
-					delete(clients, id)
-
-					fmt.Println("Client disconnected. ID: ", id)
-					break
-				}
-			}
-			mutex.Unlock()
-			err = conn.Close()
-			if err != nil {
-				log.Println(err)
-			}
-		}
-	}
-}
-
-func gameLoop() {
-	ticker := time.NewTicker(16 * time.Millisecond)
-	for range ticker.C {
-		mutex.Lock()
-		for id, b := range bullets {
-			b.X += b.VX
-			b.Y += b.VY
-			b.Life--
-			if b.Life <= 0 {
-				delete(bullets, id)
-			}
-		}
-		mutex.Unlock()
 	}
 }
 
