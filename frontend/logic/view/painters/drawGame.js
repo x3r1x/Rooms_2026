@@ -3,7 +3,7 @@ import {drawBullets} from "./drawBullets.js";
 import {drawPlayers} from "./drawPlayers.js";
 
 export function drawGame(canvas, context, state) {
-    drawBackground(canvas, context);
+    drawBackground(canvas, context, state);
     drawBullets(context, state);
     drawPlayers(context, state);
 

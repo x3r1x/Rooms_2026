@@ -13,6 +13,8 @@ export const lastState = {
         bullets: [],
         id: null
     },
+    map: [],
+    mapCollisian: [],
     enemies: [],
 };
 
