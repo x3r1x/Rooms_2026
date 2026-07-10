@@ -19,10 +19,11 @@ type BulletSpawn struct {
 
 type ClientMessage struct {
 	Player struct {
-		X       float64       `json:"x"`
-		Y       float64       `json:"y"`
-		ID      string        `json:"id"`
-		Bullets []BulletSpawn `json:"bullets"`
+		X         float64       `json:"x"`
+		Y         float64       `json:"y"`
+		DIRECTION float64       `json:"direction"`
+		ID        string        `json:"id"`
+		Bullets   []BulletSpawn `json:"bullets"`
 	} `json:"player"`
 }
 
@@ -37,11 +38,12 @@ type BulletState struct {
 }
 
 type PlayerState struct {
-	X       float64         `json:"x"`
-	Y       float64         `json:"y"`
-	ID      string          `json:"id"`
-	Bullets []BulletState   `json:"bullets"`
-	Conn    *websocket.Conn `json:"-"`
+	X         float64         `json:"x"`
+	Y         float64         `json:"y"`
+	DIRECTION float64         `json:"direction"`
+	ID        string          `json:"id"`
+	Bullets   []BulletState   `json:"bullets"`
+	Conn      *websocket.Conn `json:"-"`
 }
 
 type ServerMessage struct {
@@ -132,6 +134,7 @@ func handleWebsocket(w http.ResponseWriter, r *http.Request) {
 		if state, ok := clients[currentID]; ok {
 			state.X = msg.Player.X
 			state.Y = msg.Player.Y
+			state.DIRECTION = msg.Player.DIRECTION
 		}
 		serverMessage := ServerMessage{
 			Players: make([]PlayerState, 0, len(clients)),
@@ -144,7 +147,7 @@ func handleWebsocket(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 			serverMessage.Players = append(serverMessage.Players, PlayerState{
-				X: player.X, Y: player.Y, ID: player.ID, Bullets: myBullets,
+				X: player.X, Y: player.Y, DIRECTION: player.DIRECTION, ID: player.ID, Bullets: myBullets,
 			})
 
 		}
