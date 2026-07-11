@@ -1,4 +1,4 @@
-module GamedevRooms
+module gamedevRooms
 
 go 1.25
 

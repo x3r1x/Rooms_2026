@@ -3,5 +3,5 @@
 !/config/ssh/id_ed25519.pub
 
 #исполняемые файлы для вм
-/backend/cmd/server/server
-/backend/cmd/server/server_test_for_user_update
+./backend/cmd/server/
+!/backend/cmd/server/main.go
