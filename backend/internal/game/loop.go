@@ -8,26 +8,32 @@ import (
 
 func StartGameLoop() {
 	ticker := time.NewTicker(16 * time.Millisecond)
+	serverMessage := models.ServerMessage{
+		Players: make([]models.PlayerState, 0, len(Clients)),
+	}
 	for range ticker.C {
 		Mutex.Lock()
 		//TODO: вынести в функцию
 		for _, player := range Clients {
-			activeBullets := make([]models.Bullet, 0, len(player.Bullets))
-			for _, bullet := range player.Bullets {
+			writeIdx := 0
+			for readIdx, _ := range player.Bullets {
+				bullet := &player.Bullets[readIdx]
 				bullet.Life--
+				if bullet.Life <= 0 {
+					continue
+				}
 				bullet.X += math.Cos(bullet.Direction) * MAX_BULLET_SPEED
 				bullet.Y += math.Sin(bullet.Direction) * MAX_BULLET_SPEED
 				// обдумать условие
-				if bullet.Life > 0 && bullet.Y >= 0 && bullet.Y <= MAP_SIZE && bullet.X >= 0 && bullet.X <= MAP_SIZE {
-					activeBullets = append(activeBullets, bullet)
+				if bullet.Y >= 0 && bullet.Y <= MAP_SIZE && bullet.X >= 0 && bullet.X <= MAP_SIZE {
+					player.Bullets[writeIdx] = *bullet
+					writeIdx++
 				}
 			}
-			player.Bullets = activeBullets
+			player.Bullets = player.Bullets[:writeIdx]
 		}
 
-		serverMessage := models.ServerMessage{
-			Players: make([]models.PlayerState, 0, len(Clients)),
-		}
+		serverMessage.Players = serverMessage.Players[:0]
 		for _, player := range Clients {
 			serverMessage.Players = append(serverMessage.Players, models.PlayerState{
 				X:         player.X,
