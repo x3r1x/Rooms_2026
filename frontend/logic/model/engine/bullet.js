@@ -1,5 +1,5 @@
 import {canvas} from "../../main.js";
-import {GAME_CONSTANTS} from "../../model/game/gameConstants.js";
+import {GAME_CONSTANTS} from "../storage/gameConstants.js";
 
 export function updateBullets(elapsedTime, bulletsList) {
     const newBulletsList = {};

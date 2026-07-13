@@ -1,4 +1,4 @@
-import {GAME_CONSTANTS, GAME_SPRITES} from "../model/game/gameConstants.js";
+import {GAME_CONSTANTS, GAME_SPRITES} from "../model/storage/gameConstants.js";
 
 export function initSprites() {
     GAME_SPRITES.PLAYER_GOES.src = GAME_CONSTANTS.PLAYER_SKIN_BLUE;

@@ -1,8 +1,8 @@
-import {updateGame} from "./controller/engine/updateGame.js";
+import {updateGame} from "./model/engine/updateGame.js";
 import {drawGame} from "./view/painters/drawGame.js";
-import {currentState, initLastState} from "./model/game/gameModel.js";
-import {initListeners} from "./controller/engine/listeners.js";
-import {initSocket} from "./model/di/server.js";
+import {currentState, initLastState} from "./model/storage/states.js";
+import {initListeners} from "./controller/listeners.js";
+import {initSocket} from "./model/di/webSocket/server.js";
 import {initSprites} from "./view/sprites.js";
 import {initMap} from "./view/maps.js";
 

@@ -1,4 +1,4 @@
-import {GAME_CONSTANTS, GAME_SPRITES} from "../../model/game/gameConstants.js";
+import {GAME_CONSTANTS, GAME_SPRITES} from "../../model/storage/gameConstants.js";
 
 export function drawPlayers(context, state) {
     drawMainPlayer(context, state.player);

@@ -1,4 +1,4 @@
-import {getPlayerFromModelById} from "../engine/players.js";
+import {getPlayerFromModelById} from "../../engine/players.js";
 
 export function processAssignment(players, state) {
     for (const [id, player] of Object.entries(players)) {

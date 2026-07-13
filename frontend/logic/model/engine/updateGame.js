@@ -1,4 +1,4 @@
-import {keys} from './listeners.js';
+import {keys} from '../../controller/listeners.js';
 import {updateEnemies, updatePlayer} from "./players.js";
 
 export function updateGame(elapsedTime, state) {

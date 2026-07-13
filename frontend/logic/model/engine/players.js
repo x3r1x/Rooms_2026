@@ -1,9 +1,15 @@
-import {GAME_CONSTANTS} from "../../model/game/gameConstants.js";
+import {GAME_CONSTANTS} from "../storage/gameConstants.js";
 import {updateBullets} from "./bullet.js";
 
 export function updatePlayer(direction, elapsedTime, state) {
-    state.player.x += direction.x * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;
-    state.player.y += direction.y * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;
+    const directionVectorLength = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
+    const normalizedDirection = {
+        x: direction.x / directionVectorLength,
+        y: direction.y / directionVectorLength
+    }
+
+    state.player.x += normalizedDirection.x * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;
+    state.player.y += normalizedDirection.y * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;
     updatePlayerDirection(state);
     state.player.bullets = updateBullets(elapsedTime, state.player.bullets)
 }

@@ -1,4 +1,4 @@
-import {GAME_CONSTANTS, TILE_IMG} from "../../model/game/gameConstants.js";
+import {TILE_IMG} from "../../model/storage/gameConstants.js";
 
 export function drawBackground(canvas, context, state) {
     const map = state.map;

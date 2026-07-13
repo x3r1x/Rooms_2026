@@ -1,6 +1,6 @@
-import {createBullet} from "../factory/createBullet.js";
-import {currentState} from "../../model/game/gameModel.js";
-import {GAME_CONSTANTS} from "../../model/game/gameConstants.js";
+import {createBullet} from "../model/factory/createBullet.js";
+import {currentState} from "../model/storage/states.js";
+import {GAME_CONSTANTS} from "../model/storage/gameConstants.js";
 
 export const keys = {};
 

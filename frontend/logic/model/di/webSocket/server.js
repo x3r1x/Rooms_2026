@@ -1,6 +1,6 @@
-import {currentState, previousState} from "../game/gameModel.js";
-import {processInterpolation} from "../../controller/server/processInterpolation.js";
-import {processAssignment} from "../../controller/server/processAssignment.js";
+import {currentState, previousState} from "../../storage/states.js";
+import {processInterpolation} from "./processInterpolation.js";
+import {processAssignment} from "./processAssignment.js";
 
 export function initSocket() {
     const socket = new WebSocket("ws://84.201.159.214:8080/ws");
