@@ -68,9 +68,7 @@ func HandleWebsocket(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if currentID != "" {
-			if _, ok := game.Clients[currentID]; !ok {
-				game.UpdatePlayerState(currentID, msg.Player.X, msg.Player.Y, msg.Player.Direction, msg.Player.Bullets)
-			}
+			game.UpdatePlayerState(currentID, msg.Player.X, msg.Player.Y, msg.Player.Direction, msg.Player.Bullets)
 		}
 
 		game.Mutex.Unlock()
