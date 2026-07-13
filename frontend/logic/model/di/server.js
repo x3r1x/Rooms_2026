@@ -1,4 +1,4 @@
-import {currentState, lastState} from "../game/gameModel.js";
+import {currentState, previousState} from "../game/gameModel.js";
 import {processInterpolation} from "../../controller/server/processInterpolation.js";
 import {processAssignment} from "../../controller/server/processAssignment.js";
 
@@ -10,7 +10,9 @@ export function initSocket() {
     }
 
     socket.onmessage = function (event) {
-        parseMessage(event.data, currentState, lastState);
+        sendMessage(socket, currentState, previousState);
+        parseMessage(event.data, previousState);
+        processCurrentState(currentState, previousState);
     }
 
     socket.onerror = function (error) {
@@ -20,22 +22,38 @@ export function initSocket() {
     return socket;
 }
 
-export function sendMessage(socket, playerInfo) {
+export function parseMessage(message, state) {
+    let parsedMessage = JSON.parse(message);
+
+    if (parsedMessage.type === "interpolation" && "playerInterpolations" in parsedMessage) {
+        processInterpolation(parsedMessage["playerInterpolations"], state);
+    } else if (parsedMessage.type === "absolute" && "players" in parsedMessage) {
+        processAssignment(parsedMessage["players"], state);
+    } else {
+        console.log(`Packet loss: ${parsedMessage.type}!`);
+    }
+}
+
+function sendMessage(socket, state, previousState) {
     const message = {
-        "player": playerInfo
+        "playerInterpolation": {
+            "direction": state.movementDirection,
+            "deltaDirection": state.player.direction - previousState.player.direction,
+            "id": state.player.id,
+            "newBulletsDirection": state.newBulletsDirection
+        }
     }
 
     socket.send(JSON.stringify(message));
 }
 
-export function parseMessage(message, state, previousState) {
-    let parsedMessage = JSON.parse(message);
+function processCurrentState(currentState, previousState) {
+    currentState.player = previousState.player;
+    currentState.enemies = previousState.enemies;
 
-    if (parsedMessage.type === "interpolation" && "playerInterpolations" in parsedMessage) {
-        processInterpolation(parsedMessage["playerInterpolations"], state, previousState);
-    } else if (parsedMessage.type === "absolute" && "players" in parsedMessage) {
-        processAssignment(parsedMessage["players"], state, previousState);
-    } else {
-        console.log(`Packet loss: ${parsedMessage.type}!`);
+    currentState.movementDirection = {
+        x: 0,
+        y: 0
     }
+    currentState.newBulletsDirection = [];
 }

@@ -1,8 +1,8 @@
-import {getPlayerFromModelById} from "../engine/player.js";
+import {getPlayerFromModelById} from "../engine/players.js";
 
-export function processInterpolation(playerInterpolations, state, previousState) {
+export function processInterpolation(playerInterpolations, state) {
     for (const [id, playerInterpolation] of Object.entries(playerInterpolations)) {
-        const playerInModel = getPlayerFromModelById(previousState, id);
+        const playerInModel = getPlayerFromModelById(state, id);
 
         if (playerInModel === null) {
             console.log(`processIntepolation: Unknown id: ${id}`);
@@ -10,8 +10,6 @@ export function processInterpolation(playerInterpolations, state, previousState)
             interpolatePlayerInModel(playerInModel, playerInterpolation);
         }
     }
-
-    updateCurrentState(state, previousState);
 }
 
 function interpolatePlayerInModel(player, interpolation) {
@@ -25,7 +23,7 @@ function interpolatePlayerInModel(player, interpolation) {
             newBulletsList[id] = {
                 x: bullet.x + interpolation.deltaBullets[id].dx,
                 y: bullet.y + interpolation.deltaBullets[id].dy,
-                direction: bullet.direction
+                movementDirection: bullet.movementDirection
             }
 
         }
@@ -36,9 +34,4 @@ function interpolatePlayerInModel(player, interpolation) {
     }
 
     player.bullets = newBulletsList;
-}
-
-function updateCurrentState(currentState, previousState) {
-    currentState.player = previousState.player;
-    currentState.enemies = previousState.enemies;
 }

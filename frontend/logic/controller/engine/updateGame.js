@@ -1,24 +1,13 @@
 import {keys} from './listeners.js';
-import {updateBullets} from "./bullet.js";
-import {updatePlayer} from "./player.js";
-import {sendMessage} from "../../model/di/server.js";
+import {updateEnemies, updatePlayer} from "./players.js";
 
-export function updateGame(elapsedTime, state, socket) {
-    const playerDirection = {
-        x: 0,
-        y: 0
-    }
-
-    updateBullets(elapsedTime, state)
-    updateDirection(playerDirection);
-    updatePlayer(playerDirection, elapsedTime, state);
-
-    if (socket !== null && socket.readyState === 1) {
-        sendMessage(socket, state.player);
-    }
+export function updateGame(elapsedTime, state) {
+    updateVisualDirection(state.movementDirection);
+    updatePlayer(state.movementDirection, elapsedTime, state);
+    updateEnemies(elapsedTime, state.enemies);
 }
 
-function updateDirection(direction) {
+function updateVisualDirection(direction) {
     if (keys['w'] || keys['ц'] || keys['arrowup']) {
         direction.y -= 1
     }
@@ -30,11 +19,5 @@ function updateDirection(direction) {
     }
     if (keys['d'] || keys['в'] || keys['arrowright']) {
         direction.x += 1
-    }
-
-    let vectorLength = (Math.sqrt(direction.x * direction.x + direction.y * direction.y));
-    if (vectorLength > 0) {
-        direction.x /= vectorLength;
-        direction.y /= vectorLength;
     }
 }

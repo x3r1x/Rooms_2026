@@ -12,7 +12,7 @@ function drawMainPlayer(context, player) {
 
     context.save();
     context.translate(player.x, player.y);
-    context.rotate(player.direction);
+    context.rotate(player.movementDirection);
     context.drawImage(sprite, -size / 2, -size / 2, size, size);
     context.restore();
 }
@@ -23,7 +23,7 @@ function drawEnemy(context, enemy) {
 
     context.save();
     context.translate(enemy.x, enemy.y);
-    context.rotate(enemy.direction);
+    context.rotate(enemy.movementDirection);
     context.drawImage(sprite, -size / 2, -size / 2, size, size);
     context.restore();
 }

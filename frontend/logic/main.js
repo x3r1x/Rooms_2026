@@ -1,8 +1,8 @@
 import {updateGame} from "./controller/engine/updateGame.js";
 import {drawGame} from "./view/painters/drawGame.js";
-import {currentState, initLastState, lastState} from "./model/game/gameModel.js";
+import {currentState, initLastState} from "./model/game/gameModel.js";
 import {initListeners} from "./controller/engine/listeners.js";
-import {initSocket, parseMessage} from "./model/di/server.js";
+import {initSocket} from "./model/di/server.js";
 import {initSprites} from "./view/sprites.js";
 import {initMap} from "./view/maps.js";
 
@@ -22,6 +22,7 @@ async function loadGame() {
     const mapData = await loadData();
     initListeners(canvas);
     socket = initSocket()
+    //TODO: id бы создавать на сервере...
     initLastState(performance.now(), crypto.randomUUID());
     currentState.map = mapData.layers[0].data;
     currentState.mapCollisian = mapData.layers[1].data;

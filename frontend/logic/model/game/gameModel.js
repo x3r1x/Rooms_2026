@@ -6,6 +6,7 @@ export const currentState = {
         x: null,
         y: null
     },
+
     player: {
         x: GAME_CONSTANTS.PLAYER_START_X,
         y: GAME_CONSTANTS.PLAYER_START_Y,
@@ -13,20 +14,27 @@ export const currentState = {
         bullets: {},
         id: null
     },
+    enemies: [],
+
+    movementDirection: {
+        x: 0,
+        y: 0
+    },
+    newBulletsDirection: [],
+
     map: [],
     mapCollisian: [],
-    enemies: [],
 };
 
-export const lastState = {
+export const previousState = {
     player: {
-        x: GAME_CONSTANTS.PLAYER_START_X,
-        y: GAME_CONSTANTS.PLAYER_START_Y,
+        x: null,
+        y: null,
         direction: null,
         bullets: {},
         id: null
     },
-    enemies: [],
+    enemies: []
 }
 
 export function initLastState(dateNow, playerId) {
@@ -37,4 +45,5 @@ export function initLastState(dateNow, playerId) {
 
     currentState.player.id = playerId;
     currentState.player.direction = 0;
+    currentState.previousVisualDirection = 0;
 }
