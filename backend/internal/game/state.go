@@ -24,22 +24,19 @@ func UpdatePlayerState(id string, x, y, dir float64, clientBullets []models.Bull
 	state.Y = y
 	state.Direction = dir
 
+	existingID := make(map[string]struct{}, len(state.Bullets))
+	for _, b := range state.Bullets {
+		existingID[b.Id] = struct{}{}
+	}
 	for _, cb := range clientBullets {
-		isDuplicate := false
-		for _, existing := range state.Bullets {
-			if existing.Id == cb.Id {
-				isDuplicate = true
-				break
-			}
-		}
-		if !isDuplicate {
+		if _, exist := existingID[cb.Id]; !exist {
 			newBullet := models.Bullet{
 				Id:        cb.Id,
 				X:         x,
 				Y:         y,
 				Direction: cb.Direction,
-				StartX:    state.X,
-				StartY:    state.Y,
+				StartX:    x,
+				StartY:    y,
 				Owner:     cb.Owner,
 				Life:      BULLET_LIFE,
 			}
