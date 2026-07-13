@@ -1,11 +1,15 @@
 import {GAME_CONSTANTS, GAME_SPRITES} from "../../model/game/gameConstants.js";
 
 export function drawBullets(context, state) {
-    state.player.bullets.forEach((bullet) => drawPLayerBullets(context, bullet));
+    for (const bullet of Object.values(state.player.bullets)) {
+        drawPLayerBullets(context, bullet);
+    }
 
-    state.enemies.forEach((enemy) => {
-        enemy.bullets.forEach((enemyBullet) => drawEnemyBullets(context, enemyBullet));
-    });
+    for (const enemy of Object.values(state.enemies)) {
+        for (const enemyBullet of Object.values(enemy.bullets)) {
+            drawEnemyBullets(context, enemyBullet);
+        }
+    }
 }
 
 function drawPLayerBullets(context, bullet) {

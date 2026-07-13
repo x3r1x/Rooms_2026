@@ -1,5 +1,5 @@
 import {createBullet} from "../factory/createBullet.js";
-import {lastState} from "../../model/game/gameModel.js";
+import {currentState} from "../../model/game/gameModel.js";
 import {GAME_CONSTANTS} from "../../model/game/gameConstants.js";
 
 export const keys = {};
@@ -25,7 +25,7 @@ function initCanvasListeners(canvas) {
 
         const x = event.clientX - canvasRect.left;
         const y = event.clientY - canvasRect.top;
-        const direction = Math.atan2(y - lastState.player.y, x - lastState.player.x);
+        const direction = Math.atan2(y - currentState.player.y, x - currentState.player.x);
 
         const localX = GAME_CONSTANTS.PLAYER_VISUAL_SIZE / 2;
         const localY = GAME_CONSTANTS.PLAYER_VISUAL_SIZE / 2 - (GAME_CONSTANTS.BULLET_WIDTH + (GAME_CONSTANTS.PLAYER_VISUAL_SIZE * 0.1));
@@ -33,10 +33,10 @@ function initCanvasListeners(canvas) {
         const rotatedX = localX * Math.cos(direction) - localY * Math.sin(direction);
         const rotatedY = localX * Math.sin(direction) + localY * Math.cos(direction);
 
-        const bulletStartX = lastState.player.x + rotatedX;
-        const bulletStartY = lastState.player.y + rotatedY;
+        const bulletStartX = currentState.player.x + rotatedX;
+        const bulletStartY = currentState.player.y + rotatedY;
 
-        createBullet(lastState, direction, bulletStartX, bulletStartY);
+        createBullet(currentState, direction, bulletStartX, bulletStartY);
     });
 
     canvas.addEventListener('mousemove', function (event) {
@@ -45,7 +45,7 @@ function initCanvasListeners(canvas) {
         const x = event.clientX - canvasRect.left;
         const y = event.clientY - canvasRect.top;
 
-        lastState.mousePosition.x = x;
-        lastState.mousePosition.y = y;
+        currentState.mousePosition.x = x;
+        currentState.mousePosition.y = y;
     })
 }

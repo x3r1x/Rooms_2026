@@ -19,3 +19,15 @@ export function updateEnemies(playersArray, state) {
         }
     })
 }
+
+export function getPlayerFromModelById(state, id) {
+    if (state.player.id === id) {
+        return state.player;
+    }
+
+    if (id in state.enemies) {
+        return state.enemies[id]
+    }
+
+    return null;
+}

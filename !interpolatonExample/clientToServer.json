@@ -1,0 +1,12 @@
+{
+  "playerInterpolation": {
+    "speedX": 1,
+    "speedY": 0,
+    "deltaVisualDirection": "0.13",
+    "id": "GUID_1",
+    "newBulletsDirection": [
+      0.23,
+      -1.25
+    ]
+  }
+}

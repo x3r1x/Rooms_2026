@@ -1,0 +1,23 @@
+{
+  "type": "absolute",
+  "players": {
+    "GUID_1": {
+      "x": 234.15,
+      "y": 241.24,
+      "direction": -3.1,
+      "bullets": {
+        "Bullet_GUID_1": {
+          "x": 12.23,
+          "y": 321.12,
+          "direction": 1.2
+        }
+      }
+    },
+    "GUID_2": {
+      "x": 0,
+      "y": 0,
+      "direction": 124,
+      "bullets": {}
+    }
+  }
+}

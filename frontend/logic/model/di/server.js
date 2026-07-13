@@ -1,5 +1,6 @@
-import {updateEnemies} from "../../controller/engine/player.js";
-import {lastState} from "../game/gameModel.js";
+import {currentState, lastState} from "../game/gameModel.js";
+import {processInterpolation} from "../../controller/server/processInterpolation.js";
+import {processAssignment} from "../../controller/server/processAssignment.js";
 
 export function initSocket() {
     const socket = new WebSocket("ws://84.201.159.214:8080/ws");
@@ -9,7 +10,7 @@ export function initSocket() {
     }
 
     socket.onmessage = function (event) {
-        parseMessage(event.data, lastState);
+        parseMessage(event.data, currentState, lastState);
     }
 
     socket.onerror = function (error) {
@@ -27,8 +28,14 @@ export function sendMessage(socket, playerInfo) {
     socket.send(JSON.stringify(message));
 }
 
-function parseMessage(message, state) {
+export function parseMessage(message, state, previousState) {
     let parsedMessage = JSON.parse(message);
 
-    updateEnemies(parsedMessage["players"], state)
+    if (parsedMessage.type === "interpolation" && "playerInterpolations" in parsedMessage) {
+        processInterpolation(parsedMessage["playerInterpolations"], state, previousState);
+    } else if (parsedMessage.type === "absolute" && "players" in parsedMessage) {
+        processAssignment(parsedMessage["players"], state, previousState);
+    } else {
+        console.log(`Packet loss: ${parsedMessage.type}!`);
+    }
 }

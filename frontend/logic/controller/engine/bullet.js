@@ -2,12 +2,18 @@ import {canvas} from "../../main.js";
 import {GAME_CONSTANTS} from "../../model/game/gameConstants.js";
 
 export function updateBullets(elapsedTime, state) {
-    state.player.bullets = state.player.bullets.filter(bullet => {
+    const newBulletsList = {};
+
+    for (const [id, bullet] of Object.entries(state.player.bullets)) {
         bullet.x += Math.cos(bullet.direction) * elapsedTime * GAME_CONSTANTS.BULLET_SPEED;
         bullet.y += Math.sin(bullet.direction) * elapsedTime * GAME_CONSTANTS.BULLET_SPEED;
 
-        return !isBulletOutOfBounds(bullet);
-    })
+        if (!isBulletOutOfBounds(bullet)) {
+            newBulletsList[id] = bullet;
+        }
+    }
+
+    state.player.bullets = newBulletsList;
 }
 
 function isBulletOutOfBounds(bullet) {

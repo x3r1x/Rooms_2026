@@ -1,8 +1,8 @@
 import {updateGame} from "./controller/engine/updateGame.js";
 import {drawGame} from "./view/painters/drawGame.js";
-import {initLastState, lastState} from "./model/game/gameModel.js";
+import {currentState, initLastState, lastState} from "./model/game/gameModel.js";
 import {initListeners} from "./controller/engine/listeners.js";
-import {initSocket} from "./model/di/server.js";
+import {initSocket, parseMessage} from "./model/di/server.js";
 import {initSprites} from "./view/sprites.js";
 import {initMap} from "./view/maps.js";
 
@@ -23,8 +23,8 @@ async function loadGame() {
     initListeners(canvas);
     socket = initSocket()
     initLastState(performance.now(), crypto.randomUUID());
-    lastState.map = mapData.layers[0].data;
-    lastState.mapCollisian = mapData.layers[1].data;
+    currentState.map = mapData.layers[0].data;
+    currentState.mapCollisian = mapData.layers[1].data;
     initMap();
     initSprites();
 
@@ -33,12 +33,12 @@ async function loadGame() {
 
 function startGameLoop() {
     const currentTime = performance.now();
-    const elapsedTime = currentTime - lastState.lastTime;
+    const elapsedTime = currentTime - currentState.lastTime;
 
-    updateGame(elapsedTime, lastState, socket);
-    drawGame(canvas, context, lastState);
+    updateGame(elapsedTime, currentState, socket);
+    drawGame(canvas, context, currentState);
 
-    lastState.lastTime = currentTime;
+    currentState.lastTime = currentTime;
     requestAnimationFrame(startGameLoop);
 }
 

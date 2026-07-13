@@ -1,6 +1,6 @@
 import {GAME_CONSTANTS} from "./gameConstants.js";
 
-export const lastState = {
+export const currentState = {
     lastTime: null,
     mousePosition: {
         x: null,
@@ -10,7 +10,7 @@ export const lastState = {
         x: GAME_CONSTANTS.PLAYER_START_X,
         y: GAME_CONSTANTS.PLAYER_START_Y,
         direction: null,
-        bullets: [],
+        bullets: {},
         id: null
     },
     map: [],
@@ -18,12 +18,23 @@ export const lastState = {
     enemies: [],
 };
 
+export const lastState = {
+    player: {
+        x: GAME_CONSTANTS.PLAYER_START_X,
+        y: GAME_CONSTANTS.PLAYER_START_Y,
+        direction: null,
+        bullets: {},
+        id: null
+    },
+    enemies: [],
+}
+
 export function initLastState(dateNow, playerId) {
-    lastState.lastTime = dateNow;
+    currentState.lastTime = dateNow;
 
-    lastState.mousePosition.x = 0;
-    lastState.mousePosition.y = 0;
+    currentState.mousePosition.x = 0;
+    currentState.mousePosition.y = 0;
 
-    lastState.player.id = playerId;
-    lastState.player.direction = 0;
+    currentState.player.id = playerId;
+    currentState.player.direction = 0;
 }
