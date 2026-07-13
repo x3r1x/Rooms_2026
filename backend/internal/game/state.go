@@ -10,7 +10,7 @@ var (
 	Mutex   sync.Mutex
 )
 
-const MAX_BULLET_SPEED = 1.5
+const MAX_BULLET_SPEED = 22.5
 const MAP_SIZE = 2000.0
 const BULLET_LIFE = 60
 
