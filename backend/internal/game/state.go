@@ -41,6 +41,7 @@ func UpdatePlayerState(id string, x, y, dir float64, clientBullets []models.Bull
 				Life:      BULLET_LIFE,
 			}
 			state.Bullets = append(state.Bullets, newBullet)
+			existingID[cb.Id] = struct{}{}
 		}
 	}
 }
