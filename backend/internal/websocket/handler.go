@@ -7,6 +7,7 @@ import (
 	"gamedevRooms/internal/models"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -30,19 +31,41 @@ func HandleWebsocket(w http.ResponseWriter, r *http.Request) {
 	}()
 	fmt.Println("New connection established.")
 
+	sendChan := make(chan []byte, 64)
 	var currentID string
 
+	go func() {
+		defer func() {
+			if err := conn.Close(); err != nil {
+				log.Println(err)
+			}
+		}()
+		for data := range sendChan {
+			err = conn.SetWriteDeadline(time.Now().Add(time.Second * 3))
+			if err != nil {
+				log.Println(err)
+				return
+			}
+			if err = conn.WriteMessage(websocket.TextMessage, data); err != nil {
+				log.Println(err)
+				return
+			}
+		}
+	}()
+	defer func() {
+		close(sendChan)
+		game.Mutex.Lock()
+		if currentID != "" {
+			delete(game.Clients, currentID)
+			fmt.Println("Disconnected client:", currentID)
+		}
+		game.Mutex.Unlock()
+	}()
+
 	for {
-		//TODO: добавить коллизии
 		_, p, err := conn.ReadMessage()
 		if err != nil {
 			log.Println(err)
-			game.Mutex.Lock()
-			if currentID != "" {
-				delete(game.Clients, currentID)
-				fmt.Println("Client disconnected. Id: ", currentID)
-			}
-			game.Mutex.Unlock()
 			break
 		}
 		var msg models.ClientMessage
@@ -53,15 +76,15 @@ func HandleWebsocket(w http.ResponseWriter, r *http.Request) {
 
 		game.Mutex.Lock()
 
-		if currentID == "" && msg.Player.Id != "" {
-			currentID = msg.Player.Id
+		if currentID == "" && msg.PlayerInterpolation.Id != "" {
+			currentID = msg.PlayerInterpolation.Id
 			game.Clients[currentID] = &models.PlayerState{
-				Id:        currentID,
-				X:         msg.Player.X,
-				Y:         msg.Player.Y,
-				Direction: msg.Player.Direction,
-				Bullets:   []models.Bullet{},
+				X:         models.PLAYER_START_X,
+				Y:         models.PLAYER_START_Y,
+				Direction: models.PLAYER_START_DIRECTION,
+				Bullets:   map[string]models.Bullet{},
 				Conn:      conn,
+				SendChan:  sendChan,
 			}
 			game.Mutex.Unlock()
 			continue
@@ -69,7 +92,15 @@ func HandleWebsocket(w http.ResponseWriter, r *http.Request) {
 
 		if currentID != "" {
 			if _, ok := game.Clients[currentID]; ok {
-				game.UpdatePlayerState(currentID, msg.Player.X, msg.Player.Y, msg.Player.Direction, msg.Player.Bullets)
+				var playerMovementDirection game.PlayerMovementDirection
+
+				playerMovementDirection = game.PlayerMovementDirection{
+					X: float64(msg.PlayerInterpolation.Direction.X),
+					Y: float64(msg.PlayerInterpolation.Direction.Y),
+				}
+
+				game.UpdatePlayerState(currentID, playerMovementDirection, msg.PlayerInterpolation.DeltaVisualDirection,
+					msg.PlayerInterpolation.NewBulletsDirection)
 			}
 		}
 
