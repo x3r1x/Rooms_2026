@@ -17,7 +17,7 @@ var ServerMessagePool = sync.Pool{
 
 func UpdateBullets() {
 	for id, player := range Clients {
-		writeIdx := 0
+		newBullets := make(map[string]models.Bullet)
 		for readIdx, _ := range player.Bullets {
 			bullet := player.Bullets[readIdx]
 			bullet.Life--
@@ -26,35 +26,34 @@ func UpdateBullets() {
 			}
 			bullet.X += math.Cos(bullet.Direction) * models.MAX_BULLET_SPEED
 			bullet.Y += math.Sin(bullet.Direction) * models.MAX_BULLET_SPEED
-			// обдумать условие
 			if bullet.Y >= 0 && bullet.Y <= models.MAP_SIZE && bullet.X >= 0 && bullet.X <= models.MAP_SIZE {
-				player.Bullets[id] = bullet
-				writeIdx++
+				newBullets[readIdx] = bullet
 			}
 		}
-		//player.Bullets = player.Bullets[:id]
+		player.Bullets = newBullets
+		Clients[id] = player
 	}
-
 }
 
 func StartGameLoop() {
 	ticker := time.NewTicker(models.TICK_TIME * time.Millisecond)
 	//TODO: мапа на клиентов, чтобы избавиться от дублирования.
-	//TODO: мапа на пули, для регулирования при попадании в стену и удалении из последовательности середины
 
 	for range ticker.C {
 		msg := ServerMessagePool.Get().(*models.AbsoluteServerMessage)
 
+		for k := range msg.Players {
+			delete(msg.Players, k)
+		}
+
 		Mutex.Lock()
-		//TODO: вынести в функцию
-		//TODO: организовать очищение памяти от мусора. опционально
 		UpdateBullets()
 		for id, player := range Clients {
 			msg.Players[id] = *player
 		}
 		Mutex.Unlock()
 		broadcastAbsolute(*msg)
+		//PreviousClients = Clients
 		ServerMessagePool.Put(msg)
-		PreviousClients = Clients
 	}
 }
