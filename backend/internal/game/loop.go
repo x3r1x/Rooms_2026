@@ -18,8 +18,7 @@ var ServerMessagePool = sync.Pool{
 func UpdateBullets() {
 	for id, player := range Clients {
 		newBullets := make(map[string]models.Bullet)
-		for readIdx, _ := range player.Bullets {
-			bullet := player.Bullets[readIdx]
+		for readIdx, bullet := range player.Bullets {
 			bullet.Life--
 			if bullet.Life <= 0 {
 				continue

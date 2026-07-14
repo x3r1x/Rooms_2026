@@ -43,7 +43,7 @@ func normalizeMovementDirection(movementDirection *PlayerMovementDirection) {
 	if vectorLength != 0 {
 		*movementDirection = PlayerMovementDirection{
 			X: movementDirection.X / vectorLength,
-			Y: movementDirection.X / vectorLength,
+			Y: movementDirection.Y / vectorLength,
 		}
 	}
 }
