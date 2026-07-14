@@ -12,7 +12,7 @@ type PlayerState struct {
 	Direction float64           `json:"direction"`
 	Bullets   map[string]Bullet `json:"bullets"`
 	Conn      *websocket.Conn   `json:"-"`
-	Mu        sync.Mutex        `json:"-"`
+	SendChan  chan<- []byte     `json:"-"`
 }
 
 type PlayerInterpolation struct {

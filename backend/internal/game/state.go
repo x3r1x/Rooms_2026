@@ -12,7 +12,7 @@ import (
 var (
 	Clients         = make(map[string]*models.PlayerState)
 	PreviousClients = make(map[string]*models.PlayerState)
-	Mutex           sync.Mutex
+	Mutex           sync.RWMutex
 )
 
 type PlayerMovementDirection struct {
