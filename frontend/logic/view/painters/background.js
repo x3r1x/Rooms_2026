@@ -1,5 +1,5 @@
 import {TILE_IMG} from "../../model/game/gameConstants.js";
-import {lastState, layersForRoom, room} from "../../model/game/gameModel.js";
+import {layersForRoom, room} from "../../model/game/gameModel.js";
 
 export function drawBackground(canvas, context) {
     const mapExit = room.exits.data;
