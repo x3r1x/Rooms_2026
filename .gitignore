@@ -3,5 +3,8 @@
 !/config/ssh/id_ed25519.pub
 
 #исполняемые файлы для вм
-./backend/cmd/server/
+./backend
+./backend/cmd/server
 !/backend/cmd/server/main.go
+!./backend/internal
+!./backend/go.mod

@@ -34,8 +34,8 @@ func broadcast(message models.ServerMessage) {
 	if len(deadClients) > 0 {
 		Mutex.Lock()
 		for _, deadClient := range deadClients {
-			delete(Clients, deadClient.ID)
-			fmt.Println("Client disconnected. ID: ", deadClient.ID)
+			delete(Clients, deadClient.Id)
+			fmt.Println("Client disconnected. Id: ", deadClient.Id)
 			err = deadClient.Conn.Close()
 			if err != nil {
 				log.Println(err)

@@ -40,7 +40,7 @@ func HandleWebsocket(w http.ResponseWriter, r *http.Request) {
 			game.Mutex.Lock()
 			if currentID != "" {
 				delete(game.Clients, currentID)
-				fmt.Println("Client disconnected. ID: ", currentID)
+				fmt.Println("Client disconnected. Id: ", currentID)
 			}
 			game.Mutex.Unlock()
 			break
@@ -53,23 +53,24 @@ func HandleWebsocket(w http.ResponseWriter, r *http.Request) {
 
 		game.Mutex.Lock()
 
-		if currentID == "" && msg.Player.ID != "" {
-			currentID = msg.Player.ID
+		if currentID == "" && msg.Player.Id != "" {
+			currentID = msg.Player.Id
 			game.Clients[currentID] = &models.PlayerState{
-				ID:        currentID,
+				Id:        currentID,
 				X:         msg.Player.X,
 				Y:         msg.Player.Y,
-				DIRECTION: msg.Player.DIRECTION,
-				Bullets:   msg.Player.Bullets,
+				Direction: msg.Player.Direction,
+				Bullets:   []models.Bullet{},
 				Conn:      conn,
 			}
+			game.Mutex.Unlock()
+			continue
 		}
 
-		if state, ok := game.Clients[currentID]; ok {
-			state.X = msg.Player.X
-			state.Y = msg.Player.Y
-			state.DIRECTION = msg.Player.DIRECTION
-			state.Bullets = msg.Player.Bullets
+		if currentID != "" {
+			if _, ok := game.Clients[currentID]; ok {
+				game.UpdatePlayerState(currentID, msg.Player.X, msg.Player.Y, msg.Player.Direction, msg.Player.Bullets)
+			}
 		}
 
 		game.Mutex.Unlock()
