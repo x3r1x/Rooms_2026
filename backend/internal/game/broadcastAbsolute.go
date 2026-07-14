@@ -9,7 +9,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func broadcast(message models.ServerMessage) {
+func broadcastAbsolute(message models.AbsoluteServerMessage) {
+	message.Type = "absolute"
 	data, err := json.Marshal(message)
 	if err != nil {
 		log.Println(err)
@@ -17,25 +18,25 @@ func broadcast(message models.ServerMessage) {
 	}
 
 	Mutex.Lock()
-	conns := make([]*models.PlayerState, 0, len(Clients))
-	for _, player := range Clients {
-		conns = append(conns, player)
+	conns := make(map[string]*models.PlayerState)
+	for id, player := range Clients {
+		conns[id] = player
 	}
 	Mutex.Unlock()
-	var deadClients []*models.PlayerState
-	for _, player := range conns {
+	var deadClients map[string]*models.PlayerState
+	for id, player := range conns {
 		player.Mu.Lock()
 		err := player.Conn.WriteMessage(websocket.TextMessage, data)
 		player.Mu.Unlock()
 		if err != nil {
-			deadClients = append(deadClients, player)
+			deadClients[id] = player
 		}
 	}
 	if len(deadClients) > 0 {
 		Mutex.Lock()
-		for _, deadClient := range deadClients {
-			delete(Clients, deadClient.Id)
-			fmt.Println("Client disconnected. Id: ", deadClient.Id)
+		for id, deadClient := range deadClients {
+			delete(Clients, id)
+			fmt.Println("Client disconnected. Id: ", id)
 			err = deadClient.Conn.Close()
 			if err != nil {
 				log.Println(err)

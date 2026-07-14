@@ -1,5 +1,15 @@
 package models
 
-const MAX_BULLET_SPEED = 1.5
+const MAX_BULLET_SPEED = 22.5
 const MAP_SIZE = 2000.0
 const BULLET_LIFE = 60
+
+const PLAYER_START_X = 30
+const PLAYER_START_Y = 50
+const PLAYER_START_DIRECTION = 0
+const PLAYER_VISUAL_SIZE = 60
+const BULLET_WIDTH = 5
+
+const PLAYER_SPEED = 0.2
+
+const TICK_TIME = 16

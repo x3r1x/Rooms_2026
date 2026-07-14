@@ -1,12 +1,19 @@
 package models
 
 type Bullet struct {
-	Id        string  `json:"-"`
 	X         float64 `json:"x"`
 	Y         float64 `json:"y"`
 	Direction float64 `json:"direction"`
-	StartX    float64 `json:"-"`
-	StartY    float64 `json:"-"`
-	Owner     string  `json:"-"`
 	Life      float64 `json:"life"`
+}
+
+type BulletInterpolation struct {
+	DX float64 `json:"dx"`
+	DY float64 `json:"dy"`
+}
+
+type NewBullet struct {
+	X         float64 `json:"x"`
+	Y         float64 `json:"y"`
+	Direction float64 `json:"direction"`
 }

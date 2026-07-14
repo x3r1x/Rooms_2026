@@ -1,47 +1,49 @@
 package game
 
 import (
+	"gamedevRooms/internal/factory"
 	"gamedevRooms/internal/models"
+	"math"
 	"sync"
+
+	"github.com/google/uuid"
 )
 
 var (
-	Clients = make(map[string]*models.PlayerState)
-	Mutex   sync.Mutex
+	Clients         = make(map[string]*models.PlayerState)
+	PreviousClients = make(map[string]*models.PlayerState)
+	Mutex           sync.Mutex
 )
 
-const MAX_BULLET_SPEED = 22.5
-const MAP_SIZE = 2000.0
-const BULLET_LIFE = 60
+type PlayerMovementDirection struct {
+	X float64
+	Y float64
+}
 
-func UpdatePlayerState(id string, x, y, dir float64, clientBullets []models.Bullet) {
+func UpdatePlayerState(id string, movementDirection PlayerMovementDirection, deltaVisualDirection float64, newBulletDirections []float64) {
 
 	state, ok := Clients[id]
 	if !ok {
 		return
 	}
-	state.X = x
-	state.Y = y
-	state.Direction = dir
+	normalizeMovementDirection(&movementDirection)
+	state.X += movementDirection.X * models.PLAYER_SPEED * models.TICK_TIME
+	state.Y += movementDirection.Y * models.PLAYER_SPEED * models.TICK_TIME
 
-	existingID := make(map[string]struct{}, len(state.Bullets))
-	for _, b := range state.Bullets {
-		existingID[b.Id] = struct{}{}
+	state.Direction += deltaVisualDirection
+
+	for _, dir := range newBulletDirections {
+		state.Bullets[uuid.New().String()] = factory.CreateBullet(state, dir)
 	}
-	for _, cb := range clientBullets {
-		if _, exist := existingID[cb.Id]; !exist {
-			newBullet := models.Bullet{
-				Id:        cb.Id,
-				X:         x,
-				Y:         y,
-				Direction: cb.Direction,
-				StartX:    x,
-				StartY:    y,
-				Owner:     cb.Owner,
-				Life:      BULLET_LIFE,
-			}
-			state.Bullets = append(state.Bullets, newBullet)
-			existingID[cb.Id] = struct{}{}
+}
+
+func normalizeMovementDirection(movementDirection *PlayerMovementDirection) {
+	var vectorLength = math.Sqrt(movementDirection.X*movementDirection.X + movementDirection.Y*movementDirection.Y)
+
+	if vectorLength != 0 {
+		*movementDirection = PlayerMovementDirection{
+			X: movementDirection.X / vectorLength,
+			Y: movementDirection.X / vectorLength,
 		}
 	}
 }

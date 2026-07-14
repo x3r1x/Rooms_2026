@@ -1,15 +1,23 @@
 package models
 
 type ClientMessage struct {
-	Player struct {
-		X         float64  `json:"x"`
-		Y         float64  `json:"y"`
-		Direction float64  `json:"direction"`
-		Id        string   `json:"id"`
-		Bullets   []Bullet `json:"bullets"`
-	} `json:"player"`
+	PlayerInterpolation struct {
+		Direction struct {
+			X int8 `json:"x"`
+			Y int8 `json:"y"`
+		} `json:"direction"`
+		DeltaVisualDirection float64   `json:"deltaVisualDirection"`
+		Id                   string    `json:"id"`
+		NewBulletsDirection  []float64 `json:"newBulletsDirection"`
+	} `json:"playerInterpolation"`
 }
 
-type ServerMessage struct {
-	Players []PlayerState `json:"players"`
+type AbsoluteServerMessage struct {
+	Type    string                 `json:"type"`
+	Players map[string]PlayerState `json:"players"`
+}
+
+type InterpolationServerMessage struct {
+	Type                 string                         `json:"type"`
+	PlayerInterpolations map[string]PlayerInterpolation `json:"playerInterpolations"`
 }

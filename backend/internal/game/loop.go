@@ -9,59 +9,52 @@ import (
 
 var ServerMessagePool = sync.Pool{
 	New: func() interface{} {
-		return &models.ServerMessage{
-			Players: make([]models.PlayerState, 0, 100),
+		return &models.AbsoluteServerMessage{
+			Players: make(map[string]models.PlayerState),
 		}
 	},
 }
 
 func UpdateBullets() {
-	for _, player := range Clients {
+	for id, player := range Clients {
 		writeIdx := 0
 		for readIdx, _ := range player.Bullets {
-			bullet := &player.Bullets[readIdx]
+			bullet := player.Bullets[readIdx]
 			bullet.Life--
 			if bullet.Life <= 0 {
 				continue
 			}
-			bullet.X += math.Cos(bullet.Direction) * MAX_BULLET_SPEED
-			bullet.Y += math.Sin(bullet.Direction) * MAX_BULLET_SPEED
+			bullet.X += math.Cos(bullet.Direction) * models.MAX_BULLET_SPEED
+			bullet.Y += math.Sin(bullet.Direction) * models.MAX_BULLET_SPEED
 			// обдумать условие
-			if bullet.Y >= 0 && bullet.Y <= MAP_SIZE && bullet.X >= 0 && bullet.X <= MAP_SIZE {
-				player.Bullets[writeIdx] = *bullet
+			if bullet.Y >= 0 && bullet.Y <= models.MAP_SIZE && bullet.X >= 0 && bullet.X <= models.MAP_SIZE {
+				player.Bullets[id] = bullet
 				writeIdx++
 			}
 		}
-		player.Bullets = player.Bullets[:writeIdx]
+		//player.Bullets = player.Bullets[:id]
 	}
 
 }
 
 func StartGameLoop() {
-	ticker := time.NewTicker(16 * time.Millisecond)
+	ticker := time.NewTicker(models.TICK_TIME * time.Millisecond)
 	//TODO: мапа на клиентов, чтобы избавиться от дублирования.
 	//TODO: мапа на пули, для регулирования при попадании в стену и удалении из последовательности середины
 
 	for range ticker.C {
-		msg := ServerMessagePool.Get().(*models.ServerMessage)
-
-		msg.Players = msg.Players[:0]
+		msg := ServerMessagePool.Get().(*models.AbsoluteServerMessage)
 
 		Mutex.Lock()
 		//TODO: вынести в функцию
 		//TODO: организовать очищение памяти от мусора. опционально
 		UpdateBullets()
-		for _, player := range Clients {
-			msg.Players = append(msg.Players, models.PlayerState{
-				X:         player.X,
-				Y:         player.Y,
-				Direction: player.Direction,
-				Id:        player.Id,
-				Bullets:   player.Bullets,
-			})
+		for id, player := range Clients {
+			msg.Players[id] = *player
 		}
 		Mutex.Unlock()
-		broadcast(*msg)
+		broadcastAbsolute(*msg)
 		ServerMessagePool.Put(msg)
+		PreviousClients = Clients
 	}
 }

@@ -53,14 +53,13 @@ func HandleWebsocket(w http.ResponseWriter, r *http.Request) {
 
 		game.Mutex.Lock()
 
-		if currentID == "" && msg.Player.Id != "" {
-			currentID = msg.Player.Id
+		if currentID == "" && msg.PlayerInterpolation.Id != "" {
+			currentID = msg.PlayerInterpolation.Id
 			game.Clients[currentID] = &models.PlayerState{
-				Id:        currentID,
-				X:         msg.Player.X,
-				Y:         msg.Player.Y,
-				Direction: msg.Player.Direction,
-				Bullets:   []models.Bullet{},
+				X:         models.PLAYER_START_X,
+				Y:         models.PLAYER_START_Y,
+				Direction: models.PLAYER_START_DIRECTION,
+				Bullets:   map[string]models.Bullet{},
 				Conn:      conn,
 			}
 			game.Mutex.Unlock()
@@ -69,7 +68,15 @@ func HandleWebsocket(w http.ResponseWriter, r *http.Request) {
 
 		if currentID != "" {
 			if _, ok := game.Clients[currentID]; ok {
-				game.UpdatePlayerState(currentID, msg.Player.X, msg.Player.Y, msg.Player.Direction, msg.Player.Bullets)
+				var playerMovementDirection game.PlayerMovementDirection
+
+				playerMovementDirection = game.PlayerMovementDirection{
+					X: float64(msg.PlayerInterpolation.Direction.X),
+					Y: float64(msg.PlayerInterpolation.Direction.Y),
+				}
+
+				game.UpdatePlayerState(currentID, playerMovementDirection, msg.PlayerInterpolation.DeltaVisualDirection,
+					msg.PlayerInterpolation.NewBulletsDirection)
 			}
 		}
 
