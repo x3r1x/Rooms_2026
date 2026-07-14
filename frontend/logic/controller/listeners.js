@@ -21,10 +21,7 @@ function initWindowListeners() {
 
 function initCanvasListeners(canvas) {
     canvas.addEventListener('click', function (event) {
-        const canvasRect = canvas.getBoundingClientRect();
-
-        const x = event.clientX - canvasRect.left;
-        const y = event.clientY - canvasRect.top;
+        const {x, y} = getMousePos(canvas, event);
         const direction = Math.atan2(y - currentState.player.y, x - currentState.player.x);
 
         const localX = GAME_CONSTANTS.PLAYER_VISUAL_SIZE / 2;
@@ -40,12 +37,18 @@ function initCanvasListeners(canvas) {
     });
 
     canvas.addEventListener('mousemove', function (event) {
-        const canvasRect = canvas.getBoundingClientRect();
-
-        const x = event.clientX - canvasRect.left;
-        const y = event.clientY - canvasRect.top;
+        const {x, y} = getMousePos(canvas, event);
 
         currentState.mousePosition.x = x;
         currentState.mousePosition.y = y;
     })
+}
+function getMousePos(canvas, event) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    return {
+        x: (event.clientX - rect.left) * scaleX,
+        y: (event.clientY - rect.top) * scaleY
+    };
 }
