@@ -7,6 +7,7 @@ import (
 	"gamedevRooms/internal/models"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -23,26 +24,45 @@ func HandleWebsocket(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	defer func() {
-		if err := conn.Close(); err != nil {
-			log.Println(err)
-		}
-	}()
 	fmt.Println("New connection established.")
 
+	sendChan := make(chan []byte, 64)
 	var currentID string
+
+	go func() {
+		defer func() {
+			if err := conn.Close(); err != nil {
+				log.Println(err)
+			}
+		}()
+		for data := range sendChan {
+			err = conn.SetWriteDeadline(time.Now().Add(time.Second * 3))
+			if err != nil {
+				log.Println(err)
+				return
+			}
+			if err = conn.WriteMessage(websocket.TextMessage, data); err != nil {
+				log.Println(err)
+				return
+			}
+		}
+	}()
+
+	defer func() {
+		close(sendChan)
+		game.Mutex.Lock()
+		if currentID != "" {
+			delete(game.Clients, currentID)
+			fmt.Println("Disconnected client:", currentID)
+		}
+		game.Mutex.Unlock()
+	}()
 
 	for {
 		//TODO: добавить коллизии
 		_, p, err := conn.ReadMessage()
 		if err != nil {
 			log.Println(err)
-			game.Mutex.Lock()
-			if currentID != "" {
-				delete(game.Clients, currentID)
-				fmt.Println("Client disconnected. Id: ", currentID)
-			}
-			game.Mutex.Unlock()
 			break
 		}
 		var msg models.ClientMessage
@@ -62,6 +82,7 @@ func HandleWebsocket(w http.ResponseWriter, r *http.Request) {
 				Direction: msg.Player.Direction,
 				Bullets:   []models.Bullet{},
 				Conn:      conn,
+				SendChan:  sendChan,
 			}
 			game.Mutex.Unlock()
 			continue

@@ -7,7 +7,7 @@ import (
 
 var (
 	Clients = make(map[string]*models.PlayerState)
-	Mutex   sync.Mutex
+	Mutex   sync.RWMutex
 )
 
 const MAX_BULLET_SPEED = 22.5
