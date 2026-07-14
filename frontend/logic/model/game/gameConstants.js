@@ -3,7 +3,7 @@ export const GAME_CONSTANTS = {
     BULLET_SPEED: 1.5,
     CANVAS_START: 0,
 
-    PLAYER_VISUAL_SIZE: 60,
+    PLAYER_VISUAL_SIZE: 40,
     PLAYER_START_X: 650,
     PLAYER_START_Y: 400,
     PLAYER_SKIN_BLUE: 'assets/images/manBlue_gun.png',
