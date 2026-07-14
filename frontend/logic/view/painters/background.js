@@ -24,7 +24,7 @@ export function drawBackground(canvas, context) {
         context.drawImage(
             TILE_IMG.TILE,
             sourceX, sourceY, tileSize, tileSize,
-            200 + canvasX, canvasY, x * tileSize, x * tileSize
+            canvasX, canvasY, x * tileSize, x * tileSize
         );
     });
     map.forEach((tileId, index) => {
@@ -38,7 +38,7 @@ export function drawBackground(canvas, context) {
         context.drawImage(
             TILE_IMG.TILE,
             sourceX, sourceY, tileSize, tileSize,
-            200 + canvasX, canvasY, x * tileSize, x * tileSize
+             canvasX, canvasY, x * tileSize, x * tileSize
         );
     });
 
@@ -53,7 +53,7 @@ export function drawBackground(canvas, context) {
         context.drawImage(
             TILE_IMG.TILE,
             sourceX, sourceY, tileSize, tileSize,
-            200 + canvasX, canvasY, x * tileSize, x * tileSize
+             canvasX, canvasY, x * tileSize, x * tileSize
         );
     });
     mapObject.forEach((tileId, index) => {
@@ -67,11 +67,9 @@ export function drawBackground(canvas, context) {
         context.drawImage(
             TILE_IMG.TILE,
             sourceX, sourceY, tileSize, tileSize,
-            200 + canvasX, canvasY, x * tileSize, x * tileSize
+             canvasX, canvasY, x * tileSize, x * tileSize
         );
     });
-    //TODO вынести отрисовку матрицы в отдельную функцию
-    //TODO подтягивать ширину матрицы из JSON файла
 }
 function drawLayer(context, state, layer) {
 

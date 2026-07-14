@@ -17,8 +17,8 @@ async function loadData() {
 }
 
 async function loadGame() {
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
+    canvas.width = 36*25;
+    canvas.height = 36*21;
     initListeners(canvas);
     socket = initSocket()
     //TODO: id бы создавать на сервере...
