@@ -5,6 +5,6 @@ export function createBullet(state, bulletDirection, shotX, shotY) {
         direction: bulletDirection
     };
 
-    //FIXME: потом убрать генерацию IDшника, когда будет связь с фронтом
     state.player.bullets[crypto.randomUUID()] = newBullet;
+    state.newBulletsDirection.push(bulletDirection);
 }
