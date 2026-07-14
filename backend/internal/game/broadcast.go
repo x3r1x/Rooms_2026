@@ -2,12 +2,14 @@ package game
 
 import (
 	"encoding/json"
-	"fmt"
 	"gamedevRooms/internal/models"
 	"log"
-
-	"github.com/gorilla/websocket"
 )
+
+type SendResult struct {
+	player *models.PlayerState
+	err    error
+}
 
 func broadcast(message models.ServerMessage) {
 	data, err := json.Marshal(message)
@@ -16,31 +18,12 @@ func broadcast(message models.ServerMessage) {
 		return
 	}
 
-	Mutex.Lock()
-	conns := make([]*models.PlayerState, 0, len(Clients))
+	Mutex.RLock()
 	for _, player := range Clients {
-		conns = append(conns, player)
-	}
-	Mutex.Unlock()
-	var deadClients []*models.PlayerState
-	for _, player := range conns {
-		player.Mu.Lock()
-		err := player.Conn.WriteMessage(websocket.TextMessage, data)
-		player.Mu.Unlock()
-		if err != nil {
-			deadClients = append(deadClients, player)
+		select {
+		case player.SendChan <- data:
+		default:
 		}
 	}
-	if len(deadClients) > 0 {
-		Mutex.Lock()
-		for _, deadClient := range deadClients {
-			delete(Clients, deadClient.Id)
-			fmt.Println("Client disconnected. Id: ", deadClient.Id)
-			err = deadClient.Conn.Close()
-			if err != nil {
-				log.Println(err)
-			}
-		}
-		Mutex.Unlock()
-	}
+	Mutex.RUnlock()
 }

@@ -1,8 +1,6 @@
 package models
 
 import (
-	"sync"
-
 	"github.com/gorilla/websocket"
 )
 
@@ -13,5 +11,5 @@ type PlayerState struct {
 	Id        string          `json:"id"`
 	Bullets   []Bullet        `json:"bullets"`
 	Conn      *websocket.Conn `json:"-"`
-	Mu        sync.Mutex      `json:"-"`
+	SendChan  chan<- []byte   `json:"-"`
 }
