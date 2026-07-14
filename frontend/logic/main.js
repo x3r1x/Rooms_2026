@@ -1,11 +1,11 @@
 import {updateGame} from "./model/engine/updateGame.js";
 import {drawGame} from "./view/painters/drawGame.js";
-import {currentState, initLastState, room} from "./model/storage/states.js";
+import {currentState, initLastState} from "./model/storage/states.js";
 import {initListeners} from "./controller/listeners.js";
 import {initSocket} from "./model/di/webSocket/server.js";
 import {initSprites} from "./view/sprites.js";
 import {initMap} from "./view/maps.js";
-import {parserMapData, assemblyRoom} from "./model/game/layers.js";
+import {assemblyRoom, parserMapData} from "./model/storage/layers.js";
 export const canvas = document.getElementById("canvas");
 export let socket = null;
 const context = canvas.getContext('2d');

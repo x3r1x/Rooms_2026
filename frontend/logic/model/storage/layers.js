@@ -1,4 +1,4 @@
-import {layersForRoom, room} from "./gameModel.js";
+import {layersForRoom, room} from "./states.js";
 
 export function parserMapData(dataJson) {
     layersForRoom.width = dataJson.width;

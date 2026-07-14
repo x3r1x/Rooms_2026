@@ -1,9 +1,9 @@
 import {TILE_IMG} from "../../model/storage/gameConstants.js";
-import {lastState, layersForRoom, room} from "../../model/game/gameModel.js";
+import {layersForRoom, room} from "../../model/storage/states.js";
 
 const x = 1;
 
-export function drawBackground(canvas, context, state) {
+export function drawBackground(canvas, context) {
     const map = room.exits.data;
     const mapFloor = room.floors.data;
     const mapWall = room.walls.data;

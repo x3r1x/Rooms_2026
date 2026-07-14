@@ -23,7 +23,8 @@ export const currentState = {
     newBulletsDirection: [],
 
     map: [],
-    mapCollisian: [],
+    mapWall: [],
+    mapObject: [],
 };
 
 export const previousState = {
@@ -46,4 +47,22 @@ export function initLastState(dateNow, playerId) {
     currentState.player.id = playerId;
     currentState.player.direction = 0;
     currentState.previousVisualDirection = 0;
+}
+
+export const room = {
+    exits: [],
+    floors: [],
+    walls: [],
+    object: [],
+    exit: {top: false, left: false, down: false, right: false},
+    flap: {top: false, left: false, down: false, right: false},
+}
+
+export const layersForRoom = {
+    width: 0,
+    floor: [],
+    walls: [],
+    exit: [],
+    flap: [],
+    objects: []
 }
