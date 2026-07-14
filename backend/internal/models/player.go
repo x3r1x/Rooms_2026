@@ -1,8 +1,6 @@
 package models
 
 import (
-	"sync"
-
 	"github.com/gorilla/websocket"
 )
 
@@ -22,5 +20,5 @@ type PlayerInterpolation struct {
 	DeltaBullets   map[string]BulletInterpolation `json:"deltaBullets"`
 	NewBullets     map[string]NewBullet           `json:"newBullets"`
 	Conn           *websocket.Conn                `json:"-"`
-	Mu             sync.Mutex                     `json:"-"`
+	SendChan       chan<- []byte                  `json:"-"`
 }
