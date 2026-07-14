@@ -1,16 +1,13 @@
 import {TILE_IMG} from "../../model/game/gameConstants.js";
 import {lastState, layersForRoom, room} from "../../model/game/gameModel.js";
 
-const x = 1;
-
 export function drawBackground(canvas, context) {
     const mapExit = room.exits.data;
     const mapFloor = room.floors.data;
     const mapWall = room.walls.data;
     const mapObject = room.object.data;
-    const tileSize = 36;
-    const tilesPerRow = 37;
     const mapWidth = layersForRoom.width;
+
     context.fillStyle = "#1f2535";
     context.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -18,8 +15,6 @@ export function drawBackground(canvas, context) {
     drawLayer(context, mapExit, mapWidth);
     drawLayer(context, mapWall, mapWidth);
     drawLayer(context, mapObject, mapWidth);
-    //TODO вынести отрисовку матрицы в отдельную функцию
-    //TODO подтягивать ширину матрицы из JSON файла
 }
 function drawLayer(context, layer, mapWidth) {
     const tileSize = 36;
