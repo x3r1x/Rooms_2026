@@ -43,14 +43,12 @@ func StartGameLoop() {
 	//TODO: мапа на пули, для регулирования при попадании в стену и удалении из последовательности середины
 
 	for range ticker.C {
-		msg := ServerMessagePool.Get().(*models.ServerMessage)
+		ProcessCommands()
+		UpdateBullets()
 
+		msg := ServerMessagePool.Get().(*models.ServerMessage)
 		msg.Players = msg.Players[:0]
 
-		Mutex.Lock()
-		//TODO: вынести в функцию
-		//TODO: организовать очищение памяти от мусора. опционально
-		UpdateBullets()
 		for _, player := range Clients {
 			msg.Players = append(msg.Players, models.PlayerState{
 				X:         player.X,
@@ -60,7 +58,6 @@ func StartGameLoop() {
 				Bullets:   player.Bullets,
 			})
 		}
-		Mutex.Unlock()
 		broadcast(*msg)
 		ServerMessagePool.Put(msg)
 	}

@@ -18,12 +18,11 @@ func broadcast(message models.ServerMessage) {
 		return
 	}
 
-	Mutex.RLock()
 	for _, player := range Clients {
 		select {
 		case player.SendChan <- data:
 		default:
+			continue
 		}
 	}
-	Mutex.RUnlock()
 }

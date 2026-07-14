@@ -26,7 +26,7 @@ func HandleWebsocket(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println("New connection established.")
 
-	sendChan := make(chan []byte, 64)
+	sendChan := make(chan []byte, 128)
 	var currentID string
 
 	go func() {
@@ -49,13 +49,15 @@ func HandleWebsocket(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	defer func() {
-		close(sendChan)
-		game.Mutex.Lock()
 		if currentID != "" {
-			delete(game.Clients, currentID)
+			game.CommandChan <- game.Command{
+				Type: game.DisconnectPlayer,
+				ID:   currentID,
+			}
 			fmt.Println("Disconnected client:", currentID)
+		} else {
+			close(sendChan)
 		}
-		game.Mutex.Unlock()
 	}()
 
 	for {
@@ -71,29 +73,37 @@ func HandleWebsocket(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		game.Mutex.Lock()
-
 		if currentID == "" && msg.Player.Id != "" {
 			currentID = msg.Player.Id
-			game.Clients[currentID] = &models.PlayerState{
-				Id:        currentID,
-				X:         msg.Player.X,
-				Y:         msg.Player.Y,
-				Direction: msg.Player.Direction,
-				Bullets:   []models.Bullet{},
-				Conn:      conn,
-				SendChan:  sendChan,
+			game.CommandChan <- game.Command{
+				Type: game.RegisterPlayer,
+				ID:   currentID,
+				Player: &models.PlayerState{
+					Id:        currentID,
+					X:         msg.Player.X,
+					Y:         msg.Player.Y,
+					Direction: msg.Player.Direction,
+					Bullets:   []models.Bullet{},
+					Conn:      conn,
+					SendChan:  sendChan,
+				},
 			}
-			game.Mutex.Unlock()
 			continue
 		}
 
 		if currentID != "" {
-			if _, ok := game.Clients[currentID]; ok {
-				game.UpdatePlayerState(currentID, msg.Player.X, msg.Player.Y, msg.Player.Direction, msg.Player.Bullets)
+			cmd := game.Command{
+				Type:    game.UpdatePlayer,
+				ID:      currentID,
+				X:       msg.Player.X,
+				Y:       msg.Player.Y,
+				Dir:     msg.Player.Direction,
+				Bullets: msg.Player.Bullets,
+			}
+			select {
+			case game.CommandChan <- cmd:
+			default:
 			}
 		}
-
-		game.Mutex.Unlock()
 	}
 }
