@@ -3,8 +3,8 @@ import {lastState, layersForRoom, room} from "../../model/game/gameModel.js";
 
 const x = 1;
 
-export function drawBackground(canvas, context, state) {
-    const map = room.exits.data;
+export function drawBackground(canvas, context) {
+    const mapExit = room.exits.data;
     const mapFloor = room.floors.data;
     const mapWall = room.walls.data;
     const mapObject = room.object.data;
@@ -13,66 +13,30 @@ export function drawBackground(canvas, context, state) {
     const mapWidth = layersForRoom.width;
     context.fillStyle = "#1f2535";
     context.fillRect(0, 0, canvas.width, canvas.height);
-    mapFloor.forEach((tileId, index) => {
-        if (tileId === 0) return;
-        const canvasX = (index % mapWidth) * x * tileSize;
-        const canvasY = Math.floor(index / mapWidth) * x * tileSize;
 
-        const id = tileId - 1;
-        const sourceX = (id % tilesPerRow) * tileSize;
-        const sourceY = Math.floor(id / tilesPerRow) * tileSize;
-        context.drawImage(
-            TILE_IMG.TILE,
-            sourceX, sourceY, tileSize, tileSize,
-            200 + canvasX, canvasY, x * tileSize, x * tileSize
-        );
-    });
-    map.forEach((tileId, index) => {
-        if (tileId === 0) return;
-        const canvasX = (index % mapWidth) * x * tileSize;
-        const canvasY = Math.floor(index / mapWidth) * x * tileSize;
-
-        const id = tileId - 1;
-        const sourceX = (id % tilesPerRow) * tileSize;
-        const sourceY = Math.floor(id / tilesPerRow) * tileSize;
-        context.drawImage(
-            TILE_IMG.TILE,
-            sourceX, sourceY, tileSize, tileSize,
-            200 + canvasX, canvasY, x * tileSize, x * tileSize
-        );
-    });
-
-    mapWall.forEach((tileId, index) => {
-        if (tileId === 0) return;
-        const canvasX = (index % mapWidth) * x * tileSize;
-        const canvasY = Math.floor(index / mapWidth) * x * tileSize;
-
-        const id = tileId - 1;
-        const sourceX = (id % tilesPerRow) * tileSize;
-        const sourceY = Math.floor(id / tilesPerRow) * tileSize;
-        context.drawImage(
-            TILE_IMG.TILE,
-            sourceX, sourceY, tileSize, tileSize,
-            200 + canvasX, canvasY, x * tileSize, x * tileSize
-        );
-    });
-    mapObject.forEach((tileId, index) => {
-        if (tileId === 0) return;
-        const canvasX = (index % mapWidth) * x * tileSize;
-        const canvasY = Math.floor(index / mapWidth) * x * tileSize;
-
-        const id = tileId - 1;
-        const sourceX = (id % tilesPerRow) * tileSize;
-        const sourceY = Math.floor(id / tilesPerRow) * tileSize;
-        context.drawImage(
-            TILE_IMG.TILE,
-            sourceX, sourceY, tileSize, tileSize,
-            200 + canvasX, canvasY, x * tileSize, x * tileSize
-        );
-    });
+    drawLayer(context, mapFloor, mapWidth);
+    drawLayer(context, mapExit, mapWidth);
+    drawLayer(context, mapWall, mapWidth);
+    drawLayer(context, mapObject, mapWidth);
     //TODO вынести отрисовку матрицы в отдельную функцию
     //TODO подтягивать ширину матрицы из JSON файла
 }
-function drawLayer(context, state, layer) {
+function drawLayer(context, layer, mapWidth) {
+    const tileSize = 36;
+    const tilesPerRow = 37;
+    layer.forEach((tileId, index) => {
+        if (tileId === 0) return;
+        const canvasX = (index % mapWidth) * tileSize;
+        const canvasY = Math.floor(index / mapWidth) * tileSize;
+
+        const id = tileId - 1;
+        const sourceX = (id % tilesPerRow) * tileSize;
+        const sourceY = Math.floor(id / tilesPerRow) * tileSize;
+        context.drawImage(
+            TILE_IMG.TILE,
+            sourceX, sourceY, tileSize, tileSize,
+            200 + canvasX, canvasY, tileSize, tileSize
+        );
+    });
 
 }
