@@ -1,4 +1,3 @@
-import {currentState, previousState} from "../../storage/states.js";
 import {processInterpolation} from "./processInterpolation.js";
 import {processAssignment} from "./processAssignment.js";
 

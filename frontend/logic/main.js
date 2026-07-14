@@ -6,6 +6,7 @@ import {initSocket} from "./model/di/webSocket/server.js";
 import {initSprites} from "./view/sprites.js";
 import {initMap} from "./view/maps.js";
 import {assemblyRoom, parserMapData} from "./model/storage/layers.js";
+
 export const canvas = document.getElementById("canvas");
 export let socket = null;
 const context = canvas.getContext('2d');

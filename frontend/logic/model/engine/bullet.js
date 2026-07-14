@@ -5,8 +5,8 @@ export function updateBullets(elapsedTime, bulletsList) {
     const newBulletsList = {};
 
     for (const [id, bullet] of Object.entries(bulletsList)) {
-        bullet.x += Math.cos(bullet.movementDirection) * elapsedTime * GAME_CONSTANTS.BULLET_SPEED;
-        bullet.y += Math.sin(bullet.movementDirection) * elapsedTime * GAME_CONSTANTS.BULLET_SPEED;
+        bullet.x += Math.cos(bullet.direction) * elapsedTime * GAME_CONSTANTS.BULLET_SPEED;
+        bullet.y += Math.sin(bullet.direction) * elapsedTime * GAME_CONSTANTS.BULLET_SPEED;
 
         if (!isBulletOutOfBounds(bullet)) {
             newBulletsList[id] = bullet;

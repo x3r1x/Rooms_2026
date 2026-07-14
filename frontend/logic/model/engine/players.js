@@ -4,17 +4,21 @@ import {updateBullets} from "./bullet.js";
 export function updatePlayer(direction, elapsedTime, state) {
     const directionVectorLength = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
     const normalizedDirection = {
-        x: direction.x / directionVectorLength,
-        y: direction.y / directionVectorLength
+        x: direction.x,
+        y: direction.y
+    }
+    if (directionVectorLength !== 0) {
+        normalizedDirection.x = normalizedDirection.x / directionVectorLength;
+        normalizedDirection.y = normalizedDirection.y / directionVectorLength;
     }
 
     state.player.x += normalizedDirection.x * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;
     state.player.y += normalizedDirection.y * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;
-    updatePlayerDirection(state);
+    updateVisualDirection(state);
     state.player.bullets = updateBullets(elapsedTime, state.player.bullets)
 }
 
-export function updatePlayerDirection(state) {
+export function updateVisualDirection(state) {
     state.player.direction = Math.atan2(state.mousePosition.y - state.player.y, state.mousePosition.x - state.player.x);
 }
 

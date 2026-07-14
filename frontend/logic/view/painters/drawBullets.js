@@ -17,7 +17,7 @@ function drawPLayerBullet(context, bullet) {
 
     context.save();
     context.translate(bullet.x, bullet.y);
-    context.rotate(bullet.movementDirection + Math.PI / 2);
+    context.rotate(bullet.direction + Math.PI / 2);
     context.drawImage(sprite, -GAME_CONSTANTS.BULLET_WIDTH / 2, -GAME_CONSTANTS.BULLET_HEIGHT / 2,
         GAME_CONSTANTS.BULLET_WIDTH, GAME_CONSTANTS.BULLET_HEIGHT);
     context.restore();
@@ -28,7 +28,7 @@ function drawEnemyBullet(context, enemyBullet) {
 
     context.save();
     context.translate(enemyBullet.x, enemyBullet.y);
-    context.rotate(enemyBullet.movementDirection + Math.PI / 2);
+    context.rotate(enemyBullet.direction + Math.PI / 2);
     context.drawImage(sprite, -GAME_CONSTANTS.BULLET_WIDTH / 2, -GAME_CONSTANTS.BULLET_HEIGHT / 2,
         GAME_CONSTANTS.BULLET_WIDTH, GAME_CONSTANTS.BULLET_HEIGHT);
     context.restore();

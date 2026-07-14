@@ -1,10 +1,9 @@
 export function createBullet(state, bulletDirection, shotX, shotY) {
-    const newBullet = {
+    state.player.bullets[crypto.randomUUID()] = {
         x: shotX,
         y: shotY,
         direction: bulletDirection
     };
 
-    state.player.bullets[crypto.randomUUID()] = newBullet;
     state.newBulletsDirection.push(bulletDirection);
 }

@@ -2,12 +2,18 @@ import {keys} from '../../controller/listeners.js';
 import {updateEnemies, updatePlayer} from "./players.js";
 
 export function updateGame(elapsedTime, state) {
-    updateVisualDirection(state.movementDirection);
+    updateMovementDirection(state.movementDirection);
     updatePlayer(state.movementDirection, elapsedTime, state);
     updateEnemies(elapsedTime, state.enemies);
+
+    state.movementDirection = {
+        x: 0,
+        y: 0
+    }
+
 }
 
-function updateVisualDirection(direction) {
+function updateMovementDirection(direction) {
     if (keys['w'] || keys['ц'] || keys['arrowup']) {
         direction.y -= 1
     }
