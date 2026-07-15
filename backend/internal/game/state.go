@@ -43,25 +43,25 @@ func ProcessCommands() {
 				p.Y = cmd.Y
 				p.Direction = cmd.Dir
 
-				existingID := make(map[string]struct{}, len(cmd.Bullets))
-				for _, b := range p.Bullets {
-					existingID[b.Id] = struct{}{}
-				}
-				for _, cb := range cmd.Bullets {
-					if _, exist := existingID[cb.Id]; !exist {
-						newBullet := models.Bullet{
-							Id:        cb.Id,
-							X:         cmd.X,
-							Y:         cmd.Y,
-							Direction: cb.Direction,
-							StartX:    cmd.X,
-							StartY:    cmd.Y,
-							Owner:     cb.Owner,
-							Life:      BULLET_LIFE,
-						}
-						p.Bullets = append(p.Bullets, newBullet)
-						existingID[cb.Id] = struct{}{}
+				for i := range cmd.Bullets {
+					cb := &cmd.Bullets[i]
+					if cb.Id == "" {
+						continue
 					}
+					if _, exist := p.BulletIndex[cb.Id]; exist {
+						continue
+					}
+					p.Bullets = append(p.Bullets, models.Bullet{
+						Id:        cb.Id,
+						X:         cb.X,
+						Y:         cb.Y,
+						Direction: cb.Direction,
+						StartX:    cmd.X,
+						StartY:    cmd.Y,
+						Owner:     cb.Owner,
+						Life:      BULLET_LIFE,
+					})
+					p.BulletIndex[cb.Id] = len(p.Bullets) - 1
 				}
 			}
 		case DisconnectPlayer:
