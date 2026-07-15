@@ -1,7 +1,7 @@
 import {updateGame} from "./model/engine/updateGame.js";
 import {drawGame} from "./view/painters/drawGame.js";
 import {currentState, initLastState} from "./model/storage/states.js";
-import {initListeners} from "./controller/listeners.js";
+import {initListeners, resizeCanvas} from "./controller/listeners.js";
 import {initSocket} from "./model/di/webSocket/server.js";
 import {initSprites} from "./view/sprites.js";
 import {initMap} from "./view/maps.js";
@@ -17,8 +17,7 @@ async function loadData() {
 }
 
 async function loadGame() {
-    canvas.width = 36*25;
-    canvas.height = 36*21;
+    resizeCanvas(canvas)
     initListeners(canvas);
     socket = initSocket()
     //TODO: id бы создавать на сервере...

@@ -7,6 +7,8 @@ export const keys = {};
 export function initListeners(canvas) {
     initWindowListeners()
     initCanvasListeners(canvas);
+
+    canvas.addEventListener('resize', resizeCanvas)
 }
 
 function initWindowListeners() {
@@ -17,6 +19,11 @@ function initWindowListeners() {
     window.addEventListener('keyup', function (event) {
         keys[event.key.toLowerCase()] = false;
     });
+}
+
+export function resizeCanvas(canvas) {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 }
 
 function initCanvasListeners(canvas) {
