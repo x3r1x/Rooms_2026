@@ -5,9 +5,9 @@ import "encoding/json"
 type ClientMessage struct {
 	PlayerInterpolation struct {
 		Direction            Vector2   `json:"direction"`
-		DeltaVisualDirection float64   `json:"DeltaVisualDirection"`
+		DeltaVisualDirection float64   `json:"deltaDirection"`
 		ID                   string    `json:"id"`
-		NewBulletsDirection  []float64 `json:"NewBulletsDirection"`
+		NewBulletsDirection  []float64 `json:"newBulletsDirection"`
 	}
 }
 
