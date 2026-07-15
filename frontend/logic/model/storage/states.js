@@ -60,9 +60,11 @@ export const room = {
 
 export const layersForRoom = {
     width: 0,
+    tileSize: 0,
     floor: [],
     walls: [],
     exit: [],
     flap: [],
-    objects: []
+    objects: [],
+    tilesInfo: [],
 }

@@ -17,6 +17,25 @@ export function parserMapData(dataJson) {
     });
 }
 
+export function parserTileInfo(dataJson) {
+    layersForRoom.tileSize = dataJson.tileheight;
+    const tileArray = dataJson.tiles;
+    tileArray.forEach(tile => {
+        const property = {};
+        tile.properties.forEach(p => {
+            property[p.name] = JSON.parse(p.value);
+        })
+        const tileInfo = {
+            id: tile.id,
+            blocksBullet: property.blocksBullet,
+            blocksPlayer: property.blocksPlayer,
+            hitboxes: property.hitbox,
+        };
+        console.log(tileInfo);
+        layersForRoom.tilesInfo[tile.id] = tileInfo;
+    });
+}
+
 function getRandomArray(array) {
     const lenArray = Math.floor(Math.random() * array.length) + 1;
     const result = [];
