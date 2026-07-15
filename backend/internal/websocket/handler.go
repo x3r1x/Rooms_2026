@@ -6,7 +6,6 @@ import (
 	"gamedevRooms/internal/game"
 	"gamedevRooms/internal/models"
 	"log"
-	"math"
 	"net/http"
 	"time"
 
@@ -62,6 +61,7 @@ func HandleWebsocket(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	for {
+		//TODO: добавить коллизии
 		_, p, err := conn.ReadMessage()
 		if err != nil {
 			log.Println(err)
@@ -73,17 +73,17 @@ func HandleWebsocket(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		pi := &msg.PlayerInterpolation
-		if currentID == "" && pi.ID != "" {
-			currentID = pi.ID
+		if currentID == "" && msg.Player.Id != "" {
+			currentID = msg.Player.Id
 			game.CommandChan <- game.Command{
 				Type: game.RegisterPlayer,
 				ID:   currentID,
 				Player: &models.PlayerState{
 					Id:        currentID,
-					X:         game.MAP_SIZE / 2,
-					Y:         game.MAP_SIZE / 2,
-					Direction: math.Atan2(pi.Direction.Y, pi.Direction.X),
+					X:         msg.Player.X,
+					Y:         msg.Player.Y,
+					Direction: msg.Player.Direction,
+					Bullets:   []models.Bullet{},
 					Conn:      conn,
 					SendChan:  sendChan,
 				},
@@ -93,12 +93,12 @@ func HandleWebsocket(w http.ResponseWriter, r *http.Request) {
 
 		if currentID != "" {
 			cmd := game.Command{
-				Type:           game.UpdatePlayer,
-				ID:             currentID,
-				DirX:           pi.Direction.X,
-				DirY:           pi.Direction.Y,
-				DeltaVisualDir: pi.DeltaVisualDirection,
-				NewBulletsDir:  pi.NewBulletsDirection,
+				Type:    game.UpdatePlayer,
+				ID:      currentID,
+				X:       msg.Player.X,
+				Y:       msg.Player.Y,
+				Dir:     msg.Player.Direction,
+				Bullets: msg.Player.Bullets,
 			}
 			select {
 			case game.CommandChan <- cmd:

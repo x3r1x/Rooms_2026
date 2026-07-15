@@ -1,10 +1,7 @@
 package game
 
 import (
-	"fmt"
 	"gamedevRooms/internal/models"
-	"math"
-	"sync/atomic"
 )
 
 var (
@@ -16,7 +13,6 @@ const (
 	MAX_BULLET_SPEED = 22.5
 	MAP_SIZE         = 2000.0
 	BULLET_LIFE      = 60
-	PLAYER_SPEED     = 20
 )
 
 type CommandType int
@@ -28,19 +24,11 @@ const (
 )
 
 type Command struct {
-	Type           CommandType
-	ID             string
-	Player         *models.PlayerState
-	DirX, DirY     float64
-	DeltaVisualDir float64
-	NewBulletsDir  []float64
-}
-
-var bulletCounter uint64
-
-func nextBulletId(playerId string) string {
-	n := atomic.AddUint64(&bulletCounter, 1)
-	return fmt.Sprintf("%s_b_%d", playerId, n)
+	Type      CommandType
+	ID        string
+	Player    *models.PlayerState
+	X, Y, Dir float64
+	Bullets   []models.Bullet
 }
 
 func ProcessCommands() {
@@ -51,21 +39,29 @@ func ProcessCommands() {
 			Clients[cmd.ID] = cmd.Player
 		case UpdatePlayer:
 			if p, ok := Clients[cmd.ID]; ok {
-				p.Direction = math.Atan2(cmd.DirY, cmd.DirX)
-				p.Direction += cmd.DeltaVisualDir
+				p.X = cmd.X
+				p.Y = cmd.Y
+				p.Direction = cmd.Dir
 
-				for _, angle := range cmd.NewBulletsDir {
-					id := nextBulletId(p.Id)
-					p.Bullets[id] = models.Bullet{
-						Id:        id,
-						X:         p.X,
-						Y:         p.Y,
-						Direction: angle,
-						StartX:    p.X,
-						StartY:    p.Y,
-						Owner:     p.Id,
-						Life:      BULLET_LIFE,
+				for i := range cmd.Bullets {
+					cb := &cmd.Bullets[i]
+					if cb.Id == "" {
+						continue
 					}
+					if _, exist := p.BulletIndex[cb.Id]; exist {
+						continue
+					}
+					p.Bullets = append(p.Bullets, models.Bullet{
+						Id:        cb.Id,
+						X:         cb.X,
+						Y:         cb.Y,
+						Direction: cb.Direction,
+						StartX:    cmd.X,
+						StartY:    cmd.Y,
+						Owner:     cb.Owner,
+						Life:      BULLET_LIFE,
+					})
+					p.BulletIndex[cb.Id] = len(p.Bullets) - 1
 				}
 			}
 		case DisconnectPlayer:
