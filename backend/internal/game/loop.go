@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func GoGameLoop(gameState *models.GameState) {
+func GoGameLoop() {
 	ticker := time.NewTicker(16 * time.Millisecond)
 	defer ticker.Stop()
 
@@ -22,7 +22,7 @@ func GoGameLoop(gameState *models.GameState) {
 				Connection: reg.Connection,
 			}
 		case del := <-models.Game.LeaveChan:
-			delete(gameState.Players, del)
+			delete(models.Game.Players, del)
 
 		case upload := <-models.Game.InputChan:
 			if player, exist := models.Game.Players[upload.Player.Id]; exist {
@@ -32,7 +32,7 @@ func GoGameLoop(gameState *models.GameState) {
 				player.Bullets = upload.Player.Bullets
 			}
 		case <-ticker.C:
-			gameState.TickCount++
+			models.Game.TickCount++
 			//gameState.updatePhysics()
 			broadcast(models.ServerMessage{Players: takeSnapshot()})
 		}
