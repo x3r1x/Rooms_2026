@@ -33,8 +33,11 @@ func GoGameLoop() {
 			}
 		case <-ticker.C:
 			models.Game.TickCount++
-			//gameState.updatePhysics()
-			broadcast(models.ServerMessage{Players: takeSnapshot()})
+			snapshot := make([]models.PlayerState, 0, len(models.Game.Players))
+			for _, player := range models.Game.Players {
+				snapshot = append(snapshot, *player)
+			}
+			broadcast(models.ServerMessage{Players: snapshot})
 		}
 	}
 }
