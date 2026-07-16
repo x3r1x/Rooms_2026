@@ -3,7 +3,6 @@ package websocket
 import (
 	"encoding/json"
 	"fmt"
-	"gamedevRooms/internal/game"
 	"gamedevRooms/internal/models"
 	"log"
 	"net/http"
@@ -34,9 +33,6 @@ func InitWebsocket(w http.ResponseWriter, r *http.Request) {
 
 func HandleWebsocket(conn *websocket.Conn) {
 
-	var currentID string
-	var GameState models.GameState
-
 	for {
 		_, p, err := conn.ReadMessage()
 		if err != nil {
@@ -45,27 +41,21 @@ func HandleWebsocket(conn *websocket.Conn) {
 		}
 		var msg models.ClientMessage
 		if err := json.Unmarshal(p, &msg); err != nil {
-			log.Println("Ошибка сериализации: ", err)
+			log.Println("Ошибка сериализации при чтении пакета: ", err)
+			if _, exist := models.Game.Players[msg.Player.Id]; exist {
+				log.Println("Удаляем пользователя: ", msg.Player.Id)
+				models.Game.LeaveChan <- msg.Player.Id
+			}
 			continue
 		}
-
-		if currentID == "" && msg.Player.Id != "" {
-			currentID = msg.Player.Id
-			GameState.Players[currentID] = &models.PlayerState{
-				Id:        currentID,
+		if _, exist := models.Game.Players[msg.Player.Id]; !exist {
+			models.Game.RegisterChan <- models.PlayerState{
+				Id:        msg.Player.Id,
 				X:         msg.Player.X,
 				Y:         msg.Player.Y,
 				Direction: msg.Player.Direction,
 				Bullets:   msg.Player.Bullets,
 			}
 		}
-
-		if state, ok := game.Clients[currentID]; ok {
-			state.X = msg.Player.X
-			state.Y = msg.Player.Y
-			state.Direction = msg.Player.Direction
-			state.Bullets = msg.Player.Bullets
-		}
-
 	}
 }

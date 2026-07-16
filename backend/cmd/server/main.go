@@ -16,7 +16,7 @@ import (
 // TODO: добавить коллизии
 
 func main() {
-	//go StartGameLoop()
+	go GameLoop()
 	http.HandleFunc("/ws", websocket.InitWebsocket)
 	fmt.Println("server listening at port 8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
