@@ -1,9 +1,10 @@
 export function createBullet(state, bulletDirection, shotX, shotY) {
-    state.player.bullets[crypto.randomUUID()] = {
+    state.bullets.push({
         x: shotX,
         y: shotY,
-        direction: bulletDirection
-    };
+        direction: bulletDirection,
+        ownerId: state.player.id
+    })
 
-    state.newBulletsDirection.push(bulletDirection);
+    state.player.didShot = true;
 }

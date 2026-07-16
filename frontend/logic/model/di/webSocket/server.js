@@ -1,8 +1,7 @@
-import {processInterpolation} from "./processInterpolation.js";
 import {processAssignment} from "./processAssignment.js";
 import {currentState, previousState} from "../../storage/states.js";
 
-export function initSocket() {
+export function getSocket() {
     const socket = new WebSocket("ws://84.201.159.214:8080/ws");
 
     socket.onopen = function (event) {
@@ -10,7 +9,7 @@ export function initSocket() {
     }
 
     socket.onmessage = function (event) {
-        sendMessage(socket, currentState, previousState);
+        sendMessage(socket, currentState);
         parseMessage(event.data, previousState);
         processCurrentState(currentState, previousState);
     }
@@ -25,23 +24,22 @@ export function initSocket() {
 export function parseMessage(message, state) {
     let parsedMessage = JSON.parse(message);
 
-    if (parsedMessage.type === "interpolation" && "playerInterpolations" in parsedMessage) {
-        processInterpolation(parsedMessage["playerInterpolations"], state);
-    } else if (parsedMessage.type === "absolute" && "players" in parsedMessage) {
-        processAssignment(parsedMessage["players"], state);
+    // if (parsedMessage.type === "interpolation" && "playerInterpolations" in parsedMessage) {
+    //     processInterpolation(parsedMessage["playerInterpolations"], state);
+    if (parsedMessage.type === "a" && "players" in parsedMessage) {
+        processAssignment(parsedMessage, state);
     } else {
         console.log(`Packet loss: ${parsedMessage.type}!`);
     }
 }
 
-function sendMessage(socket, state, previousState) {
+function sendMessage(socket, state) {
     const message = {
-        "playerInterpolation": {
-            "direction": state.movementDirection,
-            "deltaDirection": state.player.direction - previousState.player.direction,
-            "id": state.player.id,
-            "newBulletsDirection": state.newBulletsDirection
-        }
+        "id": state.player.id,
+        "a": state.player.direction,
+        "mx": state.player.movementDirection.x,
+        "my": state.player.movementDirection.y,
+        "s": state.player.didShot
     }
 
     socket.send(JSON.stringify(message));
@@ -55,5 +53,5 @@ function processCurrentState(currentState, previousState) {
         x: 0,
         y: 0
     }
-    currentState.newBulletsDirection = [];
+    currentState.didShot = false;
 }

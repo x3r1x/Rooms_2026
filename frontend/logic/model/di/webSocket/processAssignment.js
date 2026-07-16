@@ -1,20 +1,35 @@
-import {getPlayerFromModelById} from "../../engine/players.js";
+export function processAssignment(parsedMessage, state) {
+    state.enemies = [];
+    parsedMessage.p.forEach((player) => processPlayer(player, state));
 
-export function processAssignment(players, state) {
-    for (const [id, player] of Object.entries(players)) {
-        let playerInModel = getPlayerFromModelById(state, id);
+    state.bullets = [];
+    parsedMessage.b.forEach((bullet) => processBullet(bullet, state));
+}
 
-        if (playerInModel === null) {
-            console.log(`Unknown id: ${id}!`);
-        } else {
-            assignInfoToModel(playerInModel, player);
-        }
+function processPlayer(player, state) {
+    const newPlayerInModel = {
+        x: player.x,
+        y: player.y,
+        direction: player.a,
+        movementDirection: {
+            x: player.mx,
+            y: player.my
+        },
+        id: player.id
+    }
+
+    if (newPlayerInModel.id === state.player.id) {
+        state.player = newPlayerInModel;
+    } else {
+        state.enemies.push(newPlayerInModel);
     }
 }
 
-function assignInfoToModel(playerInModel, info) {
-    playerInModel.x = info.x;
-    playerInModel.y = info.y;
-    playerInModel.direction = info.movementDirection;
-    playerInModel.bullets = info.bullets;
+function processBullet(bullet, state) {
+    state.bullets.push({
+        x: bullet.x,
+        y: bullet.y,
+        direction: bullet.a,
+        ownerId: bullet.oId
+    })
 }

@@ -1,5 +1,3 @@
-import {getPlayerFromModelById} from "../../engine/players.js";
-
 export function processInterpolation(playerInterpolations, state) {
     for (const [id, playerInterpolation] of Object.entries(playerInterpolations)) {
         const playerInModel = getPlayerFromModelById(state, id);

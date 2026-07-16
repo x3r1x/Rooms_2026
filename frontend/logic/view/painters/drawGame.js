@@ -4,8 +4,8 @@ import {drawPlayers} from "./drawPlayers.js";
 
 export function drawGame(canvas, context, state) {
     drawBackground(canvas, context);
-    drawBullets(context, state);
-    drawPlayers(context, state);
+    drawBullets(context, state.player.id, state.bullets);
+    drawPlayers(context, state.player, state.enemies);
 
     context.fill();
 }

@@ -2,7 +2,7 @@ import {updateGame} from "./model/engine/updateGame.js";
 import {drawGame} from "./view/painters/drawGame.js";
 import {currentState, initLastState} from "./model/storage/states.js";
 import {initListeners, resizeCanvas} from "./controller/listeners.js";
-import {initSocket} from "./model/di/webSocket/server.js";
+import {getSocket} from "./model/di/webSocket/server.js";
 import {initSprites} from "./view/sprites.js";
 import {initMap} from "./view/maps.js";
 import {assemblyRoom, parserMapData, parserTileInfo} from "./model/storage/layers.js";
@@ -24,7 +24,7 @@ async function loadTileInfo() {
 async function loadGame() {
     resizeCanvas(canvas)
     initListeners(canvas);
-    socket = initSocket()
+    socket = getSocket()
     //TODO: id бы создавать на сервере...
     initLastState(performance.now(), crypto.randomUUID());
     // функция загрузки всех ресурсов на будущее

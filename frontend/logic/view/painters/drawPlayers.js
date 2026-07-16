@@ -1,9 +1,9 @@
 import {GAME_CONSTANTS, GAME_SPRITES} from "../../model/storage/gameConstants.js";
 
-export function drawPlayers(context, state) {
-    drawMainPlayer(context, state.player);
+export function drawPlayers(context, mainPlayer, enemies) {
+    drawMainPlayer(context, mainPlayer);
 
-    state.enemies.forEach((enemy) => drawEnemy(context, enemy));
+    enemies.forEach((enemy) => drawEnemy(context, enemy));
 }
 
 function drawMainPlayer(context, player) {

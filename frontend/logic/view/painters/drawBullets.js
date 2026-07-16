@@ -1,18 +1,16 @@
 import {GAME_CONSTANTS, GAME_SPRITES} from "../../model/storage/gameConstants.js";
 
-export function drawBullets(context, state) {
-    for (const bullet of Object.values(state.player.bullets)) {
-        drawPLayerBullet(context, bullet);
-    }
-
-    for (const enemy of Object.values(state.enemies)) {
-        for (const enemyBullet of Object.values(enemy.bullets)) {
-            drawEnemyBullet(context, enemyBullet);
+export function drawBullets(context, playerId, bullets) {
+    bullets.forEach(function (bullet) {
+        if (bullet.ownerId === playerId) {
+            drawPlayerBullet(context, bullet);
+        } else {
+            drawEnemyBullet(context, bullet);
         }
-    }
+    })
 }
 
-function drawPLayerBullet(context, bullet) {
+function drawPlayerBullet(context, bullet) {
     const sprite = GAME_SPRITES.BULLET_FLIES;
 
     context.save();
