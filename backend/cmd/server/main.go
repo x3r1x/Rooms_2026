@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"gamedevRooms/internal/game"
 	"gamedevRooms/internal/websocket"
 	"log"
 	"net/http"
@@ -16,10 +15,9 @@ import (
 // TODO: создать отдельный цикл на обработку пуль и движения, наконец добиться нормального распределения
 // TODO: добавить коллизии
 
-// scp -i "C:\Users\maxim\.ssh\id_ed25519.pub" server yc-user@84.201.159.214:/home/yc-user/
 func main() {
-	go game.StartGameLoop()
-	http.HandleFunc("/ws", websocket.HandleWebsocket)
+	//go StartGameLoop()
+	http.HandleFunc("/ws", websocket.InitWebsocket)
 	fmt.Println("server listening at port 8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
