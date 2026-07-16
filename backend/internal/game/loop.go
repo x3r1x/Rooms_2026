@@ -30,13 +30,14 @@ func GoGameLoop() {
 				player.X = upload.Player.X
 				player.Y = upload.Player.Y
 				player.Direction = upload.Player.Direction
-				for _, bullet := range upload.Player.Bullets {
-					player.Bullets = append(player.Bullets, bullet)
-				}
+				player.Bullets = upload.Player.Bullets
+				//for _, bullet := range upload.Player.Bullets {
+				//	player.Bullets = append(player.Bullets, bullet)
+				//}
 			}
 		case <-ticker.C:
 			models.Game.TickCount++
-			updateBullets()
+			//updateBullets()
 			snapshot := createSnapshot()
 			broadcast(models.ServerMessage{Players: snapshot})
 		}
