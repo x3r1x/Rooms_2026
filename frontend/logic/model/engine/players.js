@@ -1,5 +1,6 @@
 import {GAME_CONSTANTS} from "../storage/gameConstants.js";
 import {updateBullets} from "./bullet.js";
+import {canMoveTo} from "./collision.js";
 
 export function updatePlayer(direction, elapsedTime, state) {
     const directionVectorLength = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
@@ -12,9 +13,17 @@ export function updatePlayer(direction, elapsedTime, state) {
         normalizedDirection.y = normalizedDirection.y / directionVectorLength;
     }
 
-    state.player.x += normalizedDirection.x * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;
-    state.player.y += normalizedDirection.y * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;
+    const nextX = state.player.x + normalizedDirection.x * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;
+    const nextY = state.player.y + normalizedDirection.y * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;
+
     updateVisualDirection(state);
+
+    if (canMoveTo({x: nextX, y: nextY}, state)){
+        state.player.x = nextX;
+        state.player.y = nextY;
+    }
+
+
     state.player.bullets = updateBullets(elapsedTime, state.player.bullets)
 }
 
