@@ -33,6 +33,7 @@ func InitWebsocket(w http.ResponseWriter, r *http.Request) {
 
 func HandleWebsocket(conn *websocket.Conn) {
 	var currentId string
+	var isRegistered bool
 	for {
 		_, p, err := conn.ReadMessage()
 		if err != nil {
@@ -43,7 +44,7 @@ func HandleWebsocket(conn *websocket.Conn) {
 		var msg models.ClientMessage
 		if err := json.Unmarshal(p, &msg); err != nil {
 			log.Println("Ошибка сериализации при чтении пакета: ", err)
-			if _, exist := models.Game.Players[msg.Player.Id]; exist {
+			if isRegistered {
 				log.Println("Удаляем пользователя: ", msg.Player.Id)
 				models.Game.LeaveChan <- msg.Player.Id
 			}
@@ -51,6 +52,7 @@ func HandleWebsocket(conn *websocket.Conn) {
 		}
 
 		if currentId == "" && msg.Player.Id != "" {
+			isRegistered = true
 			currentId = msg.Player.Id
 			fmt.Println("Регистрация пользователя")
 			models.Game.RegisterChan <- models.PlayerState{
