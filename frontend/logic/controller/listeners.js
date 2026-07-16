@@ -46,7 +46,6 @@ function initCanvasListeners(canvas) {
     canvas.addEventListener('mousemove', function (event) {
         const {x, y} = getMousePos(canvas, event);
 
-        console.log(currentState);
         currentState.player.mousePosition.x = x;
         currentState.player.mousePosition.y = y;
     })
