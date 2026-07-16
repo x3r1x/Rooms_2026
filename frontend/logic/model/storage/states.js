@@ -44,10 +44,12 @@ export const room = {
     object: [],
     exit: {top: false, left: false, down: false, right: false},
     flap: {top: false, left: false, down: false, right: false},
+    collision: []
 }
 
 export const layersForRoom = {
     width: 0,
+    height:0,
     tileSize: 0,
     floor: [],
     walls: [],

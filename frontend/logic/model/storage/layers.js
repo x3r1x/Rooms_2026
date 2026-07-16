@@ -2,6 +2,7 @@ import {layersForRoom, room} from "./states.js";
 
 export function parserMapData(dataJson) {
     layersForRoom.width = dataJson.width;
+    layersForRoom.height = dataJson.height;
     dataJson.layers.forEach(layer => {
         if (layer.name === 'baseRoom')
             layersForRoom.floor.push({name: layer.name, data: layer.data});
@@ -31,9 +32,12 @@ export function parserTileInfo(dataJson) {
             blocksPlayer: property.blocksPlayer,
             hitboxes: property.hitbox,
         };
-        console.log(tileInfo);
         layersForRoom.tilesInfo[tile.id] = tileInfo;
     });
+}
+
+export function getMapCollision(){
+    room.collision = assemblyObject(room.walls, room.object);
 }
 
 function getRandomArray(array) {
@@ -149,5 +153,6 @@ export function assemblyRoom() {
 
     room.floors = layersForRoom.floor[0];
 
+    getMapCollision();
 }
 

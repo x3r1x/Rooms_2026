@@ -4,6 +4,9 @@ export const GAME_CONSTANTS = {
     CANVAS_START: 0,
 
     PLAYER_VISUAL_SIZE: 40,
+
+    PLAYER_HITBOX_SIZE: 32,
+    HALF: 16,
     PLAYER_START_X: 500,
     PLAYER_START_Y: 400,
     PLAYER_SKIN_BLUE: 'assets/images/manBlue_gun.png',
@@ -18,6 +21,12 @@ export const GAME_CONSTANTS = {
 
     TILE_IMG: 'assets/tile/tileset x1.png'
 }
+export const PLAYER_LOCAL_POINTS = [
+    { x: -GAME_CONSTANTS.HALF, y: -GAME_CONSTANTS.HALF },
+    { x:  GAME_CONSTANTS.HALF, y: -GAME_CONSTANTS.HALF },
+    { x:  GAME_CONSTANTS.HALF, y:  GAME_CONSTANTS.HALF },
+    { x: -GAME_CONSTANTS.HALF, y:  GAME_CONSTANTS.HALF }
+];
 
 export const GAME_SPRITES = {
     PLAYER_STAND: new Image(),
