@@ -1,17 +1,19 @@
 import {processAssignment} from "./processAssignment.js";
-import {currentState, previousState} from "../../storage/states.js";
+import {currentState} from "../../storage/states.js";
 
 export function getSocket() {
     const socket = new WebSocket("ws://84.201.159.214:8080/ws");
 
     socket.onopen = function (event) {
         console.log(`Открыто соединение - ${event.type}!`);
+        sendMessage(socket, currentState)
     }
 
     socket.onmessage = function (event) {
         sendMessage(socket, currentState);
-        parseMessage(event.data, previousState);
-        processCurrentState(currentState, previousState);
+        parseMessage(event.data, currentState);
+
+        currentState.didShoot = false;
     }
 
     socket.onerror = function (error) {
@@ -26,7 +28,7 @@ export function parseMessage(message, state) {
 
     // if (parsedMessage.type === "interpolation" && "playerInterpolations" in parsedMessage) {
     //     processInterpolation(parsedMessage["playerInterpolations"], state);
-    if (parsedMessage.type === "a" && "players" in parsedMessage) {
+    if (parsedMessage.type === "a") {
         processAssignment(parsedMessage, state);
     } else {
         console.log(`Packet loss: ${parsedMessage.type}!`);
@@ -39,19 +41,8 @@ function sendMessage(socket, state) {
         "a": state.player.direction,
         "mx": state.player.movementDirection.x,
         "my": state.player.movementDirection.y,
-        "s": state.player.didShot
+        "s": state.player.didShoot
     }
 
     socket.send(JSON.stringify(message));
-}
-
-function processCurrentState(currentState, previousState) {
-    currentState.player = previousState.player;
-    currentState.enemies = previousState.enemies;
-
-    currentState.movementDirection = {
-        x: 0,
-        y: 0
-    }
-    currentState.didShot = false;
 }

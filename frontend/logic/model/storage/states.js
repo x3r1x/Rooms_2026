@@ -7,15 +7,15 @@ export const currentState = {
         x: GAME_CONSTANTS.PLAYER_START_X,
         y: GAME_CONSTANTS.PLAYER_START_Y,
         mousePosition: {
-            x: null,
-            y: null
+            x: 0,
+            y: 0
         },
         direction: null,
         movementDirection: {
             x: 0,
             y: 0
         },
-        didShot: false,
+        didShoot: false,
         id: null
     },
     enemies: [],
@@ -25,17 +25,6 @@ export const currentState = {
     mapWall: [],
     mapObject: [],
 };
-
-export const previousState = {
-    player: {
-        x: null,
-        y: null,
-        direction: null,
-        bullets: {},
-        id: null
-    },
-    enemies: []
-}
 
 export function initLastState(dateNow, playerId) {
     currentState.lastTime = dateNow;

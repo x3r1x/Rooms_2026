@@ -19,6 +19,7 @@ function processPlayer(player, state) {
     }
 
     if (newPlayerInModel.id === state.player.id) {
+        newPlayerInModel.mousePosition = state.player.mousePosition;
         state.player = newPlayerInModel;
     } else {
         state.enemies.push(newPlayerInModel);

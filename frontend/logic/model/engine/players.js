@@ -7,6 +7,7 @@ export function updatePlayer(direction, elapsedTime, player) {
 }
 
 export function updateVisualDirection(player) {
+    console.log(player)
     player.direction = Math.atan2(player.mousePosition.y - player.y, player.mousePosition.x - player.x);
 }
 

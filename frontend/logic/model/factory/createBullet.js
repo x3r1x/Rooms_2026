@@ -6,5 +6,5 @@ export function createBullet(state, bulletDirection, shotX, shotY) {
         ownerId: state.player.id
     })
 
-    state.player.didShot = true;
+    state.player.didShoot = true;
 }
