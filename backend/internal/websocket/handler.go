@@ -61,11 +61,14 @@ func HandleWebsocket(conn *websocket.Conn) {
 				Bullets:    msg.Player.Bullets,
 				Connection: conn,
 			}
-			if currentId != "" {
-				models.Game.InputChan <- models.ClientMessage{
-					Player: msg.Player,
-				}
+		}
+		if currentId != "" {
+			models.Game.InputChan <- models.ClientMessage{
+				Player: msg.Player,
 			}
 		}
+	}
+	if currentId != "" {
+		models.Game.LeaveChan <- currentId
 	}
 }
