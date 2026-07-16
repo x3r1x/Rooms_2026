@@ -15,12 +15,13 @@ func GoGameLoop() {
 
 		case reg := <-models.Game.RegisterChan:
 			models.Game.Players[reg.Id] = &models.PlayerState{
-				Id:         reg.Id,
-				X:          reg.X,
-				Y:          reg.Y,
-				Direction:  reg.Direction,
-				Bullets:    reg.Bullets,
-				Connection: reg.Connection,
+				Id:            reg.Id,
+				X:             reg.X,
+				Y:             reg.Y,
+				DirectionLook: reg.DirectionLook,
+				MoveX:         reg.MoveX,
+				MoveY:         reg.MoveY,
+				Connection:    reg.Connection,
 			}
 		case del := <-models.Game.LeaveChan:
 			delete(models.Game.Players, del)
@@ -29,7 +30,7 @@ func GoGameLoop() {
 			if player, exist := models.Game.Players[upload.Player.Id]; exist {
 				player.X = upload.Player.X
 				player.Y = upload.Player.Y
-				player.Direction = upload.Player.Direction
+				player.DirectionLook = upload.Player.Direction
 				player.Bullets = upload.Player.Bullets
 				//for _, bullet := range upload.Player.Bullets {
 				//	player.Bullets = append(player.Bullets, bullet)
@@ -57,8 +58,8 @@ func updateBullets() {
 		activeBullets := make([]models.Bullet, 0)
 		for _, bullet := range player.Bullets {
 			bullet.Life--
-			bullet.X += math.Cos(bullet.Direction) * models.MAX_BULLET_SPEED
-			bullet.Y += math.Sin(bullet.Direction) * models.MAX_BULLET_SPEED
+			bullet.X += math.Cos(bullet.Direction) * models.MaxBulletSpeed
+			bullet.Y += math.Sin(bullet.Direction) * models.MaxBulletSpeed
 			if bullet.Life > 0 {
 				activeBullets = append(activeBullets, bullet)
 			}

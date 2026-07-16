@@ -56,12 +56,13 @@ func HandleWebsocket(conn *websocket.Conn) {
 			currentId = msg.Player.Id
 			fmt.Println("Регистрация пользователя")
 			models.Game.RegisterChan <- models.PlayerState{
-				Id:         msg.Player.Id,
-				X:          msg.Player.X,
-				Y:          msg.Player.Y,
-				Direction:  msg.Player.Direction,
-				Bullets:    make([]models.Bullet, 0),
-				Connection: conn,
+				Id:            msg.Player.Id,
+				X:             models.PlayerSpawnPointX,
+				Y:             models.PlayerSpawnPointY,
+				DirectionLook: models.InitDirection,
+				MoveX:         models.InitDirection,
+				MoveY:         models.InitDirection,
+				Connection:    conn,
 			}
 		}
 		if currentId != "" {
