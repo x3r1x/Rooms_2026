@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"gamedevRooms/internal/game"
+	"gamedevRooms/internal/models"
 	"gamedevRooms/internal/websocket"
 	"log"
 	"net/http"
@@ -16,7 +18,7 @@ import (
 // TODO: добавить коллизии
 
 func main() {
-	go GameLoop()
+	go game.GoGameLoop(models.Game)
 	http.HandleFunc("/ws", websocket.InitWebsocket)
 	fmt.Println("server listening at port 8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))

@@ -1,21 +1,18 @@
 package game
 
 import (
-	"context"
 	"gamedevRooms/internal/models"
 	"time"
 )
 
-func GameLoop(gameState *models.GameState, ctx context.Context) {
+func GoGameLoop(gameState *models.GameState) {
 	ticker := time.NewTicker(16 * time.Millisecond)
 	defer ticker.Stop()
 
 	for {
 		select {
-		case <-ctx.Done():
-			return
 
-		case reg := <-gameState.RegisterChan:
+		case reg := <-models.Game.RegisterChan:
 			models.Game.Players[reg.Id] = &models.PlayerState{
 				Id:         reg.Id,
 				X:          reg.X,
@@ -24,12 +21,16 @@ func GameLoop(gameState *models.GameState, ctx context.Context) {
 				Bullets:    reg.Bullets,
 				Connection: reg.Connection,
 			}
-		case id := <-gameState.LeaveChan:
-			delete(gameState.Players, id)
+		case del := <-models.Game.LeaveChan:
+			delete(gameState.Players, del)
 
-		//case upload := <-gameState.InputChan:
-		//	//gameState.handleInput(input)
-
+		case upload := <-models.Game.InputChan:
+			if player, exist := models.Game.Players[upload.Player.Id]; exist {
+				player.X = upload.Player.X
+				player.Y = upload.Player.Y
+				player.Direction = upload.Player.Direction
+				player.Bullets = upload.Player.Bullets
+			}
 		case <-ticker.C:
 			gameState.TickCount++
 			//gameState.updatePhysics()

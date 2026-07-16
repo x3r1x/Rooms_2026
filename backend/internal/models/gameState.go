@@ -11,18 +11,18 @@ type GameState struct {
 
 func NewGameState() *GameState {
 	return &GameState{
-		Players:       make(map[string]*PlayerState),
-		InputChan:     make(chan ClientMessage),
-		RegisterChan:  make(chan PlayerState),
-		LeaveChan:     make(chan string),
-		BroadcastChan: make(chan []PlayerState),
+		Players:      make(map[string]*PlayerState),
+		InputChan:    make(chan ClientMessage),
+		RegisterChan: make(chan PlayerState),
+		LeaveChan:    make(chan string),
+		//BroadcastChan: make(chan []PlayerState),
 	}
 }
 
 var Game = &GameState{
-	Players:       make(map[string]*PlayerState),
-	RegisterChan:  make(chan PlayerState),
-	InputChan:     make(chan ClientMessage, 100),
-	LeaveChan:     make(chan string, 100),
-	BroadcastChan: make(chan []PlayerState, 1),
+	Players:      make(map[string]*PlayerState),
+	RegisterChan: make(chan PlayerState),
+	InputChan:    make(chan ClientMessage, 100),
+	LeaveChan:    make(chan string, 100),
+	//BroadcastChan: make(chan []PlayerState, 1),
 }

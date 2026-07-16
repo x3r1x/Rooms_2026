@@ -48,7 +48,12 @@ func HandleWebsocket(conn *websocket.Conn) {
 			}
 			continue
 		}
-		if _, exist := models.Game.Players[msg.Player.Id]; !exist {
+		if _, exist := models.Game.Players[msg.Player.Id]; exist {
+			models.Game.InputChan <- models.ClientMessage{
+				Player: msg.Player,
+			}
+		} else {
+			fmt.Println("Регистрация пользователя")
 			models.Game.RegisterChan <- models.PlayerState{
 				Id:        msg.Player.Id,
 				X:         msg.Player.X,
