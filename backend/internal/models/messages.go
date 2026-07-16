@@ -6,7 +6,6 @@ type ClientMessage struct {
 		MX float32 `json:"mx"`
 		MY float32 `json:"my"`
 		A  float32 `json:"a"`
-		M  bool    `json:"m"`
 		S  bool    `json:"s"`
 	} `json:"player"`
 }

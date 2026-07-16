@@ -19,28 +19,28 @@ func GoGameLoop() {
 				X:             reg.X,
 				Y:             reg.Y,
 				DirectionLook: reg.DirectionLook,
-				MoveX:         reg.MoveX,
-				MoveY:         reg.MoveY,
 				Connection:    reg.Connection,
 			}
 		case del := <-models.Game.LeaveChan:
 			delete(models.Game.Players, del)
 
 		case upload := <-models.Game.InputChan:
-			if player, exist := models.Game.Players[upload.Player.Id]; exist {
-				player.X = upload.Player.X
-				player.Y = upload.Player.Y
-				player.DirectionLook = upload.Player.Direction
-				player.Bullets = upload.Player.Bullets
-				//for _, bullet := range upload.Player.Bullets {
-				//	player.Bullets = append(player.Bullets, bullet)
-				//}
-			}
+			if upload.Player.S
+			//if player, exist := models.Game.Players[upload.Player.Id]; exist {
+			//	player.X = upload.Player.X
+			//	player.Y = upload.Player.Y
+			//	player.DirectionLook = upload.Player.Direction
+			//	player.Bullets = upload.Player.Bullets
+			//}
 		case <-ticker.C:
 			models.Game.TickCount++
-			//updateBullets()
+			updateBullets()
 			snapshot := createSnapshot()
-			broadcast(models.ServerMessage{Players: snapshot})
+			broadcast(models.ServerMessage{
+				Type: "a",
+				Players: snapshot,
+				Bullets: getAllBullets(),
+			})
 		}
 	}
 }
@@ -54,9 +54,8 @@ func createSnapshot() []models.PlayerState {
 }
 
 func updateBullets() {
-	for _, player := range models.Game.Players {
 		activeBullets := make([]models.Bullet, 0)
-		for _, bullet := range player.Bullets {
+		for _, bullet := range models.Game.Bullets {
 			bullet.Life--
 			bullet.X += math.Cos(bullet.Direction) * models.MaxBulletSpeed
 			bullet.Y += math.Sin(bullet.Direction) * models.MaxBulletSpeed
@@ -64,6 +63,9 @@ func updateBullets() {
 				activeBullets = append(activeBullets, bullet)
 			}
 		}
-		player.Bullets = activeBullets
-	}
+		models.Game.Bullets = activeBullets
+}
+
+func getAllBullets() []models.Bullet {
+	return models.Game.Bullets
 }
