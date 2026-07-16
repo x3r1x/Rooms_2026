@@ -1,40 +1,43 @@
 import {layersForRoom, room} from "../storage/states.js";
 import {PLAYER_LOCAL_POINTS} from "../storage/gameConstants.js";
+
 const TILE_NORMALS = [{x: 0, y: -1},
     {x: 1, y: 0},
     {x: 0, y: 1},
     {x: -1, y: 0}];
-export function canMoveTo(nextPosition, state) {
-        const personPoints = getPlayerPoints(nextPosition, state.player.direction);
-        const personNormals = getPlayerNormals(personPoints);
-        const personSAT = { points: personPoints, normals: personNormals };
 
-        const nearby = getNearbyTiles(nextPosition.x, nextPosition.y, room);
-        for (const tile of nearby) {
-            const tileInfo = layersForRoom.tilesInfo[tile.tileId];
-            if (!tileInfo.blocksPlayer) continue;
+export function canMoveTo(nextPosition, player) {
+    const personPoints = getPlayerPoints(nextPosition, player.direction);
+    const personNormals = getPlayerNormals(personPoints);
+    const personSAT = {points: personPoints, normals: personNormals};
 
-            for (const hitbox of tileInfo.hitboxes) {
-                const tilePoints = getTileWorldPoints(tile.x, tile.y, hitbox);
-                const tileSAT = { points: tilePoints, normals: TILE_NORMALS };
-                if (checkCollisionSAT(personSAT, tileSAT)) {
-                    return false;
-                }
+    const nearby = getNearbyTiles(nextPosition.x, nextPosition.y, room);
+    for (const tile of nearby) {
+        const tileInfo = layersForRoom.tilesInfo[tile.tileId];
+        if (!tileInfo.blocksPlayer) continue;
+
+        for (const hitbox of tileInfo.hitboxes) {
+            const tilePoints = getTileWorldPoints(tile.x, tile.y, hitbox);
+            const tileSAT = {points: tilePoints, normals: TILE_NORMALS};
+            if (checkCollisionSAT(personSAT, tileSAT)) {
+                return false;
             }
         }
-
-        return true;
     }
-    function getTileWorldPoints(col, row, hitbox) {
-        const s = layersForRoom.tileSize;
-        const x = col * s + hitbox.x;
-        const y = row * s + hitbox.y;
-        return [
-            { x, y },
-            { x: x + hitbox.w, y },
-            { x: x + hitbox.w, y: y + hitbox.h },
-            { x, y: y + hitbox.h }
-        ];
+
+    return true;
+}
+
+function getTileWorldPoints(col, row, hitbox) {
+    const s = layersForRoom.tileSize;
+    const x = col * s + hitbox.x;
+    const y = row * s + hitbox.y;
+    return [
+        {x, y},
+        {x: x + hitbox.w, y},
+        {x: x + hitbox.w, y: y + hitbox.h},
+        {x, y: y + hitbox.h}
+    ];
 }
 
 function getPlayerPoints(centerPlayer, angle) {
@@ -52,8 +55,8 @@ function getPlayerNormals(points) {
     for (let i = 0; i < points.length; i++) {
         const p1 = points[i];
         const p2 = points[(i + 1) % points.length];
-        const edge = { x: p2.x - p1.x, y: p2.y - p1.y };
-        normals.push({ x: -edge.y, y: edge.x });
+        const edge = {x: p2.x - p1.x, y: p2.y - p1.y};
+        normals.push({x: -edge.y, y: edge.x});
     }
     return normals;
 }
@@ -62,11 +65,7 @@ function checkCollisionSAT(box1, box2) {
     if (!checkAxes(box1.points, box2.points, box1.normals)) {
         return false;
     }
-    if (!checkAxes(box1.points, box2.points, box2.normals)) {
-        return false;
-    }
-
-    return true;
+    return checkAxes(box1.points, box2.points, box2.normals);
 }
 
 function checkAxes(points1, points2, normals) {
@@ -99,7 +98,7 @@ function isOverlapping(projection1, projection2) {
     return (projection1.max >= projection2.min) && (projection2.max >= projection1.min);
 }
 
-function getNearbyTiles(x, y, mapData){
+function getNearbyTiles(x, y, mapData) {
     const center = getTileAtPosition(x, y);
     const map = mapData.collision;
     const mapWidth = layersForRoom.width;
