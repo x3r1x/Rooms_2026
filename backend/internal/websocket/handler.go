@@ -42,7 +42,6 @@ func HandleWebsocket(conn *websocket.Conn) {
 		}
 
 		var msg models.ClientMessage
-		fmt.Println(string(p))
 		if err := json.Unmarshal(p, &msg); err != nil {
 			log.Println("Ошибка сериализации при чтении пакета: ", err)
 			if isRegistered {

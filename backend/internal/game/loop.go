@@ -30,7 +30,6 @@ func GoGameLoop() {
 
 		case upload := <-models.Game.InputChan:
 			if player, exist := models.Game.Players[upload.Id]; exist {
-				fmt.Println(upload.A)
 				player.A = upload.A
 				if upload.S && player.ShootTimer <= 0 {
 					spawnBullet(player)
