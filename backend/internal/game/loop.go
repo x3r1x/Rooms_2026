@@ -34,7 +34,7 @@ func GoGameLoop(gameState *models.GameState) {
 		case <-ticker.C:
 			gameState.TickCount++
 			//gameState.updatePhysics()
-			//gameState.BroadcastState()
+			broadcast(models.ServerMessage{Players: takeSnapshot()})
 		}
 	}
 }
