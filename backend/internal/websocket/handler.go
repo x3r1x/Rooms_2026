@@ -32,8 +32,8 @@ func InitWebsocket(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleWebsocket(conn *websocket.Conn) {
-	var currentId string
-	var isRegistered bool
+	var currentId string = ""
+	var isRegistered bool = false
 	for {
 		_, p, err := conn.ReadMessage()
 		if err != nil {
@@ -42,32 +42,36 @@ func HandleWebsocket(conn *websocket.Conn) {
 		}
 
 		var msg models.ClientMessage
+		fmt.Println(string(p))
 		if err := json.Unmarshal(p, &msg); err != nil {
 			log.Println("Ошибка сериализации при чтении пакета: ", err)
 			if isRegistered {
-				log.Println("Удаляем пользователя: ", msg.Player.Id)
-				models.Game.LeaveChan <- msg.Player.Id
+				log.Println("Удаляем пользователя: ", msg.Id)
+				models.Game.LeaveChan <- msg.Id
 			}
 			continue
 		}
 
-		if currentId == "" && msg.Player.Id != "" {
+		if currentId == "" && msg.Id != "" {
 			isRegistered = true
-			currentId = msg.Player.Id
+			currentId = msg.Id
 			fmt.Println("Регистрация пользователя")
 			models.Game.RegisterChan <- models.PlayerState{
-				Id:            msg.Player.Id,
-				X:             models.PlayerSpawnPointX,
-				Y:             models.PlayerSpawnPointY,
-				DirectionLook: models.InitDirection,
-				MoveX:         models.InitDirection,
-				MoveY:         models.InitDirection,
-				Connection:    conn,
+				Id:         msg.Id,
+				X:          models.PlayerSpawnPointX,
+				Y:          models.PlayerSpawnPointY,
+				A:          models.InitDirection,
+				MoveX:      models.InitDirection,
+				MoveY:      models.InitDirection,
+				Connection: conn,
 			}
-		}
-		if currentId != "" {
+		} else if currentId != "" {
 			models.Game.InputChan <- models.ClientMessage{
-				Player: msg.Player,
+				Id: msg.Id,
+				MX: msg.MX,
+				MY: msg.MY,
+				A:  msg.A,
+				S:  msg.S,
 			}
 		}
 	}

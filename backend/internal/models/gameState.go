@@ -20,7 +20,7 @@ type GameState struct {
 
 var Game = &GameState{
 	Players:      make(map[string]*PlayerState),
-	Bullets:      make([]Bullet),
+	Bullets:      make([]Bullet, 0),
 	RegisterChan: make(chan PlayerState),
 	InputChan:    make(chan ClientMessage, 100),
 	LeaveChan:    make(chan string, 100),
