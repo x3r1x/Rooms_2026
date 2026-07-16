@@ -2,6 +2,7 @@ package models
 
 type GameState struct {
 	Players       map[string]*PlayerState
+	Bullets       []Bullet
 	InputChan     chan ClientMessage
 	RegisterChan  chan PlayerState
 	LeaveChan     chan string

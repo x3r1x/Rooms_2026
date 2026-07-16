@@ -6,4 +6,5 @@ type Bullet struct {
 	Y         float64 `json:"y"`
 	Direction float64 `json:"direction"`
 	Life      float64 `json:"life"`
+	OwnerId   string  `json:"ownerid"`
 }
