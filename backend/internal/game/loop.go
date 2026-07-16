@@ -8,7 +8,7 @@ import (
 )
 
 func GoGameLoop() {
-	ticker := time.NewTicker(16 * time.Millisecond)
+	ticker := time.NewTicker(models.TickTime * time.Millisecond)
 	defer ticker.Stop()
 
 	for {
@@ -30,8 +30,9 @@ func GoGameLoop() {
 
 		case upload := <-models.Game.InputChan:
 			if player, exist := models.Game.Players[upload.Id]; exist {
-				fmt.Println(upload.A)
 				player.A = upload.A
+				player.MoveX = upload.MX
+				player.MoveY = upload.MY
 				if upload.S && player.ShootTimer <= 0 {
 					spawnBullet(player)
 					player.ShootTimer = models.ShootCooldown
@@ -41,6 +42,7 @@ func GoGameLoop() {
 			models.Game.TickCount++
 			updateShooterTimers()
 			updateBullets()
+			updatePlayers()
 			snapshot := createSnapshot()
 			broadcast(models.ServerMessage{
 				Type:    "a",
@@ -94,6 +96,24 @@ func updateBullets() {
 		}
 	}
 	models.Game.Bullets = activeBullets
+}
+
+func updatePlayers() {
+	for _, player := range models.Game.Players {
+		checkAndNormaliseDirection(&player.MoveX, &player.MoveY)
+
+		player.X += player.MoveX * float64(models.TickTime) * models.PlayerSpeed
+		player.Y += player.MoveY * float64(models.TickTime) * models.PlayerSpeed
+	}
+}
+
+func checkAndNormaliseDirection(moveX, moveY *float64) {
+	var vectorLength = math.Sqrt(*moveX**moveX + *moveY**moveY)
+
+	if vectorLength != 0 {
+		*moveX /= vectorLength
+		*moveY /= vectorLength
+	}
 }
 
 func getAllBullets() []models.Bullet {
