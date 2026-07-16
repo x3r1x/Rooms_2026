@@ -1,10 +1,12 @@
 package models
 
 const (
-	MaxBulletSpeed    = 1.5
+	MaxBulletSpeed    = 22.5
 	BulletLife        = 60
-	MapSize           = 2000.0
-	PlayerSpawnPointX = 200
-	PlayerSpawnPointY = 200
+	PlayerSpawnPointX = 500
+	PlayerSpawnPointY = 500
 	InitDirection     = 0
+	ShootCooldown     = 15
+	PlayerVisualSize  = 40.0
+	BulletWidth       = 5.0
 )

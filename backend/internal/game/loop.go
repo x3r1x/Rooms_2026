@@ -32,15 +32,14 @@ func GoGameLoop() {
 			if player, exist := models.Game.Players[upload.Id]; exist {
 				fmt.Println(upload.A)
 				player.A = upload.A
+				if upload.S && player.ShootTimer <= 0 {
+					spawnBullet(player)
+					player.ShootTimer = models.ShootCooldown
+				}
 			}
-			//if player, exist := models.Game.Players[upload.Player.Id]; exist {
-			//	player.X = upload.Player.X
-			//	player.Y = upload.Player.Y
-			//	player.A = upload.Player.Direction
-			//	player.Bullets = upload.Player.Bullets
-			//}
 		case <-ticker.C:
 			models.Game.TickCount++
+			updateShooterTimers()
 			updateBullets()
 			snapshot := createSnapshot()
 			broadcast(models.ServerMessage{
@@ -52,8 +51,31 @@ func GoGameLoop() {
 	}
 }
 
+func spawnBullet(player *models.PlayerState) {
+	localX := models.PlayerVisualSize / 2.0
+	localY := (models.PlayerVisualSize / 2.0) - (models.BulletWidth + (models.PlayerVisualSize * 0.1))
+
+	rotatedDX := localX*math.Cos(player.A) - localY*math.Sin(player.A)
+	rotatedDY := localX*math.Sin(player.A) + localY*math.Cos(player.A)
+	bullet := models.Bullet{
+		X:         player.X + rotatedDX,
+		Y:         player.Y + rotatedDY,
+		Direction: player.A,
+		Life:      models.BulletLife,
+		OwnerId:   player.Id,
+	}
+	models.Game.Bullets = append(models.Game.Bullets, bullet)
+}
+
+func updateShooterTimers() {
+	for _, player := range models.Game.Players {
+		if player.ShootTimer > 0 {
+			player.ShootTimer--
+		}
+	}
+}
+
 func createSnapshot() []models.PlayerState {
-	//fmt.Printf("DEBUG: Snapshot created, players count: %d\n", len(models.Game.Players))
 	snapshot := make([]models.PlayerState, 0, len(models.Game.Players))
 	for _, player := range models.Game.Players {
 		snapshot = append(snapshot, *player)
