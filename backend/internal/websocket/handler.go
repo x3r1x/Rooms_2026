@@ -60,7 +60,7 @@ func HandleWebsocket(conn *websocket.Conn) {
 				X:          msg.Player.X,
 				Y:          msg.Player.Y,
 				Direction:  msg.Player.Direction,
-				Bullets:    msg.Player.Bullets,
+				Bullets:    make([]models.Bullet, 0),
 				Connection: conn,
 			}
 		}

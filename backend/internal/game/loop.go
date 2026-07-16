@@ -19,7 +19,7 @@ func GoGameLoop() {
 				X:          reg.X,
 				Y:          reg.Y,
 				Direction:  reg.Direction,
-				Bullets:    make([]models.Bullet, 0),
+				Bullets:    reg.Bullets,
 				Connection: reg.Connection,
 			}
 		case del := <-models.Game.LeaveChan:
@@ -30,6 +30,9 @@ func GoGameLoop() {
 				player.X = upload.Player.X
 				player.Y = upload.Player.Y
 				player.Direction = upload.Player.Direction
+				for _, bullet := range upload.Player.Bullets {
+					player.Bullets = append(player.Bullets, bullet)
+				}
 			}
 		case <-ticker.C:
 			models.Game.TickCount++
