@@ -3,7 +3,6 @@ package websocket
 import (
 	"encoding/json"
 	"fmt"
-	"gamedevRooms/internal/game"
 	"gamedevRooms/internal/models"
 	"log"
 	"net/http"
@@ -17,7 +16,7 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func HandleWebsocket(w http.ResponseWriter, r *http.Request) {
+func InitWebsocket(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
@@ -25,54 +24,58 @@ func HandleWebsocket(w http.ResponseWriter, r *http.Request) {
 	}
 	defer func() {
 		if err := conn.Close(); err != nil {
-			log.Println(err)
+			log.Println("Ошибка закрытия связи: ", err)
 		}
 	}()
 	fmt.Println("New connection established.")
+	HandleWebsocket(conn)
+}
 
-	var currentID string
-
+func HandleWebsocket(conn *websocket.Conn) {
+	var currentId string = ""
+	var isRegistered bool = false
 	for {
-		//TODO: добавить коллизии
 		_, p, err := conn.ReadMessage()
 		if err != nil {
-			log.Println(err)
-			game.Mutex.Lock()
-			if currentID != "" {
-				delete(game.Clients, currentID)
-				fmt.Println("Client disconnected. Id: ", currentID)
-			}
-			game.Mutex.Unlock()
+			log.Println("Ошибка чтения: ", err)
 			break
 		}
+
 		var msg models.ClientMessage
+		fmt.Println(string(p))
 		if err := json.Unmarshal(p, &msg); err != nil {
-			log.Println(err)
+			log.Println("Ошибка сериализации при чтении пакета: ", err)
+			if isRegistered {
+				log.Println("Удаляем пользователя: ", msg.Id)
+				models.Game.LeaveChan <- msg.Id
+			}
 			continue
 		}
 
-		game.Mutex.Lock()
-
-		if currentID == "" && msg.Player.Id != "" {
-			currentID = msg.Player.Id
-			game.Clients[currentID] = &models.PlayerState{
-				Id:        currentID,
-				X:         msg.Player.X,
-				Y:         msg.Player.Y,
-				Direction: msg.Player.Direction,
-				Bullets:   []models.Bullet{},
-				Conn:      conn,
+		if currentId == "" && msg.Id != "" {
+			isRegistered = true
+			currentId = msg.Id
+			fmt.Println("Регистрация пользователя")
+			models.Game.RegisterChan <- models.PlayerState{
+				Id:         msg.Id,
+				X:          models.PlayerSpawnPointX,
+				Y:          models.PlayerSpawnPointY,
+				A:          models.InitDirection,
+				MoveX:      models.InitDirection,
+				MoveY:      models.InitDirection,
+				Connection: conn,
 			}
-			game.Mutex.Unlock()
-			continue
-		}
-
-		if currentID != "" {
-			if _, ok := game.Clients[currentID]; ok {
-				game.UpdatePlayerState(currentID, msg.Player.X, msg.Player.Y, msg.Player.Direction, msg.Player.Bullets)
+		} else if currentId != "" {
+			models.Game.InputChan <- models.ClientMessage{
+				Id: msg.Id,
+				MX: msg.MX,
+				MY: msg.MY,
+				A:  msg.A,
+				S:  msg.S,
 			}
 		}
-
-		game.Mutex.Unlock()
+	}
+	if currentId != "" {
+		models.Game.LeaveChan <- currentId
 	}
 }

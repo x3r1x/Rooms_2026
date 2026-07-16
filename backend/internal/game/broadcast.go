@@ -2,7 +2,6 @@ package game
 
 import (
 	"encoding/json"
-	"fmt"
 	"gamedevRooms/internal/models"
 	"log"
 
@@ -15,32 +14,11 @@ func broadcast(message models.ServerMessage) {
 		log.Println(err)
 		return
 	}
-
-	Mutex.Lock()
-	conns := make([]*models.PlayerState, 0, len(Clients))
-	for _, player := range Clients {
-		conns = append(conns, player)
-	}
-	Mutex.Unlock()
-	var deadClients []*models.PlayerState
-	for _, player := range conns {
-		player.Mu.Lock()
-		err := player.Conn.WriteMessage(websocket.TextMessage, data)
-		player.Mu.Unlock()
+	for id, p := range models.Game.Players {
+		err := p.Connection.WriteMessage(websocket.TextMessage, data)
 		if err != nil {
-			deadClients = append(deadClients, player)
+			log.Println("Ошибка отправки: ", err)
+			models.Game.LeaveChan <- id
 		}
-	}
-	if len(deadClients) > 0 {
-		Mutex.Lock()
-		for _, deadClient := range deadClients {
-			delete(Clients, deadClient.Id)
-			fmt.Println("Client disconnected. Id: ", deadClient.Id)
-			err = deadClient.Conn.Close()
-			if err != nil {
-				log.Println(err)
-			}
-		}
-		Mutex.Unlock()
 	}
 }

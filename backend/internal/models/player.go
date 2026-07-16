@@ -1,17 +1,13 @@
 package models
 
-import (
-	"sync"
-
-	"github.com/gorilla/websocket"
-)
+import "github.com/gorilla/websocket"
 
 type PlayerState struct {
-	X         float64         `json:"x"`
-	Y         float64         `json:"y"`
-	Direction float64         `json:"direction"`
-	Id        string          `json:"id"`
-	Bullets   []Bullet        `json:"bullets"`
-	Conn      *websocket.Conn `json:"-"`
-	Mu        sync.Mutex      `json:"-"`
+	Id         string          `json:"id"`
+	X          float64         `json:"x"`
+	Y          float64         `json:"y"`
+	A          float64         `json:"a"`
+	MoveX      float64         `json:"mx"`
+	MoveY      float64         `json:"my"`
+	Connection *websocket.Conn `json:"-"`
 }

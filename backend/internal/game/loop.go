@@ -1,67 +1,79 @@
 package game
 
 import (
+	"fmt"
 	"gamedevRooms/internal/models"
 	"math"
-	"sync"
 	"time"
 )
 
-var ServerMessagePool = sync.Pool{
-	New: func() interface{} {
-		return &models.ServerMessage{
-			Players: make([]models.PlayerState, 0, 100),
-		}
-	},
-}
-
-func UpdateBullets() {
-	for _, player := range Clients {
-		writeIdx := 0
-		for readIdx, _ := range player.Bullets {
-			bullet := &player.Bullets[readIdx]
-			bullet.Life--
-			if bullet.Life <= 0 {
-				continue
-			}
-			bullet.X += math.Cos(bullet.Direction) * MAX_BULLET_SPEED
-			bullet.Y += math.Sin(bullet.Direction) * MAX_BULLET_SPEED
-			// обдумать условие
-			if bullet.Y >= 0 && bullet.Y <= MAP_SIZE && bullet.X >= 0 && bullet.X <= MAP_SIZE {
-				player.Bullets[writeIdx] = *bullet
-				writeIdx++
-			}
-		}
-		player.Bullets = player.Bullets[:writeIdx]
-	}
-
-}
-
-func StartGameLoop() {
+func GoGameLoop() {
 	ticker := time.NewTicker(16 * time.Millisecond)
-	//TODO: мапа на клиентов, чтобы избавиться от дублирования.
-	//TODO: мапа на пули, для регулирования при попадании в стену и удалении из последовательности середины
+	defer ticker.Stop()
 
-	for range ticker.C {
-		msg := ServerMessagePool.Get().(*models.ServerMessage)
+	for {
+		select {
 
-		msg.Players = msg.Players[:0]
+		case reg := <-models.Game.RegisterChan:
+			fmt.Println("Register ", reg)
+			models.Game.Players[reg.Id] = &models.PlayerState{
+				Id:         reg.Id,
+				X:          reg.X,
+				Y:          reg.Y,
+				A:          reg.A,
+				Connection: reg.Connection,
+				MoveX:      reg.MoveX,
+				MoveY:      reg.MoveY,
+			}
+		case del := <-models.Game.LeaveChan:
+			delete(models.Game.Players, del)
 
-		Mutex.Lock()
-		//TODO: вынести в функцию
-		//TODO: организовать очищение памяти от мусора. опционально
-		UpdateBullets()
-		for _, player := range Clients {
-			msg.Players = append(msg.Players, models.PlayerState{
-				X:         player.X,
-				Y:         player.Y,
-				Direction: player.Direction,
-				Id:        player.Id,
-				Bullets:   player.Bullets,
+		case upload := <-models.Game.InputChan:
+			if player, exist := models.Game.Players[upload.Id]; exist {
+				fmt.Println(upload.A)
+				player.A = upload.A
+			}
+			//if player, exist := models.Game.Players[upload.Player.Id]; exist {
+			//	player.X = upload.Player.X
+			//	player.Y = upload.Player.Y
+			//	player.A = upload.Player.Direction
+			//	player.Bullets = upload.Player.Bullets
+			//}
+		case <-ticker.C:
+			models.Game.TickCount++
+			updateBullets()
+			snapshot := createSnapshot()
+			broadcast(models.ServerMessage{
+				Type:    "a",
+				Players: snapshot,
+				Bullets: getAllBullets(),
 			})
 		}
-		Mutex.Unlock()
-		broadcast(*msg)
-		ServerMessagePool.Put(msg)
 	}
+}
+
+func createSnapshot() []models.PlayerState {
+	//fmt.Printf("DEBUG: Snapshot created, players count: %d\n", len(models.Game.Players))
+	snapshot := make([]models.PlayerState, 0, len(models.Game.Players))
+	for _, player := range models.Game.Players {
+		snapshot = append(snapshot, *player)
+	}
+	return snapshot
+}
+
+func updateBullets() {
+	activeBullets := make([]models.Bullet, 0)
+	for _, bullet := range models.Game.Bullets {
+		bullet.Life--
+		bullet.X += math.Cos(bullet.Direction) * models.MaxBulletSpeed
+		bullet.Y += math.Sin(bullet.Direction) * models.MaxBulletSpeed
+		if bullet.Life > 0 {
+			activeBullets = append(activeBullets, bullet)
+		}
+	}
+	models.Game.Bullets = activeBullets
+}
+
+func getAllBullets() []models.Bullet {
+	return models.Game.Bullets
 }
