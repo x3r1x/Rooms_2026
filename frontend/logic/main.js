@@ -21,6 +21,10 @@ async function loadTileInfo() {
     return await response.json();
 }
 
+function loadImages(){
+
+}
+
 async function loadGame() {
     resizeCanvas(canvas)
     initListeners(canvas);
@@ -35,6 +39,7 @@ async function loadGame() {
     initMap();
     initSprites();
     assemblyRoom();
+    loadImages();
 
     requestAnimationFrame(startGameLoop);
 }

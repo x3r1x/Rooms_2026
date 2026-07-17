@@ -4,32 +4,37 @@ export const GAME_CONSTANTS = {
     CANVAS_START: 0,
 
     PLAYER_VISUAL_SIZE: 40,
+    PLAYER_VISUAL_HEIGHT: 64,
+    PLAYER_VISUAL_WIDTH: 66,
 
-    PLAYER_HITBOX_SIZE: 32,
+    PLAYER_HITBOX_SIZE: 50,
+
+    PLAYER_HITBOX_HEIGHT: 50,
+    PLAYER_HITBOX_WIDTH: 0,
+
     HALF: 16,
     PLAYER_START_X: 500,
     PLAYER_START_Y: 400,
-    PLAYER_SKIN_BLUE: 'assets/images/manBlue_gun.png',
+    PLAYER_SKIN_BLUE_PATH: 'assets/images/person.png',
 
     BULLET_WIDTH: 5,
     BULLET_HEIGHT: 25,
     BULLET_COLOR: "#cdcbcb",
-    BULLET_SKIN: 'assets/images/bullet_classic.png',
+    BULLET_SKIN_PATH: 'assets/images/bullet_classic.png',
 
-    ENEMY_SKIN: 'assets/images/hitman1_gun.png',
-    ENEMY_BULLET_SKIN: 'assets/images/enemy_bullet_classic.png',
+    ENEMY_SPRITE_LIST_PATH: 'assets/images/hitman1_gun.png',
+    ENEMY_BULLET_SKIN_PATH: 'assets/images/enemy_bullet_classic.png',
 
-    TILE_IMG: 'assets/tile/tileset x1.png'
+    TILE_IMG_PATH: 'assets/tile/tileset x1.png'
 }
 export const PLAYER_LOCAL_POINTS = [
-    { x: -GAME_CONSTANTS.HALF, y: -GAME_CONSTANTS.HALF },
-    { x:  GAME_CONSTANTS.HALF, y: -GAME_CONSTANTS.HALF },
-    { x:  GAME_CONSTANTS.HALF, y:  GAME_CONSTANTS.HALF },
-    { x: -GAME_CONSTANTS.HALF, y:  GAME_CONSTANTS.HALF }
+    {x: -GAME_CONSTANTS.HALF, y: -GAME_CONSTANTS.HALF},
+    {x: GAME_CONSTANTS.HALF, y: -GAME_CONSTANTS.HALF},
+    {x: GAME_CONSTANTS.HALF, y: GAME_CONSTANTS.HALF},
+    {x: -GAME_CONSTANTS.HALF, y: GAME_CONSTANTS.HALF}
 ];
 
 export const GAME_SPRITES = {
-    PLAYER_STAND: new Image(),
     PLAYER_GOES: new Image(),
     PLAYER_DIE: new Image(),
 
