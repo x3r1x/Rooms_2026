@@ -44,7 +44,7 @@ func (gl *GameLoop) Run() {
 	}
 }
 
-func (gl *GameLoop) handleRegister(reg model.PlayerState) {
+func (gl *GameLoop) handleRegister(reg *model.PlayerState) {
 	fmt.Println("Register ", reg)
 	gl.game.AddPlayer(reg)
 }
@@ -69,7 +69,7 @@ func (gl *GameLoop) handleUpdate(upd model.ClientMessage) {
 	}
 }
 
-func (gl *GameLoop) spawnBullet(player model.PlayerState) {
+func (gl *GameLoop) spawnBullet(player *model.PlayerState) {
 	localX := model.PlayerVisualSize / 2.0
 	localY := (model.PlayerVisualSize / 2.0) - (model.BulletWidth + (model.PlayerVisualSize * 0.1))
 
@@ -134,7 +134,7 @@ func (gl *GameLoop) NormaliseDirection(moveX, moveY *float64) {
 func (gl *GameLoop) createSnapshot() []model.PlayerState {
 	snapshot := make([]model.PlayerState, 0, len(gl.game.GetAllPlayers()))
 	for _, player := range gl.game.GetAllPlayers() {
-		snapshot = append(snapshot, player)
+		snapshot = append(snapshot, *player)
 	}
 	return snapshot
 }

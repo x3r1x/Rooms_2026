@@ -3,6 +3,7 @@ package websocket
 import (
 	"encoding/json"
 	"fmt"
+	"gamedevRooms/internal/game"
 	"gamedevRooms/internal/model"
 	"log"
 	"net/http"
@@ -10,13 +11,21 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+type WebsocketHandler struct {
+	gameState *game.GameState
+}
+
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
 }
 
-func InitWebsocket(w http.ResponseWriter, r *http.Request) {
+func NewWebsocketHandler(gs *game.GameState) *WebsocketHandler {
+	return &WebsocketHandler{gameState: gs}
+}
+
+func (wsh *WebsocketHandler) InitWebsocket(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
@@ -28,10 +37,10 @@ func InitWebsocket(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 	fmt.Println("New connection established.")
-	HandleWebsocket(conn)
+	wsh.HandleWebsocket(conn)
 }
 
-func HandleWebsocket(conn *websocket.Conn) {
+func (wsh *WebsocketHandler) HandleWebsocket(conn *websocket.Conn) {
 	var currentId string = ""
 	var isRegistered bool = false
 	for {
@@ -46,7 +55,7 @@ func HandleWebsocket(conn *websocket.Conn) {
 			log.Println("Ошибка сериализации при чтении пакета: ", err)
 			if isRegistered {
 				log.Println("Удаляем пользователя: ", msg.Id)
-				model.Game.LeaveChan <- msg.Id
+				wsh.gameState.DeleteChan <- msg.Id
 			}
 			continue
 		}
@@ -55,7 +64,7 @@ func HandleWebsocket(conn *websocket.Conn) {
 			isRegistered = true
 			currentId = msg.Id
 			fmt.Println("Регистрация пользователя")
-			model.Game.RegisterChan <- model.PlayerState{
+			wsh.gameState.RegisterChan <- &model.PlayerState{
 				Id:         msg.Id,
 				X:          model.PlayerSpawnPointX,
 				Y:          model.PlayerSpawnPointY,
@@ -65,7 +74,7 @@ func HandleWebsocket(conn *websocket.Conn) {
 				Connection: conn,
 			}
 		} else if currentId != "" {
-			model.Game.InputChan <- model.ClientMessage{
+			wsh.gameState.UpdateChan <- model.ClientMessage{
 				Id: msg.Id,
 				MX: msg.MX,
 				MY: msg.MY,
@@ -75,6 +84,6 @@ func HandleWebsocket(conn *websocket.Conn) {
 		}
 	}
 	if currentId != "" {
-		model.Game.LeaveChan <- currentId
+		wsh.gameState.DeleteChan <- currentId
 	}
 }

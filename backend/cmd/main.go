@@ -13,8 +13,13 @@ import (
 // TODO: коллизия для пуль и их непосредственная обработка
 
 func main() {
-	go game.GoGameLoop()
-	http.HandleFunc("/ws", websocket.InitWebsocket)
+	gameState := game.NewGameState()
+	gameLoop := game.NewGameLoop(gameState)
+	go gameLoop.Run()
+
+	wsHandler := websocket.NewWebsocketHandler(gameState)
+	http.HandleFunc("/ws", wsHandler.InitWebsocket)
+
 	fmt.Println("server listening at port 8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
