@@ -3,7 +3,7 @@ package game
 import (
 	"encoding/json"
 	"fmt"
-	"gamedevRooms/internal/models"
+	"gamedevRooms/internal/model"
 	"log"
 	"math"
 	"time"
@@ -12,15 +12,15 @@ import (
 )
 
 type GameLoop struct {
-	game *models.GameState
+	game *GameState
 }
 
-func NewGameLoop(game *models.GameState) *GameLoop {
+func NewGameLoop(game *GameState) *GameLoop {
 	return &GameLoop{game: game}
 }
 
 func (gl *GameLoop) Run() {
-	ticker := time.NewTicker(models.TickTime * time.Millisecond)
+	ticker := time.NewTicker(model.TickTime * time.Millisecond)
 	defer ticker.Stop()
 
 	for {
@@ -35,7 +35,7 @@ func (gl *GameLoop) Run() {
 		case <-ticker.C:
 			gl.updateGameState()
 			snapshot := gl.createSnapshot()
-			gl.broadcast(models.ServerMessage{
+			gl.broadcast(model.ServerMessage{
 				Type:    "a",
 				Players: snapshot,
 				Bullets: gl.game.GetAllBullets(),
@@ -44,7 +44,7 @@ func (gl *GameLoop) Run() {
 	}
 }
 
-func (gl *GameLoop) handleRegister(reg models.PlayerState) {
+func (gl *GameLoop) handleRegister(reg model.PlayerState) {
 	fmt.Println("Register ", reg)
 	gl.game.AddPlayer(reg)
 }
@@ -54,7 +54,7 @@ func (gl *GameLoop) handleDelete(del string) {
 	gl.game.RemovePlayer(del)
 }
 
-func (gl *GameLoop) handleUpdate(upd models.ClientMessage) {
+func (gl *GameLoop) handleUpdate(upd model.ClientMessage) {
 	player, exist := gl.game.GetPlayer(upd.Id)
 	if !exist {
 		return
@@ -65,21 +65,21 @@ func (gl *GameLoop) handleUpdate(upd models.ClientMessage) {
 
 	if upd.S && player.ShootTimer <= 0 {
 		gl.spawnBullet(player)
-		player.ShootTimer = models.ShootCooldown
+		player.ShootTimer = model.ShootCooldown
 	}
 }
 
-func (gl *GameLoop) spawnBullet(player models.PlayerState) {
-	localX := models.PlayerVisualSize / 2.0
-	localY := (models.PlayerVisualSize / 2.0) - (models.BulletWidth + (models.PlayerVisualSize * 0.1))
+func (gl *GameLoop) spawnBullet(player model.PlayerState) {
+	localX := model.PlayerVisualSize / 2.0
+	localY := (model.PlayerVisualSize / 2.0) - (model.BulletWidth + (model.PlayerVisualSize * 0.1))
 
 	rotatedDX := localX*math.Cos(player.A) - localY*math.Sin(player.A)
 	rotatedDY := localX*math.Sin(player.A) + localY*math.Cos(player.A)
-	bullet := models.Bullet{
+	bullet := model.Bullet{
 		X:         player.X + rotatedDX,
 		Y:         player.Y + rotatedDY,
 		Direction: player.A,
-		Life:      models.BulletLife,
+		Life:      model.BulletLife,
 		OwnerId:   player.Id,
 	}
 	gl.game.AddBullet(bullet)
@@ -101,11 +101,11 @@ func (gl *GameLoop) updateShooterTimers() {
 }
 
 func (gl *GameLoop) updateBullets() {
-	activeBullets := make([]models.Bullet, 0)
+	activeBullets := make([]model.Bullet, 0)
 	for _, bullet := range gl.game.GetAllBullets() {
 		bullet.Life--
-		bullet.X += math.Cos(bullet.Direction) * models.MaxBulletSpeed
-		bullet.Y += math.Sin(bullet.Direction) * models.MaxBulletSpeed
+		bullet.X += math.Cos(bullet.Direction) * model.MaxBulletSpeed
+		bullet.Y += math.Sin(bullet.Direction) * model.MaxBulletSpeed
 		if bullet.Life > 0 {
 			activeBullets = append(activeBullets, bullet)
 		}
@@ -117,8 +117,8 @@ func (gl *GameLoop) updatePlayers() {
 	for _, player := range gl.game.GetAllPlayers() {
 		gl.NormaliseDirection(&player.MoveX, &player.MoveY)
 
-		player.X += player.MoveX * float64(models.TickTime) * models.PlayerSpeed
-		player.Y += player.MoveY * float64(models.TickTime) * models.PlayerSpeed
+		player.X += player.MoveX * float64(model.TickTime) * model.PlayerSpeed
+		player.Y += player.MoveY * float64(model.TickTime) * model.PlayerSpeed
 	}
 }
 
@@ -131,15 +131,15 @@ func (gl *GameLoop) NormaliseDirection(moveX, moveY *float64) {
 	}
 }
 
-func (gl *GameLoop) createSnapshot() []models.PlayerState {
-	snapshot := make([]models.PlayerState, 0, len(gl.game.GetAllPlayers()))
+func (gl *GameLoop) createSnapshot() []model.PlayerState {
+	snapshot := make([]model.PlayerState, 0, len(gl.game.GetAllPlayers()))
 	for _, player := range gl.game.GetAllPlayers() {
 		snapshot = append(snapshot, player)
 	}
 	return snapshot
 }
 
-func (gl *GameLoop) broadcast(message models.ServerMessage) {
+func (gl *GameLoop) broadcast(message model.ServerMessage) {
 	data, err := json.Marshal(message)
 	if err != nil {
 		log.Println(err)

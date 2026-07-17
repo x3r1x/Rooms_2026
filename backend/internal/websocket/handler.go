@@ -3,7 +3,7 @@ package websocket
 import (
 	"encoding/json"
 	"fmt"
-	"gamedevRooms/internal/models"
+	"gamedevRooms/internal/model"
 	"log"
 	"net/http"
 
@@ -41,12 +41,12 @@ func HandleWebsocket(conn *websocket.Conn) {
 			break
 		}
 
-		var msg models.ClientMessage
+		var msg model.ClientMessage
 		if err := json.Unmarshal(p, &msg); err != nil {
 			log.Println("Ошибка сериализации при чтении пакета: ", err)
 			if isRegistered {
 				log.Println("Удаляем пользователя: ", msg.Id)
-				models.Game.LeaveChan <- msg.Id
+				model.Game.LeaveChan <- msg.Id
 			}
 			continue
 		}
@@ -55,17 +55,17 @@ func HandleWebsocket(conn *websocket.Conn) {
 			isRegistered = true
 			currentId = msg.Id
 			fmt.Println("Регистрация пользователя")
-			models.Game.RegisterChan <- models.PlayerState{
+			model.Game.RegisterChan <- model.PlayerState{
 				Id:         msg.Id,
-				X:          models.PlayerSpawnPointX,
-				Y:          models.PlayerSpawnPointY,
-				A:          models.InitDirection,
-				MoveX:      models.InitDirection,
-				MoveY:      models.InitDirection,
+				X:          model.PlayerSpawnPointX,
+				Y:          model.PlayerSpawnPointY,
+				A:          model.InitDirection,
+				MoveX:      model.InitDirection,
+				MoveY:      model.InitDirection,
 				Connection: conn,
 			}
 		} else if currentId != "" {
-			models.Game.InputChan <- models.ClientMessage{
+			model.Game.InputChan <- model.ClientMessage{
 				Id: msg.Id,
 				MX: msg.MX,
 				MY: msg.MY,
@@ -75,6 +75,6 @@ func HandleWebsocket(conn *websocket.Conn) {
 		}
 	}
 	if currentId != "" {
-		models.Game.LeaveChan <- currentId
+		model.Game.LeaveChan <- currentId
 	}
 }
