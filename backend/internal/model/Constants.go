@@ -13,7 +13,10 @@ const (
 	InitDirection     = 0
 	PlayerVisualSize  = 40.0
 	PlayerSpeed       = float64(0.2)
+	PlayerHalfSize    = 40.0
 	MaxPlayerHealth   = 100
+	//константы для окружения и полей
+	CellSize = 40.0
 	// общие служебные координаты
 	TickTime = 16
 )

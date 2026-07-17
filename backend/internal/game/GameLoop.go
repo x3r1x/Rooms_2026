@@ -59,13 +59,19 @@ func (gl *GameLoop) handleUpdate(upd model.ClientMessage) {
 	if !exist {
 		return
 	}
-	player.Angle = upd.Angle
-	player.MoveX = upd.MX
-	player.MoveY = upd.MY
+	if player.Health > 0 {
+		player.Angle = upd.Angle
+		player.MoveX = upd.MX
+		player.MoveY = upd.MY
 
-	if upd.IsShoot && player.ShootTimer <= 0 {
-		gl.spawnBullet(player)
-		player.ShootTimer = model.ShootCooldown
+		if upd.IsShoot && player.ShootTimer <= 0 {
+			gl.spawnBullet(player)
+			player.ShootTimer = model.ShootCooldown
+		}
+	} else if player.Health < 0 && player.RebornTimer != 0 {
+		player.RebornTimer--
+	} else {
+
 	}
 }
 
