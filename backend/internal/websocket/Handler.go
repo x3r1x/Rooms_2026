@@ -68,18 +68,18 @@ func (wsh *WebsocketHandler) HandleWebsocket(conn *websocket.Conn) {
 				Id:         msg.Id,
 				X:          model.PlayerSpawnPointX,
 				Y:          model.PlayerSpawnPointY,
-				A:          model.InitDirection,
+				Angle:      model.InitDirection,
 				MoveX:      model.InitDirection,
 				MoveY:      model.InitDirection,
 				Connection: conn,
 			}
 		} else if currentId != "" {
 			wsh.gameState.UpdateChan <- model.ClientMessage{
-				Id: msg.Id,
-				MX: msg.MX,
-				MY: msg.MY,
-				A:  msg.A,
-				S:  msg.S,
+				Id:      msg.Id,
+				MX:      msg.MX,
+				MY:      msg.MY,
+				Angle:   msg.Angle,
+				IsShoot: msg.IsShoot,
 			}
 		}
 	}

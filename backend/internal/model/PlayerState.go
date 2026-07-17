@@ -7,7 +7,7 @@ type PlayerState struct {
 	Health     float64         `json:"-"`
 	X          float64         `json:"x"`
 	Y          float64         `json:"y"`
-	A          float64         `json:"a"`
+	Angle      float64         `json:"a"`
 	MoveX      float64         `json:"mx"`
 	MoveY      float64         `json:"my"`
 	Connection *websocket.Conn `json:"-"`

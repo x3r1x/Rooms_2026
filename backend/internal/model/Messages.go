@@ -1,11 +1,11 @@
 package model
 
 type ClientMessage struct {
-	Id string  `json:"id"`
-	MX float64 `json:"mx"`
-	MY float64 `json:"my"`
-	A  float64 `json:"a"`
-	S  bool    `json:"s"`
+	Id      string  `json:"id"`
+	MX      float64 `json:"mx"`
+	MY      float64 `json:"my"`
+	Angle   float64 `json:"a"`
+	IsShoot bool    `json:"s"`
 }
 
 type ServerMessage struct {
