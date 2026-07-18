@@ -66,6 +66,7 @@ func (wsh *WebsocketHandler) HandleWebsocket(conn *websocket.Conn) {
 			fmt.Println("Регистрация пользователя")
 			wsh.gameState.RegisterChan <- &model.PlayerState{
 				Id:         msg.Id,
+				Health:     model.MaxPlayerHealth,
 				X:          model.PlayerSpawnPointX,
 				Y:          model.PlayerSpawnPointY,
 				Angle:      model.InitDirection,

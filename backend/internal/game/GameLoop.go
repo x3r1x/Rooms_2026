@@ -65,15 +65,14 @@ func (gl *GameLoop) handleUpdate(upd model.ClientMessage) {
 	player.MoveX = upd.MX
 	player.MoveY = upd.MY
 
-	if upd.IsShoot && player.ShootTimer <= 0 {
+	if player.Health > 0 && upd.IsShoot && player.ShootTimer <= 0 {
 		gl.spawnBullet(player)
 		player.ShootTimer = model.ShootCooldown
+	} else if player.Health < 0 && player.RebornTimer != 0 {
+		player.RebornTimer--
+	} else if player.Health < 0 && player.RebornTimer == 0 {
+		player.Health = model.MaxPlayerHealth
 	}
-	//} else if player.Health < 0 && player.RebornTimer != 0 {
-	//	player.RebornTimer--
-	//} else {
-	//
-	//}
 }
 
 func (gl *GameLoop) spawnBullet(player *model.PlayerState) {
@@ -139,8 +138,11 @@ func (gl *GameLoop) checkCollision(bullet model.Bullet) bool {
 			Normals: playerNormals,
 		}
 		if physics.CheckCollisionSAT(bulletSAT, playerSAT) {
-			player.Health -= model.BulletDamage
+			player.Health -= model.BulletDamage * (bullet.Life / model.BulletLife * model.BulletDamageMulti)
 			fmt.Println("HIT! The player: ", player.Id, ", got shoot. Now he have this health", player.Health)
+			if player.Health < 0 {
+				player.RebornTimer = model.PlayerRebornTimer
+			}
 			return true
 		}
 	}
