@@ -8,8 +8,34 @@
     <title>Rooms</title>
 </head>
 <body>
-    <div class="wrapper-canvas">
+<div id="game-ui-container" class="game-wrapper">
+    <div class="screen-main-menu"></div>
+    <div class="screen-game">
+        <div class="wrapper-game-stat">
+            <h1 class="name">ROOMS</h1>
+            <div id="game-stat" class="block-game-stat">
+
+            </div>
+        </div>
         <canvas id="canvas" class="main__canvas"></canvas>
+        <div class="screen-death" style="">
+            <div class="death-content-box">
+                <p class="death-title">YOU DIED</p>
+                <div class="respawn-timer-container">
+                    <span>Respawn in:</span>
+                    <span id="respawn-timer-value" class="respawn-timer-value">10</span>
+                    <span>s</span>
+                </div>
+            </div>
+        </div>
     </div>
+
+
+
+    <div class="screen-game-over" display="none">
+
+    </div>
+</div>
+
 </body>
 </html>

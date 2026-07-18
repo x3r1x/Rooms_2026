@@ -10,32 +10,38 @@ function drawMainPlayer(context, player) {
     const spriteSheet = GAME_SPRITES.PLAYER_GOES;
     const frameWidth = spriteSheet.width / 6;
     const frameHeight = spriteSheet.height;
-    let frameIndex = 0;
-    const size = GAME_CONSTANTS.PLAYER_VISUAL_SIZE;
-    if (keys['w'] || keys['a'] || keys['s'] || keys['d'] ||
-        keys['ц'] || keys['ф'] || keys['ы'] || keys['в']){
-        frameIndex = Math.floor(Date.now() / 100) % 6;
+    if (player.movementDirection.x !== 0 || player.movementDirection.y !== 0) {
+        player.spriteIndex = Math.floor(Date.now() / 200) % 6;
     } else {
-        frameIndex = 0;
+        player.spriteIndex = 0;
     }
     context.save();
     context.translate(player.x, player.y);
     context.rotate(player.direction);
     context.drawImage(
         spriteSheet,
-        frameIndex * frameWidth, 0, frameWidth, frameHeight,
-        -frameWidth / 2, -frameHeight / 2, frameWidth, frameHeight
+        player.spriteIndex * frameWidth, 0, frameWidth, frameHeight,
+        -GAME_CONSTANTS.PLAYER_VISUAL_WIDTH/2, -GAME_CONSTANTS.PLAYER_VISUAL_HEIGHT/2, GAME_CONSTANTS.PLAYER_VISUAL_WIDTH, GAME_CONSTANTS.PLAYER_VISUAL_HEIGHT
     );
     context.restore();
 }
 
 function drawEnemy(context, enemy) {
-    const sprite = GAME_SPRITES.ENEMY_GOES;
-    const size = GAME_CONSTANTS.PLAYER_VISUAL_SIZE;
-
+    const spriteSheet = GAME_SPRITES.ENEMY_GOES;
+    const frameWidth = spriteSheet.width / 6;
+    const frameHeight = spriteSheet.height;
+    if (enemy.movementDirection.x !== 0 || enemy.movementDirection.y !== 0) {
+        enemy.spriteIndex = Math.floor(Date.now() / 200) % 6;
+    } else {
+        enemy.spriteIndex = 0;
+    }
     context.save();
     context.translate(enemy.x, enemy.y);
     context.rotate(enemy.direction);
-    context.drawImage(sprite, -size / 2, -size / 2, size, size);
+    context.drawImage(
+        spriteSheet,
+        enemy.spriteIndex * frameWidth, 0, frameWidth, frameHeight,
+        -GAME_CONSTANTS.PLAYER_VISUAL_WIDTH/2, -GAME_CONSTANTS.PLAYER_VISUAL_HEIGHT/2, GAME_CONSTANTS.PLAYER_VISUAL_WIDTH, GAME_CONSTANTS.PLAYER_VISUAL_HEIGHT
+    );
     context.restore();
 }

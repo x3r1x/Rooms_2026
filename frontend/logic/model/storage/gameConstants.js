@@ -4,15 +4,15 @@ export const GAME_CONSTANTS = {
     CANVAS_START: 0,
 
     PLAYER_VISUAL_SIZE: 40,
-    PLAYER_VISUAL_HEIGHT: 64,
-    PLAYER_VISUAL_WIDTH: 66,
+    PLAYER_VISUAL_HEIGHT: 60,
+    PLAYER_VISUAL_WIDTH: 44,
 
     PLAYER_HITBOX_SIZE: 50,
 
-    PLAYER_HITBOX_HEIGHT: 50,
-    PLAYER_HITBOX_WIDTH: 0,
+    PLAYER_HITBOX_HEIGHT: 40,
+    PLAYER_HITBOX_WIDTH: 39,
 
-    HALF: 16,
+    HALF: 20,
     PLAYER_START_X: 500,
     PLAYER_START_Y: 400,
     PLAYER_SKIN_BLUE_PATH: 'assets/images/person.png',
@@ -20,9 +20,12 @@ export const GAME_CONSTANTS = {
     BULLET_WIDTH: 5,
     BULLET_HEIGHT: 25,
     BULLET_COLOR: "#cdcbcb",
+
+    HEALTH_BAR_PATH: 'assets/images/health-bar_sheet.png',
+
     BULLET_SKIN_PATH: 'assets/images/bullet_classic.png',
 
-    ENEMY_SPRITE_LIST_PATH: 'assets/images/hitman1_gun.png',
+    ENEMY_SPRITE_LIST_PATH: 'assets/images/enemy.png',
     ENEMY_BULLET_SKIN_PATH: 'assets/images/enemy_bullet_classic.png',
 
     TILE_IMG_PATH: 'assets/tile/tileset x1.png'
@@ -37,6 +40,8 @@ export const PLAYER_LOCAL_POINTS = [
 export const GAME_SPRITES = {
     PLAYER_GOES: new Image(),
     PLAYER_DIE: new Image(),
+
+    HEALTH_BAR: new Image(),
 
     BULLET_HIT: new Image(),
     BULLET_FLIES: new Image(),

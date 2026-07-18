@@ -16,7 +16,8 @@ export const currentState = {
             y: 0
         },
         didShoot: false,
-        id: null
+        id: null,
+        spriteIndex: 0,
     },
     enemies: [],
     bullets: [],

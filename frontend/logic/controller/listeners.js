@@ -22,8 +22,8 @@ function initWindowListeners() {
 }
 
 export function resizeCanvas(canvas) {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.width = 900;
+    canvas.height = 756;
 }
 
 function initCanvasListeners(canvas) {
@@ -31,8 +31,8 @@ function initCanvasListeners(canvas) {
         const {x, y} = getMousePos(canvas, event);
         const direction = Math.atan2(y - currentState.player.y, x - currentState.player.x);
 
-        const localX = GAME_CONSTANTS.PLAYER_VISUAL_SIZE / 2;
-        const localY = GAME_CONSTANTS.PLAYER_VISUAL_SIZE / 2 - (GAME_CONSTANTS.BULLET_WIDTH + (GAME_CONSTANTS.PLAYER_VISUAL_SIZE * 0.1));
+        const localX = GAME_CONSTANTS.PLAYER_VISUAL_WIDTH / 2;
+        const localY = GAME_CONSTANTS.PLAYER_VISUAL_HEIGHT / 2;
 
         const rotatedX = localX * Math.cos(direction) - localY * Math.sin(direction);
         const rotatedY = localX * Math.sin(direction) + localY * Math.cos(direction);
