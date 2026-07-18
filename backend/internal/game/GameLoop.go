@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"gamedevRooms/internal/model"
+	"gamedevRooms/internal/physics"
 	"log"
 	"math"
 	"time"
@@ -59,20 +60,20 @@ func (gl *GameLoop) handleUpdate(upd model.ClientMessage) {
 	if !exist {
 		return
 	}
-	if player.Health > 0 {
-		player.Angle = upd.Angle
-		player.MoveX = upd.MX
-		player.MoveY = upd.MY
+	//if player.Health > 0 {
+	player.Angle = upd.Angle
+	player.MoveX = upd.MX
+	player.MoveY = upd.MY
 
-		if upd.IsShoot && player.ShootTimer <= 0 {
-			gl.spawnBullet(player)
-			player.ShootTimer = model.ShootCooldown
-		}
-	} else if player.Health < 0 && player.RebornTimer != 0 {
-		player.RebornTimer--
-	} else {
-
+	if upd.IsShoot && player.ShootTimer <= 0 {
+		gl.spawnBullet(player)
+		player.ShootTimer = model.ShootCooldown
 	}
+	//} else if player.Health < 0 && player.RebornTimer != 0 {
+	//	player.RebornTimer--
+	//} else {
+	//
+	//}
 }
 
 func (gl *GameLoop) spawnBullet(player *model.PlayerState) {
@@ -121,11 +122,23 @@ func (gl *GameLoop) updateBullets() {
 }
 
 func (gl *GameLoop) checkCollision(bullet model.Bullet) bool {
+	bulletPoints := physics.GetBulletPoints(bullet.X, bullet.Y, bullet.Direction)
+	bulletNormals := physics.GetNormals(bulletPoints)
+	bulletSAT := physics.SATBox{
+		Points:  bulletPoints,
+		Normals: bulletNormals,
+	}
 	for _, player := range gl.game.GetAllPlayers() {
 		if player.Id == bullet.OwnerId {
 			continue
 		}
-		if bullet.X == player.X && bullet.Y == player.Y {
+		playerPoints := physics.GetPlayerPoints(player.X, player.Y, player.Angle)
+		playerNormals := physics.GetNormals(playerPoints)
+		playerSAT := physics.SATBox{
+			Points:  playerPoints,
+			Normals: playerNormals,
+		}
+		if physics.CheckCollisionSAT(bulletSAT, playerSAT) {
 			player.Health -= model.BulletDamage
 			fmt.Println("HIT! The player: ", player.Id, ", got shoot. Now he have this health", player.Health)
 			return true

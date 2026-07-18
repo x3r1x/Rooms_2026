@@ -5,6 +5,7 @@ const (
 	MaxBulletSpeed = 22.5
 	BulletLife     = 60
 	ShootCooldown  = 15
+	BulletLength   = 25.0
 	BulletWidth    = 5.0
 	BulletDamage   = 10
 	// константы для игроков
