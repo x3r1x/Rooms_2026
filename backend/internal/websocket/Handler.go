@@ -12,7 +12,7 @@ import (
 )
 
 type WebsocketHandler struct {
-	gameState *game.GameState
+	gameLoop *game.GameLoop
 }
 
 var upgrader = websocket.Upgrader{
@@ -21,8 +21,8 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func NewWebsocketHandler(gs *game.GameState) *WebsocketHandler {
-	return &WebsocketHandler{gameState: gs}
+func NewWebsocketHandler(gl *game.GameLoop) *WebsocketHandler {
+	return &WebsocketHandler{gameLoop: gl}
 }
 
 func (wsh *WebsocketHandler) InitWebsocket(w http.ResponseWriter, r *http.Request) {
@@ -55,7 +55,7 @@ func (wsh *WebsocketHandler) HandleWebsocket(conn *websocket.Conn) {
 			log.Println("Ошибка сериализации при чтении пакета: ", err)
 			if isRegistered {
 				log.Println("Удаляем пользователя: ", msg.Id)
-				wsh.gameState.DeleteChan <- msg.Id
+				wsh.gameLoop.DeletePlayer(msg.Id)
 			}
 			continue
 		}
@@ -64,7 +64,7 @@ func (wsh *WebsocketHandler) HandleWebsocket(conn *websocket.Conn) {
 			isRegistered = true
 			currentId = msg.Id
 			fmt.Println("Регистрация пользователя")
-			wsh.gameState.RegisterChan <- &model.PlayerState{
+			wsh.gameLoop.RegisterPlayer(&model.PlayerState{
 				Id:         msg.Id,
 				Health:     model.MaxPlayerHealth,
 				X:          model.PlayerSpawnPointX,
@@ -73,18 +73,18 @@ func (wsh *WebsocketHandler) HandleWebsocket(conn *websocket.Conn) {
 				MoveX:      model.InitDirection,
 				MoveY:      model.InitDirection,
 				Connection: conn,
-			}
+			})
 		} else if currentId != "" {
-			wsh.gameState.UpdateChan <- model.ClientMessage{
+			wsh.gameLoop.UpdatePlayer(model.ClientMessage{
 				Id:      msg.Id,
 				MX:      msg.MX,
 				MY:      msg.MY,
 				Angle:   msg.Angle,
 				IsShoot: msg.IsShoot,
-			}
+			})
 		}
 	}
 	if currentId != "" {
-		wsh.gameState.DeleteChan <- currentId
+		wsh.gameLoop.DeletePlayer(currentId)
 	}
 }

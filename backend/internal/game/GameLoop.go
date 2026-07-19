@@ -3,8 +3,8 @@ package game
 import (
 	"encoding/json"
 	"fmt"
+	"gamedevRooms/internal/collision"
 	"gamedevRooms/internal/model"
-	"gamedevRooms/internal/physics"
 	"log"
 	"math"
 	"time"
@@ -13,13 +13,31 @@ import (
 )
 
 type GameLoop struct {
-	game *GameState
+	game         *GameState
+	updateChan   chan model.ClientMessage
+	registerChan chan *model.PlayerState
+	deleteChan   chan string
 }
 
 func NewGameLoop(game *GameState) *GameLoop {
-	return &GameLoop{game: game}
+	return &GameLoop{game: game,
+		updateChan:   make(chan model.ClientMessage),
+		registerChan: make(chan *model.PlayerState),
+		deleteChan:   make(chan string),
+	}
 }
 
+func (gl *GameLoop) RegisterPlayer(player *model.PlayerState) {
+	gl.registerChan <- player
+}
+
+func (gl *GameLoop) UpdatePlayer(msg model.ClientMessage) {
+	gl.updateChan <- msg
+}
+
+func (gl *GameLoop) DeletePlayer(id string) {
+	gl.deleteChan <- id
+}
 func (gl *GameLoop) Run() {
 	ticker := time.NewTicker(model.TickTime * time.Millisecond)
 	defer ticker.Stop()
@@ -27,75 +45,24 @@ func (gl *GameLoop) Run() {
 	for {
 		select {
 
-		case reg := <-gl.game.RegisterChan:
-			gl.handleRegister(reg)
-		case del := <-gl.game.DeleteChan:
-			gl.handleDelete(del)
-		case upload := <-gl.game.UpdateChan:
-			gl.handleUpdate(upload)
+		case reg := <-gl.registerChan:
+			gl.game.AddPlayer(reg)
+		case del := <-gl.deleteChan:
+			gl.game.RemovePlayer(del)
+		case upload := <-gl.updateChan:
+			gl.game.UpdatePlayer(upload)
 		case <-ticker.C:
-			gl.updateGameState()
-			snapshot := gl.createSnapshot()
+			gl.game.IncrementTick()
+			gl.updateShooterTimers()
+			gl.updateBullets()
+			gl.updatePlayers()
 			gl.broadcast(model.ServerMessage{
 				Type:    "a",
-				Players: snapshot,
+				Players: gl.createSnapshot(),
 				Bullets: gl.game.GetAllBullets(),
 			})
 		}
 	}
-}
-
-func (gl *GameLoop) handleRegister(reg *model.PlayerState) {
-	fmt.Println("Register ", reg)
-	gl.game.AddPlayer(reg)
-}
-
-func (gl *GameLoop) handleDelete(del string) {
-	fmt.Println("Delete ", del)
-	gl.game.RemovePlayer(del)
-}
-
-func (gl *GameLoop) handleUpdate(upd model.ClientMessage) {
-	player, exist := gl.game.GetPlayer(upd.Id)
-	if !exist {
-		return
-	}
-	//if player.Health > 0 {
-	player.Angle = upd.Angle
-	player.MoveX = upd.MX
-	player.MoveY = upd.MY
-
-	if player.Health > 0 && upd.IsShoot && player.ShootTimer <= 0 {
-		gl.spawnBullet(player)
-		player.ShootTimer = model.ShootCooldown
-	} else if player.Health < 0 && player.RebornTimer != 0 {
-		player.RebornTimer--
-	} else if player.Health < 0 && player.RebornTimer == 0 {
-		player.Health = model.MaxPlayerHealth
-	}
-}
-
-func (gl *GameLoop) spawnBullet(player *model.PlayerState) {
-	localX := model.PlayerVisualSize / 2.0
-	localY := (model.PlayerVisualSize / 2.0) - (model.BulletWidth + (model.PlayerVisualSize * 0.1))
-
-	rotatedDX := localX*math.Cos(player.Angle) - localY*math.Sin(player.Angle)
-	rotatedDY := localX*math.Sin(player.Angle) + localY*math.Cos(player.Angle)
-	bullet := model.Bullet{
-		X:         player.X + rotatedDX,
-		Y:         player.Y + rotatedDY,
-		Direction: player.Angle,
-		Life:      model.BulletLife,
-		OwnerId:   player.Id,
-	}
-	gl.game.AddBullet(bullet)
-}
-
-func (gl *GameLoop) updateGameState() {
-	gl.game.IncrementTick()
-	gl.updateShooterTimers()
-	gl.updateBullets()
-	gl.updatePlayers()
 }
 
 func (gl *GameLoop) updateShooterTimers() {
@@ -121,9 +88,9 @@ func (gl *GameLoop) updateBullets() {
 }
 
 func (gl *GameLoop) checkCollision(bullet model.Bullet) bool {
-	bulletPoints := physics.GetBulletPoints(bullet.X, bullet.Y, bullet.Direction)
-	bulletNormals := physics.GetNormals(bulletPoints)
-	bulletSAT := physics.SATBox{
+	bulletPoints := collision.GetBulletPoints(bullet.X, bullet.Y, bullet.Direction)
+	bulletNormals := collision.GetNormals(bulletPoints)
+	bulletSAT := collision.SATBox{
 		Points:  bulletPoints,
 		Normals: bulletNormals,
 	}
@@ -131,13 +98,13 @@ func (gl *GameLoop) checkCollision(bullet model.Bullet) bool {
 		if player.Id == bullet.OwnerId {
 			continue
 		}
-		playerPoints := physics.GetPlayerPoints(player.X, player.Y, player.Angle)
-		playerNormals := physics.GetNormals(playerPoints)
-		playerSAT := physics.SATBox{
+		playerPoints := collision.GetPlayerPoints(player.X, player.Y, player.Angle)
+		playerNormals := collision.GetNormals(playerPoints)
+		playerSAT := collision.SATBox{
 			Points:  playerPoints,
 			Normals: playerNormals,
 		}
-		if physics.CheckCollisionSAT(bulletSAT, playerSAT) {
+		if collision.CheckCollisionSAT(bulletSAT, playerSAT) {
 			player.Health -= model.BulletDamage * (bullet.Life / model.BulletLife * model.BulletDamageMulti)
 			fmt.Println("HIT! The player: ", player.Id, ", got shoot. Now he have this health", player.Health)
 			if player.Health < 0 {
@@ -188,7 +155,7 @@ func (gl *GameLoop) broadcast(message model.ServerMessage) {
 		err := p.Connection.WriteMessage(websocket.TextMessage, data)
 		if err != nil {
 			log.Println("Ошибка отправки: ", err)
-			gl.game.DeleteChan <- id
+			gl.deleteChan <- id
 		}
 	}
 }
