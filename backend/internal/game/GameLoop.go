@@ -65,6 +65,11 @@ func (gl *GameLoop) Run() {
 	}
 }
 
+//func (gl *GameLoop) startGame() {
+//	gl.game.SetGameActive(true)
+//	log.Println()
+//}
+
 func (gl *GameLoop) updateShooterTimers() {
 	for _, player := range gl.game.GetAllPlayers() {
 		if player.ShootTimer > 0 {
