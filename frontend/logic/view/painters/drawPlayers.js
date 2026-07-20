@@ -9,21 +9,25 @@ export function drawPlayers(context, mainPlayer, enemies) {
 function drawMainPlayer(context, player) {
     const sprite = GAME_SPRITES.PLAYER_GOES;
     const size = GAME_CONSTANTS.PLAYER_VISUAL_SIZE;
-
-    context.save();
+    if (player.hp > 0){
+        context.save();
     context.translate(player.x, player.y);
     context.rotate(player.direction);
     context.drawImage(sprite, -size / 2, -size / 2, size, size);
     context.restore();
+    }
+    
 }
 
 function drawEnemy(context, enemy) {
     const sprite = GAME_SPRITES.ENEMY_GOES;
     const size = GAME_CONSTANTS.PLAYER_VISUAL_SIZE;
-
-    context.save();
+    if (enemy.hp > 0){
+        context.save();
     context.translate(enemy.x, enemy.y);
     context.rotate(enemy.direction);
     context.drawImage(sprite, -size / 2, -size / 2, size, size);
     context.restore();
+    }
+    
 }
