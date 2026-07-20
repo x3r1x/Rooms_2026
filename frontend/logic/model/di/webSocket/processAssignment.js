@@ -15,7 +15,8 @@ function processPlayer(player, state) {
             x: player.mx,
             y: player.my
         },
-        id: player.id
+        id: player.id,
+        h: player.h
     }
 
     if (newPlayerInModel.id === state.player.id) {
