@@ -46,16 +46,29 @@ func (gl *GameLoop) Run() {
 		select {
 
 		case reg := <-gl.registerChan:
-			gl.game.AddPlayer(reg)
+			gl.handleRegister(reg)
 		case del := <-gl.deleteChan:
-			gl.game.RemovePlayer(del)
+			gl.handleDelete(del)
 		case upload := <-gl.updateChan:
 			gl.game.UpdatePlayer(upload)
 		case <-ticker.C:
+			if !gl.game.IsGameActive() {
+				continue
+			}
 			gl.game.IncrementTick()
 			gl.updateShooterTimers()
 			gl.updateBullets()
 			gl.updatePlayers()
+
+			remaining := gl.game.GetRemainingSeconds()
+			if remaining <= 0 {
+				gl.endGame()
+				return
+			}
+			if remaining%10 == 0 {
+				log.Printf("Осталось времени: %d секунд", remaining)
+			}
+
 			gl.broadcast(model.ServerMessage{
 				Type:    "a",
 				Players: gl.createSnapshot(),
@@ -64,6 +77,88 @@ func (gl *GameLoop) Run() {
 		}
 	}
 }
+
+// === LOBBITOMIA ===
+
+func (gl *GameLoop) handleRegister(player *model.PlayerState) {
+	if !gl.game.CanAddPlayer() {
+		log.Printf(" Отклонено подключение %s: игра активна или лобби заполнено", player.Id)
+		if player.Connection != nil {
+			if err := player.Connection.Close(); err != nil {
+				log.Println("Подключение невозможно закрыть")
+			}
+		}
+		return
+	}
+
+	gl.game.AddPlayer(player)
+	log.Printf("Игрок %s подключился. Всего: %d/4", player.Id, len(gl.game.GetAllPlayers()))
+
+	if gl.game.IsLobbyFull() {
+		log.Println("Лобби заполнено")
+		gl.startGame()
+	}
+}
+
+func (gl *GameLoop) handleDelete(id string) {
+	gl.game.RemovePlayer(id)
+	log.Printf("Игрок %s удален. Осталось: %d", id, len(gl.game.GetAllPlayers()))
+
+	if gl.game.IsGameActive() {
+		if len(gl.game.GetAllPlayers()) <= 1 {
+			log.Println("Игрок вышел, игра завершена досрочно")
+			gl.endGame()
+		}
+	}
+}
+
+func (gl *GameLoop) startGame() {
+	if gl.game.IsGameActive() {
+		return
+	}
+	gl.game.SetGameActive(true)
+}
+
+func (gl *GameLoop) endGame() {
+	if !gl.game.IsGameActive() {
+		return
+	}
+	gl.game.SetGameActive(false)
+	winner := gl.getWinner()
+	log.Println(winner)
+	gl.resetGame()
+}
+
+func (gl *GameLoop) getWinner() string {
+	var winner string
+	maxHealth := -1.0
+
+	for _, player := range gl.game.GetAllPlayers() {
+		if player.Health > maxHealth {
+			maxHealth = player.Health
+			winner = player.Id
+		}
+	}
+
+	if winner == "" {
+		return "Никто"
+	}
+	return winner
+}
+
+func (gl *GameLoop) resetGame() {
+	gl.game.SetBullets([]model.Bullet{})
+	for _, player := range gl.game.GetAllPlayers() {
+		player.Health = model.MaxPlayerHealth
+		player.X = model.PlayerSpawnPointX
+		player.Y = model.PlayerSpawnPointY
+		player.Angle = model.InitDirection
+		player.RebornTimer = 0
+		player.ShootTimer = 0
+	}
+}
+
+// ==================
 
 func (gl *GameLoop) updateShooterTimers() {
 	for _, player := range gl.game.GetAllPlayers() {
@@ -84,7 +179,7 @@ func (gl *GameLoop) updateBullets() {
 			hit, player := gl.collisionService.CheckBulletCollision(bullet)
 			if hit && player.Health > 0 {
 				gl.collisionService.HandleHit(player, bullet)
-			} else if !hit {
+			} else {
 				activeBullets = append(activeBullets, bullet)
 			}
 		}

@@ -56,7 +56,7 @@ func (gs *GameState) IsLobbyEmpty() bool {
 }
 
 func (gs *GameState) IsLobbyFull() bool {
-	return len(gs.players) <= 4
+	return len(gs.players) >= 4
 }
 
 func (gs *GameState) HasMinimumPlayer() bool {
@@ -110,7 +110,7 @@ func (gs *GameState) UpdatePlayer(upd model.ClientMessage) {
 	player.MoveX = upd.MX
 	player.MoveY = upd.MY
 
-	if player.Health > 0 && upd.IsShoot && player.ShootTimer <= 0 {
+	if gs.isGameActive && player.Health > 0 && upd.IsShoot && player.ShootTimer <= 0 {
 		gs.addBullet(player)
 		player.ShootTimer = model.ShootCooldown
 	}
