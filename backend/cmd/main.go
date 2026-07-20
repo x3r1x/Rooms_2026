@@ -15,7 +15,7 @@ func main() {
 	gameLoop := game.NewGameLoop(gameState)
 	go gameLoop.Run()
 
-	wsHandler := websocket.NewWebsocketHandler(gameState)
+	wsHandler := websocket.NewWebsocketHandler(gameLoop)
 	http.HandleFunc("/ws", wsHandler.InitWebsocket)
 
 	fmt.Println("server listening at port 8080")
