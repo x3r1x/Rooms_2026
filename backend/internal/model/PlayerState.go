@@ -12,5 +12,5 @@ type PlayerState struct {
 	MoveY       float64         `json:"my"`
 	Connection  *websocket.Conn `json:"-"`
 	ShootTimer  int             `json:"-"`
-	RebornTimer int             `json:"-"`
+	RebornTimer int             `json:"rt"`
 }

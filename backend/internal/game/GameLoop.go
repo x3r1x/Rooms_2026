@@ -118,19 +118,15 @@ func (gl *GameLoop) checkCollision(bullet model.Bullet) bool {
 
 func (gl *GameLoop) updatePlayers() {
 	for _, player := range gl.game.GetAllPlayers() {
-		gl.normaliseDirection(&player.MoveX, &player.MoveY)
+		vectorLength := math.Sqrt(player.MoveX*player.MoveX + player.MoveY*player.MoveY)
 
-		player.X += player.MoveX * float64(model.TickTime) * model.PlayerSpeed
-		player.Y += player.MoveY * float64(model.TickTime) * model.PlayerSpeed
-	}
-}
+		if vectorLength != 0 {
+			player.MoveX /= vectorLength
+			player.MoveY /= vectorLength
+		}
 
-func (gl *GameLoop) normaliseDirection(moveX, moveY *float64) {
-	var vectorLength = math.Sqrt(*moveX**moveX + *moveY**moveY)
-
-	if vectorLength != 0 {
-		*moveX /= vectorLength
-		*moveY /= vectorLength
+		player.X += player.MoveX * model.TickTime * model.PlayerSpeed
+		player.Y += player.MoveY * model.TickTime * model.PlayerSpeed
 	}
 }
 

@@ -64,7 +64,8 @@ func (gs *GameState) UpdatePlayer(upd model.ClientMessage) {
 	if player.Health > 0 && upd.IsShoot && player.ShootTimer <= 0 {
 		gs.addBullet(player)
 		player.ShootTimer = model.ShootCooldown
-	} else if player.Health < 0 && player.RebornTimer != 0 {
+	}
+	if player.Health < 0 && player.RebornTimer != 0 {
 		player.RebornTimer--
 	} else if player.Health < 0 && player.RebornTimer == 0 {
 		player.Health = model.MaxPlayerHealth
