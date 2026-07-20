@@ -82,9 +82,9 @@ func (gl *GameLoop) updateBullets() {
 
 		if bullet.Life > 0 {
 			hit, player := gl.collisionService.CheckBulletCollision(bullet)
-			if hit {
+			if hit && player.Health > 0 {
 				gl.collisionService.HandleHit(player, bullet)
-			} else {
+			} else if !hit {
 				activeBullets = append(activeBullets, bullet)
 			}
 		}
