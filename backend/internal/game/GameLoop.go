@@ -2,8 +2,6 @@ package game
 
 import (
 	"encoding/json"
-	"fmt"
-	"gamedevRooms/internal/collision"
 	"gamedevRooms/internal/model"
 	"log"
 	"math"
@@ -13,17 +11,19 @@ import (
 )
 
 type GameLoop struct {
-	game         *GameState
-	updateChan   chan model.ClientMessage
-	registerChan chan *model.PlayerState
-	deleteChan   chan string
+	game             *GameState
+	collisionService *CollisionService
+	updateChan       chan model.ClientMessage
+	registerChan     chan *model.PlayerState
+	deleteChan       chan string
 }
 
 func NewGameLoop(game *GameState) *GameLoop {
 	return &GameLoop{game: game,
-		updateChan:   make(chan model.ClientMessage),
-		registerChan: make(chan *model.PlayerState),
-		deleteChan:   make(chan string),
+		collisionService: NewCollisionService(game),
+		updateChan:       make(chan model.ClientMessage),
+		registerChan:     make(chan *model.PlayerState),
+		deleteChan:       make(chan string),
 	}
 }
 
@@ -80,40 +80,16 @@ func (gl *GameLoop) updateBullets() {
 		bullet.X += math.Cos(bullet.Direction) * model.MaxBulletSpeed
 		bullet.Y += math.Sin(bullet.Direction) * model.MaxBulletSpeed
 
-		if bullet.Life > 0 && !gl.checkCollision(bullet) {
-			activeBullets = append(activeBullets, bullet)
+		if bullet.Life > 0 {
+			hit, player := gl.collisionService.CheckBulletCollision(bullet)
+			if hit {
+				gl.collisionService.HandleHit(player, bullet)
+			} else {
+				activeBullets = append(activeBullets, bullet)
+			}
 		}
 	}
 	gl.game.SetBullets(activeBullets)
-}
-
-func (gl *GameLoop) checkCollision(bullet model.Bullet) bool {
-	bulletPoints := collision.GetBulletPoints(bullet.X, bullet.Y, bullet.Direction)
-	bulletNormals := collision.GetNormals(bulletPoints)
-	bulletSAT := collision.SATBox{
-		Points:  bulletPoints,
-		Normals: bulletNormals,
-	}
-	for _, player := range gl.game.GetAllPlayers() {
-		if player.Id == bullet.OwnerId {
-			continue
-		}
-		playerPoints := collision.GetPlayerPoints(player.X, player.Y, player.Angle)
-		playerNormals := collision.GetNormals(playerPoints)
-		playerSAT := collision.SATBox{
-			Points:  playerPoints,
-			Normals: playerNormals,
-		}
-		if collision.CheckCollisionSAT(bulletSAT, playerSAT) {
-			player.Health -= model.BulletDamage * (bullet.Life / model.BulletLife * model.BulletDamageMulti)
-			fmt.Println("HIT! The player: ", player.Id, ", got shoot. Now he have this health", player.Health)
-			if player.Health < 0 {
-				player.RebornTimer = model.PlayerRebornTimer
-			}
-			return true
-		}
-	}
-	return false
 }
 
 func (gl *GameLoop) updatePlayers() {
