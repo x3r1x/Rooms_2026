@@ -4,7 +4,6 @@ import (
 	"embed"
 	"fmt"
 	"gamedevRooms/internal/game"
-	mapModel "gamedevRooms/internal/gameMap"
 	"gamedevRooms/internal/websocket"
 	"io/fs"
 	"log"
@@ -15,11 +14,10 @@ import (
 var frontendFs embed.FS
 
 func main() {
-	newMap := mapModel.NewMap(7)
-	fmt.Println(newMap)
+	//newMap := mapModel.NewMap(7)
+	//fmt.Println(newMap)
 
-	gameState := game.NewGameState()
-	gameLoop := game.NewGameLoop(gameState)
+	gameLoop := game.NewGameLoop(game.NewGameState())
 	go gameLoop.Run()
 
 	wsHandler := websocket.NewWebsocketHandler(gameLoop)
