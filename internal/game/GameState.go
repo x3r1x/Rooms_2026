@@ -10,6 +10,7 @@ import (
 
 type GameState struct {
 	players       map[string]*model.PlayerState
+	objects       map[string]model.Object
 	bullets       []model.Bullet
 	tickCount     uint64
 	isGameActive  bool
@@ -21,11 +22,32 @@ func NewGameState() *GameState {
 	return &GameState{
 		players:      make(map[string]*model.PlayerState),
 		bullets:      make([]model.Bullet, 0),
+		objects:      make(map[string]model.Object),
 		isGameActive: false,
 		gameDuration: 60 * time.Second,
 	}
 }
 
+// == OBJECT ===
+func (gs *GameState) GetObjects() map[string]model.Object {
+	return gs.objects
+}
+
+func (gs *GameState) SetObjects(objects map[string]model.Object) {
+	gs.objects = objects
+}
+
+func (gs *GameState) AddObject(obj model.Object) {
+	gs.objects[obj.Id] = obj
+}
+
+func (gs *GameState) RemoveObject(id string) {
+	if _, exist := gs.objects[id]; exist {
+		delete(gs.objects, id)
+	}
+}
+
+// =============
 // === LOBBITOMIA ===
 
 func (gs *GameState) IsGameActive() bool {
