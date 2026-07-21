@@ -1,0 +1,16 @@
+{
+  "s": "w",
+  "oId": "client's own UUID",
+  "p": [
+    {
+      "n": "nicknamexD",
+      "id": "someUUID",
+      "r": false
+    },
+    {
+      "n": "nickname_1",
+      "id": "client's own UUID",
+      "r": true
+    }
+  ]
+}
