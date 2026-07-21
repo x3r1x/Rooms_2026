@@ -1,0 +1,84 @@
+body{
+    margin: 0;
+    padding: 0;
+    display: flex;
+    background-image: url('background.png');
+    background-size: cover;        
+    background-position: center; 
+    justify-content: center;
+    align-content: center;
+    min-height: 100vh;
+    flex-wrap: wrap;
+}
+.nickname-field{
+    width: 70%;
+    height: 50%;
+    border: 15px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-content: center;
+    background-color: #0d1f3c;
+   
+    border:  10px solid #ffffff;
+    border-radius: 15px;
+    margin: 0;
+    padding: 0;
+    gap: 3vh;
+    align-items: center;
+}
+
+.nickname-field h1{
+    color: #ffffff;
+    font-size: 10vw;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+    font-weight: normal;
+    margin: 0;
+    padding: 0;
+    width: auto;
+    height: auto;
+    margin-top: 1vh;
+
+}
+
+.nickname-field h2{
+    color: #ffffff;
+    font-size: 4vw;
+    letter-spacing: 2px;
+    font-weight: normal;
+    margin: 0;
+    padding: 0;
+    width: fit-content;
+}
+
+.get-nickname{
+    display: flex;
+    flex-direction: column;
+    gap: 5vh;
+    margin: 0;
+    padding: 0;
+    gap: 3vh;
+    flex-wrap: wrap;
+    align-content: center;
+    margin-bottom: 1vh;
+}
+
+.input-nickname{
+  background-color: #183768;
+  border: 5px;
+  width: 60%;    
+  font-size: 4vw;
+  border:  5px solid #ffffff;
+  color:#ffffff;
+  border-radius: 15px;
+}
+.button-send-nickname{
+    background-color: #001a2e;
+    border: 5px;
+    width: 60%; 
+    font-size: 4vw; 
+    color: #ffffff;
+    border:  5px solid #ffffff;
+    border-radius: 15px;
+}

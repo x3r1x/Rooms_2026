@@ -22,8 +22,8 @@ function initWindowListeners() {
 }
 
 export function resizeCanvas(canvas) {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.width = 900;
+    canvas.height = 756;
 }
 
 function initCanvasListeners(canvas) {
