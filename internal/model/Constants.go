@@ -17,9 +17,11 @@ const (
 	PlayerSpeed       = 0.2
 	MaxPlayerHealth   = 100
 	PlayerRebornTimer = 300
-	// общие служебные координаты
-	TickTime = 16
-
+	// константы общие служебные
+	TickTime                     = 16
+	GameDuration                 = 60
+	MaxCountOfPlayers            = 2
+	MinCountOfPlayers            = 2
 	MinBarrierType               = 1
 	MaxBarrierType               = 7
 	BaseRoomIndex                = 0

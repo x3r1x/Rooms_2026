@@ -24,11 +24,11 @@ func NewGameState() *GameState {
 		objects:      make(map[string]*model.Object),
 		bullets:      make([]model.Bullet, 0),
 		isGameActive: false,
-		gameDuration: 60 * time.Second,
+		gameDuration: model.GameDuration * time.Second,
 	}
 }
 
-// == OBJECT ===
+// ===== OBJECT =====
 func (gs *GameState) GetObjects() map[string]*model.Object {
 	return gs.objects
 }
@@ -47,7 +47,8 @@ func (gs *GameState) RemoveObject(id string) {
 	}
 }
 
-// =============
+// ==================
+
 // === LOBBITOMIA ===
 
 func (gs *GameState) IsGameActive() bool {
@@ -78,11 +79,11 @@ func (gs *GameState) IsLobbyEmpty() bool {
 }
 
 func (gs *GameState) IsLobbyFull() bool {
-	return len(gs.players) >= 4
+	return len(gs.players) >= model.MaxCountOfPlayers
 }
 
 func (gs *GameState) HasMinimumPlayer() bool {
-	return len(gs.players) >= 2
+	return len(gs.players) >= model.MinCountOfPlayers
 }
 
 func (gs *GameState) CanAddPlayer() bool {

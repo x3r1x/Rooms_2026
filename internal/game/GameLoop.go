@@ -38,6 +38,7 @@ func (gl *GameLoop) UpdatePlayer(msg model.ClientMessage) {
 func (gl *GameLoop) DeletePlayer(id string) {
 	gl.deleteChan <- id
 }
+
 func (gl *GameLoop) Run() {
 	ticker := time.NewTicker(model.TickTime * time.Millisecond)
 	defer ticker.Stop()
@@ -63,7 +64,7 @@ func (gl *GameLoop) Run() {
 			remaining := gl.game.GetRemainingSeconds()
 			if remaining <= 0 {
 				gl.endGame()
-				return
+				gl.restartGame()
 			}
 			if remaining%10 == 0 {
 				log.Printf("Осталось времени: %d секунд", remaining)
@@ -76,6 +77,26 @@ func (gl *GameLoop) Run() {
 			})
 		}
 	}
+}
+
+func (gl *GameLoop) restartGame() {
+	log.Println("Перезапуск игры с теми же игроками...")
+
+	gl.game.SetBullets([]model.Bullet{})
+
+	for _, player := range gl.game.GetAllPlayers() {
+		player.Health = model.MaxPlayerHealth
+		player.X = model.PlayerSpawnPointX
+		player.Y = model.PlayerSpawnPointY
+		player.Angle = model.InitDirection
+		player.RebornTimer = 0
+		player.ShootTimer = 0
+	}
+
+	gl.game.gameStartTime = time.Now()
+	gl.game.SetGameActive(true)
+
+	log.Printf("Новая игра началась! Игроков: %d", len(gl.game.GetAllPlayers()))
 }
 
 // === LOBBITOMIA ===
@@ -178,7 +199,7 @@ func (gl *GameLoop) updateBullets() {
 		if bullet.Life > 0 {
 			hit, player, obj := gl.collisionService.CheckBulletCollision(bullet)
 			if hit {
-				if player != nil && player.Health > 0 {
+				if player.Health > 0 {
 					gl.collisionService.HandlePlayerHit(player, bullet)
 				} else {
 					gl.collisionService.HandleObjectHit(obj, bullet)

@@ -82,6 +82,9 @@ func (cs *CollisionService) buildObjectSAT(obj *model.Object) collision.SATBox {
 }
 
 func (cs *CollisionService) HandleObjectHit(obj *model.Object, bullet model.Bullet) {
+	if obj == nil {
+		return
+	}
 	if !obj.IsDestroyable {
 		return
 	}
@@ -95,6 +98,9 @@ func (cs *CollisionService) HandleObjectHit(obj *model.Object, bullet model.Bull
 }
 
 func (cs *CollisionService) HandlePlayerHit(player *model.PlayerState, bullet model.Bullet) {
+	if player == nil {
+		return
+	}
 	player.Health -= cs.calculateDamage(bullet)
 
 	log.Printf("HIT! Player %s took %.2f damage. Health: %.2f\n",
