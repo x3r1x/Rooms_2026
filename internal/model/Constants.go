@@ -41,4 +41,10 @@ const (
 	BottomMarker                 = "bottom"
 	RightMarker                  = "right"
 	ConnectNeighbouredRoomChance = 0.4
+
+	WaitingLobbyState   = "w"
+	ReadyLobbyState     = "r"
+	CountdownLobbyState = "c"
+	OngoingGameState    = "o"
+	EndedGameState      = "e"
 )

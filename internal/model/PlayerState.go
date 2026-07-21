@@ -2,7 +2,7 @@ package model
 
 import "github.com/gorilla/websocket"
 
-type PlayerState struct {
+type PlayerGameState struct {
 	Id          string          `json:"id"`
 	Health      float64         `json:"h"`
 	X           float64         `json:"x"`

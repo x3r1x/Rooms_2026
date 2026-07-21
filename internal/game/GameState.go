@@ -9,7 +9,7 @@ import (
 )
 
 type GameState struct {
-	players       map[string]*model.PlayerState
+	players       map[string]*model.PlayerGameState
 	bullets       []model.Bullet
 	tickCount     uint64
 	isGameActive  bool
@@ -19,7 +19,7 @@ type GameState struct {
 
 func NewGameState() *GameState {
 	return &GameState{
-		players:      make(map[string]*model.PlayerState),
+		players:      make(map[string]*model.PlayerGameState),
 		bullets:      make([]model.Bullet, 0),
 		isGameActive: false,
 		gameDuration: 60 * time.Second,
@@ -73,11 +73,11 @@ func (gs *GameState) GetAllBullets() []model.Bullet {
 	return gs.bullets
 }
 
-func (gs *GameState) GetAllPlayers() map[string]*model.PlayerState {
+func (gs *GameState) GetAllPlayers() map[string]*model.PlayerGameState {
 	return gs.players
 }
 
-func (gs *GameState) GetPlayer(id string) (*model.PlayerState, bool) {
+func (gs *GameState) GetPlayer(id string) (*model.PlayerGameState, bool) {
 	player, exist := gs.players[id]
 	return player, exist
 }
@@ -90,7 +90,7 @@ func (gs *GameState) IncrementTick() {
 	gs.tickCount++
 }
 
-func (gs *GameState) AddPlayer(player *model.PlayerState) {
+func (gs *GameState) AddPlayer(player *model.PlayerGameState) {
 	log.Println("Register ", player.Id)
 	gs.players[player.Id] = player
 }
@@ -100,7 +100,7 @@ func (gs *GameState) RemovePlayer(playerId string) {
 	delete(gs.players, playerId)
 }
 
-func (gs *GameState) UpdatePlayer(upd model.ClientMessage) {
+func (gs *GameState) UpdatePlayer(upd model.ClientGameMessage) {
 	player, exist := gs.GetPlayer(upd.Id)
 	if !exist {
 		return
@@ -121,7 +121,7 @@ func (gs *GameState) UpdatePlayer(upd model.ClientMessage) {
 	}
 }
 
-func (gs *GameState) addBullet(player *model.PlayerState) {
+func (gs *GameState) addBullet(player *model.PlayerGameState) {
 	bullet := factory.BulletFactory(player)
 	gs.bullets = append(gs.bullets, bullet)
 }

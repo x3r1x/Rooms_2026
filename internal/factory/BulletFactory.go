@@ -5,7 +5,7 @@ import (
 	"math"
 )
 
-func BulletFactory(player *model.PlayerState) model.Bullet {
+func BulletFactory(player *model.PlayerGameState) model.Bullet {
 	localX := model.PlayerVisualSize / 2.0
 	localY := (model.PlayerVisualSize / 2.0) - (model.BulletWidth + (model.PlayerVisualSize * 0.1))
 

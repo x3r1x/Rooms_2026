@@ -14,7 +14,7 @@ func NewCollisionService(state *GameState) *CollisionService {
 	return &CollisionService{state: state}
 }
 
-func (cs *CollisionService) CheckBulletCollision(bullet model.Bullet) (bool, *model.PlayerState) {
+func (cs *CollisionService) CheckBulletCollision(bullet model.Bullet) (bool, *model.PlayerGameState) {
 	bulletSAT := cs.buildBulletSAT(bullet)
 
 	for _, player := range cs.state.GetAllPlayers() {
@@ -39,7 +39,7 @@ func (cs *CollisionService) buildBulletSAT(bullet model.Bullet) collision.SATBox
 	}
 }
 
-func (cs *CollisionService) buildPlayerSAT(player *model.PlayerState) collision.SATBox {
+func (cs *CollisionService) buildPlayerSAT(player *model.PlayerGameState) collision.SATBox {
 	points := collision.GetPlayerPoints(player.X, player.Y, player.Angle)
 	normals := collision.GetNormals(points)
 	return collision.SATBox{
@@ -48,7 +48,7 @@ func (cs *CollisionService) buildPlayerSAT(player *model.PlayerState) collision.
 	}
 }
 
-func (cs *CollisionService) HandleHit(player *model.PlayerState, bullet model.Bullet) {
+func (cs *CollisionService) HandleHit(player *model.PlayerGameState, bullet model.Bullet) {
 	damage := model.BulletDamage * (bullet.Life/model.BulletLife*model.BulletDamageMulti + 1)
 	player.Health -= damage
 

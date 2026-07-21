@@ -3,8 +3,7 @@ package main
 import (
 	"embed"
 	"fmt"
-	"gamedevRooms/internal/game"
-	mapModel "gamedevRooms/internal/gameMap"
+	"gamedevRooms/internal/Lobby"
 	"gamedevRooms/internal/websocket"
 	"io/fs"
 	"log"
@@ -15,14 +14,9 @@ import (
 var frontendFs embed.FS
 
 func main() {
-	newMap := mapModel.NewMap(7)
-	fmt.Println(newMap)
+	lobby := Lobby.NewLobby()
 
-	gameState := game.NewGameState()
-	gameLoop := game.NewGameLoop(gameState)
-	go gameLoop.Run()
-
-	wsHandler := websocket.NewWebsocketHandler(gameLoop)
+	wsHandler := websocket.NewWebsocketHandler(lobby)
 	http.HandleFunc("/ws", wsHandler.InitWebsocket)
 
 	staticFiles, err := fs.Sub(frontendFs, "frontend")

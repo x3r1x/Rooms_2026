@@ -13,25 +13,25 @@ import (
 type GameLoop struct {
 	game             *GameState
 	collisionService *CollisionService
-	updateChan       chan model.ClientMessage
-	registerChan     chan *model.PlayerState
+	updateChan       chan model.ClientGameMessage
+	registerChan     chan *model.PlayerGameState
 	deleteChan       chan string
 }
 
 func NewGameLoop(game *GameState) *GameLoop {
 	return &GameLoop{game: game,
 		collisionService: NewCollisionService(game),
-		updateChan:       make(chan model.ClientMessage),
-		registerChan:     make(chan *model.PlayerState),
+		updateChan:       make(chan model.ClientGameMessage),
+		registerChan:     make(chan *model.PlayerGameState),
 		deleteChan:       make(chan string),
 	}
 }
 
-func (gl *GameLoop) RegisterPlayer(player *model.PlayerState) {
+func (gl *GameLoop) RegisterPlayer(player *model.PlayerGameState) {
 	gl.registerChan <- player
 }
 
-func (gl *GameLoop) UpdatePlayer(msg model.ClientMessage) {
+func (gl *GameLoop) UpdatePlayer(msg model.ClientGameMessage) {
 	gl.updateChan <- msg
 }
 
@@ -69,7 +69,7 @@ func (gl *GameLoop) Run() {
 				log.Printf("Осталось времени: %d секунд", remaining)
 			}
 
-			gl.broadcast(model.ServerMessage{
+			gl.broadcast(model.ServerGameMessage{
 				Type:    "a",
 				Players: gl.createSnapshot(),
 				Bullets: gl.game.GetAllBullets(),
@@ -80,7 +80,7 @@ func (gl *GameLoop) Run() {
 
 // === LOBBITOMIA ===
 
-func (gl *GameLoop) handleRegister(player *model.PlayerState) {
+func (gl *GameLoop) handleRegister(player *model.PlayerGameState) {
 	if !gl.game.CanAddPlayer() {
 		log.Printf(" Отклонено подключение %s: игра активна или лобби заполнено", player.Id)
 		if player.Connection != nil {
@@ -201,15 +201,15 @@ func (gl *GameLoop) updatePlayers() {
 	}
 }
 
-func (gl *GameLoop) createSnapshot() []model.PlayerState {
-	snapshot := make([]model.PlayerState, 0, len(gl.game.GetAllPlayers()))
+func (gl *GameLoop) createSnapshot() []model.PlayerGameState {
+	snapshot := make([]model.PlayerGameState, 0, len(gl.game.GetAllPlayers()))
 	for _, player := range gl.game.GetAllPlayers() {
 		snapshot = append(snapshot, *player)
 	}
 	return snapshot
 }
 
-func (gl *GameLoop) broadcast(message model.ServerMessage) {
+func (gl *GameLoop) broadcast(message model.ServerGameMessage) {
 	data, err := json.Marshal(message)
 	if err != nil {
 		log.Println(err)
