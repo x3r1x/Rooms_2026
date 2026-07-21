@@ -10,7 +10,7 @@ import (
 
 type GameState struct {
 	players       map[string]*model.PlayerState
-	objects       map[string]model.Object
+	objects       map[string]*model.Object
 	bullets       []model.Bullet
 	tickCount     uint64
 	isGameActive  bool
@@ -21,23 +21,23 @@ type GameState struct {
 func NewGameState() *GameState {
 	return &GameState{
 		players:      make(map[string]*model.PlayerState),
+		objects:      make(map[string]*model.Object),
 		bullets:      make([]model.Bullet, 0),
-		objects:      make(map[string]model.Object),
 		isGameActive: false,
 		gameDuration: 60 * time.Second,
 	}
 }
 
 // == OBJECT ===
-func (gs *GameState) GetObjects() map[string]model.Object {
+func (gs *GameState) GetObjects() map[string]*model.Object {
 	return gs.objects
 }
 
-func (gs *GameState) SetObjects(objects map[string]model.Object) {
+func (gs *GameState) SetObjects(objects map[string]*model.Object) {
 	gs.objects = objects
 }
 
-func (gs *GameState) AddObject(obj model.Object) {
+func (gs *GameState) AddObject(obj *model.Object) {
 	gs.objects[obj.Id] = obj
 }
 
