@@ -14,7 +14,7 @@ const (
 	PlayerSpawnPointY = 500
 	InitDirection     = 0
 	PlayerVisualSize  = 40.0
-	PlayerSpeed       = float64(0.2)
+	PlayerSpeed       = 0.2
 	MaxPlayerHealth   = 100
 	PlayerRebornTimer = 300
 	// общие служебные координаты

@@ -2,8 +2,6 @@ package game
 
 import (
 	"encoding/json"
-	"fmt"
-	"gamedevRooms/internal/collision"
 	"gamedevRooms/internal/model"
 	"log"
 	"math"
@@ -13,17 +11,19 @@ import (
 )
 
 type GameLoop struct {
-	game         *GameState
-	updateChan   chan model.ClientMessage
-	registerChan chan *model.PlayerState
-	deleteChan   chan string
+	game             *GameState
+	collisionService *CollisionService
+	updateChan       chan model.ClientMessage
+	registerChan     chan *model.PlayerState
+	deleteChan       chan string
 }
 
 func NewGameLoop(game *GameState) *GameLoop {
 	return &GameLoop{game: game,
-		updateChan:   make(chan model.ClientMessage),
-		registerChan: make(chan *model.PlayerState),
-		deleteChan:   make(chan string),
+		collisionService: NewCollisionService(game),
+		updateChan:       make(chan model.ClientMessage),
+		registerChan:     make(chan *model.PlayerState),
+		deleteChan:       make(chan string),
 	}
 }
 
@@ -46,16 +46,29 @@ func (gl *GameLoop) Run() {
 		select {
 
 		case reg := <-gl.registerChan:
-			gl.game.AddPlayer(reg)
+			gl.handleRegister(reg)
 		case del := <-gl.deleteChan:
-			gl.game.RemovePlayer(del)
+			gl.handleDelete(del)
 		case upload := <-gl.updateChan:
 			gl.game.UpdatePlayer(upload)
 		case <-ticker.C:
+			if !gl.game.IsGameActive() {
+				continue
+			}
 			gl.game.IncrementTick()
 			gl.updateShooterTimers()
 			gl.updateBullets()
 			gl.updatePlayers()
+
+			remaining := gl.game.GetRemainingSeconds()
+			if remaining <= 0 {
+				gl.endGame()
+				return
+			}
+			if remaining%10 == 0 {
+				log.Printf("Осталось времени: %d секунд", remaining)
+			}
+
 			gl.broadcast(model.ServerMessage{
 				Type:    "a",
 				Players: gl.createSnapshot(),
@@ -65,10 +78,87 @@ func (gl *GameLoop) Run() {
 	}
 }
 
-//func (gl *GameLoop) startGame() {
-//	gl.game.SetGameActive(true)
-//	log.Println()
-//}
+// === LOBBITOMIA ===
+
+func (gl *GameLoop) handleRegister(player *model.PlayerState) {
+	if !gl.game.CanAddPlayer() {
+		log.Printf(" Отклонено подключение %s: игра активна или лобби заполнено", player.Id)
+		if player.Connection != nil {
+			if err := player.Connection.Close(); err != nil {
+				log.Println("Подключение невозможно закрыть")
+			}
+		}
+		return
+	}
+
+	gl.game.AddPlayer(player)
+	log.Printf("Игрок %s подключился. Всего: %d/4", player.Id, len(gl.game.GetAllPlayers()))
+
+	if gl.game.IsLobbyFull() {
+		log.Println("Лобби заполнено")
+		gl.startGame()
+	}
+}
+
+func (gl *GameLoop) handleDelete(id string) {
+	gl.game.RemovePlayer(id)
+	log.Printf("Игрок %s удален. Осталось: %d", id, len(gl.game.GetAllPlayers()))
+
+	if gl.game.IsGameActive() {
+		if len(gl.game.GetAllPlayers()) <= 1 {
+			log.Println("Игрок вышел, игра завершена досрочно")
+			gl.endGame()
+		}
+	}
+}
+
+func (gl *GameLoop) startGame() {
+	if gl.game.IsGameActive() {
+		return
+	}
+	gl.game.SetGameActive(true)
+}
+
+func (gl *GameLoop) endGame() {
+	if !gl.game.IsGameActive() {
+		return
+	}
+	gl.game.SetGameActive(false)
+	winner := gl.getWinner()
+	log.Println(winner)
+	gl.resetGame()
+}
+
+func (gl *GameLoop) getWinner() string {
+	var winner string
+	maxHealth := -1.0
+
+	for _, player := range gl.game.GetAllPlayers() {
+		if player.Health > maxHealth {
+			maxHealth = player.Health
+			winner = player.Id
+		}
+	}
+
+	if winner == "" {
+		return "Никто"
+	}
+	return winner
+}
+
+func (gl *GameLoop) resetGame() {
+	gl.game.SetBullets([]model.Bullet{})
+	for _, player := range gl.game.GetAllPlayers() {
+		player.Health = model.MaxPlayerHealth
+		player.X = model.PlayerSpawnPointX
+		player.Y = model.PlayerSpawnPointY
+		player.Angle = model.InitDirection
+		player.RebornTimer = 0
+		player.ShootTimer = 0
+	}
+}
+
+// ==================
 
 func (gl *GameLoop) updateShooterTimers() {
 	for _, player := range gl.game.GetAllPlayers() {
@@ -85,57 +175,29 @@ func (gl *GameLoop) updateBullets() {
 		bullet.X += math.Cos(bullet.Direction) * model.MaxBulletSpeed
 		bullet.Y += math.Sin(bullet.Direction) * model.MaxBulletSpeed
 
-		if bullet.Life > 0 && !gl.checkCollision(bullet) {
-			activeBullets = append(activeBullets, bullet)
+		if bullet.Life > 0 {
+			hit, player := gl.collisionService.CheckBulletCollision(bullet)
+			if hit && player.Health > 0 {
+				gl.collisionService.HandleHit(player, bullet)
+			} else {
+				activeBullets = append(activeBullets, bullet)
+			}
 		}
 	}
 	gl.game.SetBullets(activeBullets)
 }
 
-func (gl *GameLoop) checkCollision(bullet model.Bullet) bool {
-	bulletPoints := collision.GetBulletPoints(bullet.X, bullet.Y, bullet.Direction)
-	bulletNormals := collision.GetNormals(bulletPoints)
-	bulletSAT := collision.SATBox{
-		Points:  bulletPoints,
-		Normals: bulletNormals,
-	}
-	for _, player := range gl.game.GetAllPlayers() {
-		if player.Id == bullet.OwnerId {
-			continue
-		}
-		playerPoints := collision.GetPlayerPoints(player.X, player.Y, player.Angle)
-		playerNormals := collision.GetNormals(playerPoints)
-		playerSAT := collision.SATBox{
-			Points:  playerPoints,
-			Normals: playerNormals,
-		}
-		if collision.CheckCollisionSAT(bulletSAT, playerSAT) {
-			player.Health -= model.BulletDamage * (bullet.Life / model.BulletLife * model.BulletDamageMulti)
-			fmt.Println("HIT! The player: ", player.Id, ", got shoot. Now he have this health", player.Health)
-			if player.Health < 0 {
-				player.RebornTimer = model.PlayerRebornTimer
-			}
-			return true
-		}
-	}
-	return false
-}
-
 func (gl *GameLoop) updatePlayers() {
 	for _, player := range gl.game.GetAllPlayers() {
-		gl.normaliseDirection(&player.MoveX, &player.MoveY)
+		vectorLength := math.Sqrt(player.MoveX*player.MoveX + player.MoveY*player.MoveY)
 
-		player.X += player.MoveX * float64(model.TickTime) * model.PlayerSpeed
-		player.Y += player.MoveY * float64(model.TickTime) * model.PlayerSpeed
-	}
-}
+		if vectorLength != 0 {
+			player.MoveX /= vectorLength
+			player.MoveY /= vectorLength
+		}
 
-func (gl *GameLoop) normaliseDirection(moveX, moveY *float64) {
-	var vectorLength = math.Sqrt(*moveX**moveX + *moveY**moveY)
-
-	if vectorLength != 0 {
-		*moveX /= vectorLength
-		*moveY /= vectorLength
+		player.X += player.MoveX * model.TickTime * model.PlayerSpeed
+		player.Y += player.MoveY * model.TickTime * model.PlayerSpeed
 	}
 }
 
