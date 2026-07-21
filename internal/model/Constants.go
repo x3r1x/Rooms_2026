@@ -20,7 +20,7 @@ const (
 	// константы общие служебные
 	TickTime                     = 16
 	GameDuration                 = 60
-	MaxCountOfPlayers            = 2
+	MaxCountOfPlayers            = 5
 	MinCountOfPlayers            = 2
 	MinBarrierType               = 1
 	MaxBarrierType               = 7

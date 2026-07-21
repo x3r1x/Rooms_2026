@@ -107,6 +107,9 @@ func (cs *CollisionService) HandlePlayerHit(player *model.PlayerState, bullet mo
 		player.Id, player.Health)
 
 	if player.Health < 0 {
+		if killer, exist := cs.state.GetPlayer(bullet.OwnerId); exist {
+			killer.BodyCount++
+		}
 		player.RebornTimer = model.PlayerRebornTimer
 	}
 }

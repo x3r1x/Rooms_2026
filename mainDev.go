@@ -14,8 +14,8 @@ import (
 func main() {
 	gameState := game.NewGameState()
 
-	mapManager := game.NewMapManager(gameState)
-	_ = mapManager
+	//mapManager := game.NewMapManager(gameState)
+	//_ = mapManager
 
 	gameLoop := game.NewGameLoop(gameState)
 	go gameLoop.Run()

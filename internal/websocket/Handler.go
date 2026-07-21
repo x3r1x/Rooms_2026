@@ -65,14 +65,17 @@ func (wsh *WebsocketHandler) HandleWebsocket(conn *websocket.Conn) {
 			currentId = msg.Id
 			fmt.Println("Регистрация пользователя")
 			wsh.gameLoop.RegisterPlayer(&model.PlayerState{
-				Id:         msg.Id,
-				Health:     model.MaxPlayerHealth,
-				X:          model.PlayerSpawnPointX,
-				Y:          model.PlayerSpawnPointY,
-				Angle:      model.InitDirection,
-				MoveX:      model.InitDirection,
-				MoveY:      model.InitDirection,
-				Connection: conn,
+				Id:          msg.Id,
+				Health:      model.MaxPlayerHealth,
+				X:           model.PlayerSpawnPointX,
+				Y:           model.PlayerSpawnPointY,
+				Angle:       model.InitDirection,
+				MoveX:       model.InitDirection,
+				MoveY:       model.InitDirection,
+				Connection:  conn,
+				ShootTimer:  0,
+				RebornTimer: 0,
+				BodyCount:   0,
 			})
 		} else if currentId != "" {
 			wsh.gameLoop.UpdatePlayer(model.ClientMessage{

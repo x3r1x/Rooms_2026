@@ -13,4 +13,5 @@ type PlayerState struct {
 	Connection  *websocket.Conn `json:"-"`
 	ShootTimer  int             `json:"-"`
 	RebornTimer int             `json:"rt"`
+	BodyCount   int             `json:"-"`
 }

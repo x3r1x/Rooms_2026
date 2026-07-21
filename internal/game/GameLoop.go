@@ -152,11 +152,11 @@ func (gl *GameLoop) endGame() {
 
 func (gl *GameLoop) getWinner() string {
 	var winner string
-	maxHealth := -1.0
+	maxBodyCount := -1
 
 	for _, player := range gl.game.GetAllPlayers() {
-		if player.Health > maxHealth {
-			maxHealth = player.Health
+		if player.BodyCount > maxBodyCount {
+			maxBodyCount = player.BodyCount
 			winner = player.Id
 		}
 	}
