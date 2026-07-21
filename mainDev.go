@@ -12,10 +12,12 @@ import (
 //var frontendFs embed.FS
 
 func main() {
-	//newMap := mapModel.NewMap(7)
-	//fmt.Println(newMap)
+	gameState := game.NewGameState()
 
-	gameLoop := game.NewGameLoop(game.NewGameState())
+	mapManager := game.NewMapManager(gameState)
+	_ = mapManager
+
+	gameLoop := game.NewGameLoop(gameState)
 	go gameLoop.Run()
 
 	wsHandler := websocket.NewWebsocketHandler(gameLoop)
