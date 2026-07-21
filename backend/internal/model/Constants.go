@@ -19,4 +19,26 @@ const (
 	PlayerRebornTimer = 300
 	// общие служебные координаты
 	TickTime = 16
+
+	MinBarrierType               = 1
+	MaxBarrierType               = 7
+	BaseRoomIndex                = 0
+	BaseWallsIndex               = 1
+	ExitTopIndex                 = 2
+	ExitLeftIndex                = 3
+	ExitBottomIndex              = 4
+	ExitRightIndex               = 5
+	FlapTopIndex                 = 6
+	FlapLeftIndex                = 7
+	FlapBottomIndex              = 8
+	FlapRightIndex               = 9
+	BarriersStartIndex           = 10
+	BarriersAmount               = 7
+	RoomHeight                   = 21
+	RoomWidth                    = 25
+	TopMarker                    = "top"
+	LeftMarker                   = "left"
+	BottomMarker                 = "bottom"
+	RightMarker                  = "right"
+	ConnectNeighbouredRoomChance = 0.4
 )
