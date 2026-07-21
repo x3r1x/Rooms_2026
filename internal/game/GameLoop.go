@@ -176,12 +176,16 @@ func (gl *GameLoop) updateBullets() {
 		bullet.Y += math.Sin(bullet.Direction) * model.MaxBulletSpeed
 
 		if bullet.Life > 0 {
-			hit, player := gl.collisionService.CheckBulletCollision(bullet)
-			if hit && player.Health > 0 {
-				gl.collisionService.HandleHit(player, bullet)
-			} else {
-				activeBullets = append(activeBullets, bullet)
+			hit, player, obj := gl.collisionService.CheckBulletCollision(bullet)
+			if hit {
+				if player != nil && player.Health > 0 {
+					gl.collisionService.HandlePlayerHit(player, bullet)
+				} else {
+					gl.collisionService.HandleObjectHit(obj, bullet)
+				}
+				continue
 			}
+			activeBullets = append(activeBullets, bullet)
 		}
 	}
 	gl.game.SetBullets(activeBullets)
@@ -189,6 +193,7 @@ func (gl *GameLoop) updateBullets() {
 
 func (gl *GameLoop) updatePlayers() {
 	for _, player := range gl.game.GetAllPlayers() {
+		oldX, oldY := player.X, player.Y
 		vectorLength := math.Sqrt(player.MoveX*player.MoveX + player.MoveY*player.MoveY)
 
 		if vectorLength != 0 {
@@ -196,8 +201,16 @@ func (gl *GameLoop) updatePlayers() {
 			player.MoveY /= vectorLength
 		}
 
-		player.X += player.MoveX * model.TickTime * model.PlayerSpeed
-		player.Y += player.MoveY * model.TickTime * model.PlayerSpeed
+		newX := player.X + player.MoveX*model.TickTime*model.PlayerSpeed
+		newY := player.Y + player.MoveY*model.TickTime*model.PlayerSpeed
+		player.X = newX
+		if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
+			player.X = oldX
+		}
+		player.Y = newY
+		if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
+			player.Y = oldY
+		}
 	}
 }
 
