@@ -109,7 +109,6 @@ function getNearbyTiles(x, y, mapData) {
             if ((row >= 0) && (row < mapHeight) && (col >= 0) && (col < mapWidth)) {
                 const index = row * mapWidth + col;
                 const tileId = map.data[index];
-                console.log(tileId);
                 if (tileId > 0) {
                     nearby.push({
                         tileId: tileId - 1,

@@ -19,6 +19,7 @@ function processPlayer(player, state) {
         hp: player.h,
         rebornTime: player.rt
     }
+    console.log(player.id);
 
     if (newPlayerInModel.id === state.player.id) {
         newPlayerInModel.mousePosition = state.player.mousePosition;
