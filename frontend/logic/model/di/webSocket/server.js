@@ -28,6 +28,7 @@ export function parseMessage(message, state) {
 
     // if (parsedMessage.type === "interpolation" && "playerInterpolations" in parsedMessage) {
     //     processInterpolation(parsedMessage["playerInterpolations"], state);
+
     if (parsedMessage.type === "a") {
         processAssignment(parsedMessage, state);
     } else {

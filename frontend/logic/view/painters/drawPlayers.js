@@ -9,12 +9,16 @@ export function drawPlayers(context, mainPlayer, enemies) {
 function drawMainPlayer(context, player) {
     const sprite = GAME_SPRITES.PLAYER_GOES;
     const size = GAME_CONSTANTS.PLAYER_VISUAL_SIZE;
+    const deathScreen = document.getElementById("death-screen");
     if (player.hp > 0){
+        deathScreen.style.display = "none";
         context.save();
         context.translate(player.x, player.y);
         context.rotate(player.direction);
         context.drawImage(sprite, -size / 2, -size / 2, size, size);
         context.restore();
+    } else {
+        deathScreen.style.display = "absolute";
     }
     
 }

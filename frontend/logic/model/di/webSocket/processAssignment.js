@@ -4,6 +4,8 @@ export function processAssignment(parsedMessage, state) {
 
     state.bullets = [];
     parsedMessage.b.forEach((bullet) => processBullet(bullet, state));
+
+    updatePlayersStatistic(state);
 }
 
 function processPlayer(player, state) {
@@ -35,4 +37,25 @@ function processBullet(bullet, state) {
         direction: bullet.a,
         ownerId: bullet.oId
     })
+}
+
+function updatePlayersStatistic(state) {
+    const listElement = document.getElementById("players-list");
+
+
+    const allPlayers = [state.player, ...state.enemies];
+
+    listElement.innerHTML = allPlayers.map(p => {
+    const isMe = p.id === state.player.id;
+    let hp = p.hp; 
+    if (hp <= 0){
+        hp = "kill"
+    }
+        return `
+            <p class="player-stat-item ${isMe ? 'is-me' : ''}">
+                <span class="player-stat-name">${p.id}</span>
+                <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
+            </p>
+        `;
+    }).join('');
 }
