@@ -125,7 +125,7 @@ func (gl *GameLoop) endGame() {
 	}
 	gl.game.SetGameActive(false)
 	winner := gl.getWinner()
-	log.Println(winner)
+	log.Println("WINNER ID: ", winner)
 	gl.resetGame()
 }
 
