@@ -8,7 +8,9 @@ export function initGameListeners(canvas) {
     initWindowListeners()
     initCanvasListeners(canvas);
 
-    canvas.addEventListener('resize', resizeCanvas)
+    resizeCanvas(canvas);
+    
+    window.addEventListener('resize', () => resizeCanvas(canvas));
 }
 
 function initWindowListeners() {
@@ -24,6 +26,9 @@ function initWindowListeners() {
 export function resizeCanvas(canvas) {
     canvas.width = 900;
     canvas.height = 756;
+    
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
 }
 
 function initCanvasListeners(canvas) {

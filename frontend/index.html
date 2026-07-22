@@ -9,145 +9,65 @@
 </head>
 
 <body>
-    <div class="nickname" id="nicknameWindow">
+    <div class="wrapper-nickname" style="display: none">
         <div class="nickname-field">
             <h1>ROOMS</h1>
             <h2>ENTER YOUR NICKNAME</h2>
-            <div class="get-nickname">
-                <input class="input-nickname" id="nicknameInput" type="text" name="username"  maxlength="10" required>
-                <button class="button-send-nickname" id="nicknameButton">CONNECT</button>
-            </div>
+            <form class="get-nickname">
+                <input class="input-nickname" type="text" name="username"  maxlength="10" required>
+                <button class="button-send-nickname"type="submit">CONNECT</button>
+            </form>
         </div>
     </div>
 
-    <div class="main-game" id="mainGameWindow">
+    <div class="wrapper-lobby"  style="display: none">
+        <div class="lobby-info">
+            <h1>ROOMS</h1>
+            <div class="lobby-status">
+                <h2>LOBBY STATUS</h2>
+                <h2>PLAYERS CONNECTED: <span id="player-connected">0</span></h2>
+                <div id="lobby-list" class="lobby-list">
+                </div>
+            </div>
+        </div>
+        <div class="wrapper-start-game">
+            <button class="start-game">START GAME</botton>
+        </div>
+    </div>
+    
+    <div class="main-game" style="display: none">
         <div class="game-info">
             <h1>ROOMS</h1>
             <div class="statistic">
                 <h2>STATISTIC</h2>
                 <div id="players-list" class="players-list">
-                    <p class="player-stat-item is-me">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
-                    <p class="player-stat-item">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
-                    <p class="player-stat-item">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
-                    <p class="player-stat-item">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
-                    <p class="player-stat-item">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
-                    <p class="player-stat-item">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
-                    <p class="player-stat-item">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
-                    <p class="player-stat-item">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
-                    <p class="player-stat-item">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
-                    <p class="player-stat-item">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
-                    <p class="player-stat-item">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
-                    <p class="player-stat-item">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
-                    <p class="player-stat-item">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
-                    <p class="player-stat-item">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
-                    <p class="player-stat-item">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
-                    <p class="player-stat-item">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
-                    <p class="player-stat-item">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
-                    <p class="player-stat-item">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
-                    <p class="player-stat-item">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
-                    <p class="player-stat-item">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
-                    <p class="player-stat-item">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
-                    <p class="player-stat-item">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
-                    <p class="player-stat-item">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
-                    <p class="player-stat-item">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
-                    <p class="player-stat-item">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
-                    <p class="player-stat-item">
-                        <span class="player-stat-name">${p.id}</span>
-                        <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p>
                 </div>
             </div>
             </div>
             <div class="wrapper-canvas">
                 <canvas id="canvas" class="main__canvas"></canvas>
                 <div id="death-screen" class="death-screen" style="display: none">
-                <h1 class="death-title">YOU DIED</h1>
-                <p class="respawn-text">Respawn in: <span id="respawn-timer">5</span>s</p>
+                    <h1 class="death-title">YOU DIED</h1>
+                    <p class="respawn-text">Respawn in: <span id="respawn-timer">5</span>s</p>
+                </div>
+        
             </div>
-
         </div>
+        
     </div>
-
-
-
-    <div class="screen-game-over" display="none">
-
+    <div class="screen-game-over">
+            <div class="result-info">
+                <h1>ROOMS</h1>
+                <div class="result-status">
+                    <h2>RESULT</h2>
+                    <div id="result-list" class="result-list">
+                    </div>
+                </div>
+            </div>
+            <div class="wrapper-game-over-message">
+                <p class="game-over-message"></p>
+                <button class="restart-game">RESTART GAME</botton>
+            </div>
     </div>
-
 </body>
 </html>
