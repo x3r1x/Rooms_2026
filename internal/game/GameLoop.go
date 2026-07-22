@@ -197,12 +197,13 @@ func (gl *GameLoop) updateBullets() {
 		bullet.Y += math.Sin(bullet.Direction) * model.MaxBulletSpeed
 
 		if bullet.Life > 0 {
-			hit, player, obj := gl.collisionService.CheckBulletCollision(bullet)
+			hit, player, _ := gl.collisionService.CheckBulletCollision(bullet)
 			if hit {
 				if player.Health > 0 {
 					gl.collisionService.HandlePlayerHit(player, bullet)
 				} else {
-					gl.collisionService.HandleObjectHit(obj, bullet)
+					//	gl.collisionService.HandleObjectHit(obj, bullet)
+					log.Println("Bah in object")
 				}
 				continue
 			}

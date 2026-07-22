@@ -81,21 +81,21 @@ func (cs *CollisionService) buildObjectSAT(obj *model.Object) collision.SATBox {
 	}
 }
 
-func (cs *CollisionService) HandleObjectHit(obj *model.Object, bullet model.Bullet) {
-	if obj == nil {
-		return
-	}
-	if !obj.IsDestroyable {
-		return
-	}
-	obj.Health -= cs.calculateDamage(bullet)
-
-	log.Printf("HIT! Object %s took %.2f damage. Health: %.2f\n")
-	if obj.Health < 0 {
-		cs.state.RemoveObject(obj.Id)
-		log.Printf("Object %s was destroyed", obj.Id)
-	}
-}
+//func (cs *CollisionService) HandleObjectHit(obj *model.Object, bullet model.Bullet) {
+//	if obj == nil {
+//		return
+//	}
+//	if !obj.IsDestroyable {
+//		return
+//	}
+//	obj.Health -= cs.calculateDamage(bullet)
+//
+//	log.Printf("HIT! Object %s took %.2f damage. Health: %.2f\n")
+//	if obj.Health < 0 {
+//		cs.state.RemoveObject(obj.Id)
+//		log.Printf("Object %s was destroyed", obj.Id)
+//	}
+//}
 
 func (cs *CollisionService) HandlePlayerHit(player *model.PlayerState, bullet model.Bullet) {
 	if player == nil {
@@ -110,6 +110,7 @@ func (cs *CollisionService) HandlePlayerHit(player *model.PlayerState, bullet mo
 		if killer, exist := cs.state.GetPlayer(bullet.OwnerId); exist {
 			killer.BodyCount++
 		}
+		player.DeathCount++
 		player.RebornTimer = model.PlayerRebornTimer
 	}
 }
