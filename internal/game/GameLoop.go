@@ -38,6 +38,7 @@ func (gl *GameLoop) UpdatePlayer(msg model.ClientGameMessage) {
 func (gl *GameLoop) DeletePlayer(id string) {
 	gl.deleteChan <- id
 }
+
 func (gl *GameLoop) Run() {
 	ticker := time.NewTicker(model.TickTime * time.Millisecond)
 	defer ticker.Stop()
@@ -63,7 +64,7 @@ func (gl *GameLoop) Run() {
 			remaining := gl.game.GetRemainingSeconds()
 			if remaining <= 0 {
 				gl.endGame()
-				return
+				gl.restartGame()
 			}
 			if remaining%10 == 0 {
 				log.Printf("Осталось времени: %d секунд", remaining)
@@ -76,6 +77,26 @@ func (gl *GameLoop) Run() {
 			})
 		}
 	}
+}
+
+func (gl *GameLoop) restartGame() {
+	log.Println("Перезапуск игры с теми же игроками...")
+
+	gl.game.SetBullets([]model.Bullet{})
+
+	for _, player := range gl.game.GetAllPlayers() {
+		player.Health = model.MaxPlayerHealth
+		player.X = model.PlayerSpawnPointX
+		player.Y = model.PlayerSpawnPointY
+		player.Angle = model.InitDirection
+		player.RebornTimer = 0
+		player.ShootTimer = 0
+	}
+
+	gl.game.gameStartTime = time.Now()
+	gl.game.SetGameActive(true)
+
+	log.Printf("Новая игра началась! Игроков: %d", len(gl.game.GetAllPlayers()))
 }
 
 // === LOBBITOMIA ===
@@ -131,11 +152,11 @@ func (gl *GameLoop) endGame() {
 
 func (gl *GameLoop) getWinner() string {
 	var winner string
-	maxHealth := -1.0
+	maxBodyCount := -1
 
 	for _, player := range gl.game.GetAllPlayers() {
-		if player.Health > maxHealth {
-			maxHealth = player.Health
+		if player.BodyCount > maxBodyCount {
+			maxBodyCount = player.BodyCount
 			winner = player.Id
 		}
 	}
@@ -176,12 +197,17 @@ func (gl *GameLoop) updateBullets() {
 		bullet.Y += math.Sin(bullet.Direction) * model.MaxBulletSpeed
 
 		if bullet.Life > 0 {
-			hit, player := gl.collisionService.CheckBulletCollision(bullet)
-			if hit && player.Health > 0 {
-				gl.collisionService.HandleHit(player, bullet)
-			} else {
-				activeBullets = append(activeBullets, bullet)
+			hit, player, _ := gl.collisionService.CheckBulletCollision(bullet)
+			if hit {
+				if player.Health > 0 {
+					gl.collisionService.HandlePlayerHit(player, bullet)
+				} else {
+					//	gl.collisionService.HandleObjectHit(obj, bullet)
+					log.Println("Bah in object")
+				}
+				continue
 			}
+			activeBullets = append(activeBullets, bullet)
 		}
 	}
 	gl.game.SetBullets(activeBullets)
@@ -189,6 +215,7 @@ func (gl *GameLoop) updateBullets() {
 
 func (gl *GameLoop) updatePlayers() {
 	for _, player := range gl.game.GetAllPlayers() {
+		oldX, oldY := player.X, player.Y
 		vectorLength := math.Sqrt(player.MoveX*player.MoveX + player.MoveY*player.MoveY)
 
 		if vectorLength != 0 {
@@ -196,8 +223,16 @@ func (gl *GameLoop) updatePlayers() {
 			player.MoveY /= vectorLength
 		}
 
-		player.X += player.MoveX * model.TickTime * model.PlayerSpeed
-		player.Y += player.MoveY * model.TickTime * model.PlayerSpeed
+		newX := player.X + player.MoveX*model.TickTime*model.PlayerSpeed
+		newY := player.Y + player.MoveY*model.TickTime*model.PlayerSpeed
+		player.X = newX
+		if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
+			player.X = oldX
+		}
+		player.Y = newY
+		if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
+			player.Y = oldY
+		}
 	}
 }
 

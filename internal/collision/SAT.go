@@ -56,6 +56,17 @@ func GetBulletPoints(x, y, angle float64) []Point {
 	return points
 }
 
+func GetObjectPoints(x, y, width, height float64) []Point {
+	halfW := width / 2.0
+	halfH := height / 2.0
+	return []Point{
+		{x - halfW, y - halfH},
+		{x + halfW, y - halfH},
+		{x + halfW, y + halfH},
+		{x - halfW, y + halfH},
+	}
+}
+
 func GetNormals(points []Point) []Point {
 	normals := make([]Point, len(points))
 	for i := 0; i < len(points); i++ {
