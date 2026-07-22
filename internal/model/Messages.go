@@ -48,3 +48,8 @@ type ServerGameMessage struct {
 	Players []PlayerGameState `json:"p"`
 	Bullets []Bullet          `json:"b"`
 }
+
+type ServerCountdownMessage struct {
+	State     string `json:"s"`
+	Countdown int    `json:"c"`
+}

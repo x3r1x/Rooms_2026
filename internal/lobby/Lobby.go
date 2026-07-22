@@ -5,6 +5,7 @@ import (
 	"gamedevRooms/internal/game"
 	"gamedevRooms/internal/model"
 	"log"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -90,14 +91,14 @@ func (l *Lobby) broadcastLobbyState() {
 		})
 	}
 
-	msg := model.ServerLobbyMessage{
-		State:   l.state,
-		Players: players,
-	}
-
-	data, _ := json.Marshal(msg)
-
 	for _, p := range l.players {
+		msg := model.ServerLobbyMessage{
+			State:   l.state,
+			OwnId:   p.Id,
+			Players: players,
+		}
+
+		data, _ := json.Marshal(msg)
 		if p.Connection != nil {
 			if err := p.Connection.WriteMessage(websocket.TextMessage, data); err != nil {
 				log.Println("Невозможно отправить состояние лобби игроку")
@@ -133,12 +134,16 @@ func (l *Lobby) StartGame() {
 		return
 	}
 
-	l.gameLoop = game.NewGameLoop(game.NewGameState())
-	go l.gameLoop.Run()
+	gameState := game.NewGameState()
+	mapManager := game.NewMapManager(gameState)
+	roomMessages := mapManager.GetRoomMessages()
+
+	l.sendReadyState(roomMessages)
+	l.doCountdown()
 
 	for _, player := range l.players {
 		if player.Ready {
-			l.gameLoop.RegisterPlayer(&model.PlayerGameState{
+			gameState.AddPlayer(&model.PlayerGameState{
 				Id:          player.Id,
 				Health:      model.MaxPlayerHealth,
 				X:           model.PlayerSpawnPointX,
@@ -154,8 +159,44 @@ func (l *Lobby) StartGame() {
 			})
 		}
 	}
-	for id := range l.players {
-		delete(l.players, id)
-	}
+	l.gameLoop = game.NewGameLoop(gameState)
+	l.state = model.OngoingGameState
+
+	go l.gameLoop.Run()
+	//for id := range l.players {
+	//	delete(l.players, id)
+	//}
 	l.playersReady = 0
+}
+
+func (l *Lobby) sendReadyState(roomMessages map[string]model.RoomMessage) {
+	msg := model.ServerReadyMessage{
+		State:     model.ReadyLobbyState,
+		Countdown: 5.0,
+		Map:       roomMessages,
+	}
+	data, _ := json.Marshal(msg)
+	for _, p := range l.players {
+		if p.Connection != nil {
+			if err := p.Connection.WriteMessage(websocket.TextMessage, data); err != nil {
+				return
+			}
+		}
+	}
+}
+
+func (l *Lobby) doCountdown() {
+	for i := 5; i > 0; i-- {
+		msg := model.ServerCountdownMessage{
+			State:     model.CountdownLobbyState,
+			Countdown: i,
+		}
+		data, _ := json.Marshal(msg)
+		for _, p := range l.players {
+			if err := p.Connection.WriteMessage(websocket.TextMessage, data); err != nil {
+				return
+			}
+		}
+		time.Sleep(1 * time.Second)
+	}
 }

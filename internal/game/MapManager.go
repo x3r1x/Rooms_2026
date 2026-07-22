@@ -3,6 +3,7 @@ package game
 import (
 	mapModel "gamedevRooms/internal/gameMap"
 	"gamedevRooms/internal/model"
+	"strconv"
 
 	"github.com/google/uuid"
 )
@@ -65,4 +66,29 @@ func (mm *MapManager) loadMapObjects() {
 		}
 	}
 	mm.gameState.SetObjects(objects)
+}
+
+func (mm *MapManager) GetRoomMessages() map[string]model.RoomMessage {
+	result := make(map[string]model.RoomMessage)
+
+	for id, room := range mm.gameMap.GetGameMap() {
+		barrierNum := 1
+		barrierStr := room.GetBarrierType()
+		if len(barrierStr) > 7 {
+			if num, err := strconv.Atoi(barrierStr[7:]); err == nil {
+				barrierNum = num
+			}
+		}
+
+		result[id] = model.RoomMessage{
+			ExitTop:    room.GetExit(model.TopMarker),
+			ExitLeft:   room.GetExit(model.LeftMarker),
+			ExitBottom: room.GetExit(model.BottomMarker),
+			ExitRight:  room.GetExit(model.RightMarker),
+			Id:         room.GetId(),
+			BorderType: barrierNum,
+		}
+	}
+
+	return result
 }
