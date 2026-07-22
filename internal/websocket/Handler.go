@@ -43,7 +43,13 @@ func (wsh *WebsocketHandler) InitWebsocket(w http.ResponseWriter, r *http.Reques
 }
 
 func (wsh *WebsocketHandler) HandleWebsocket(conn *websocket.Conn) {
-	currentId := ""
+	var currentId string
+
+	defer func() {
+		if currentId != "" {
+			wsh.lobby.RemovePlayerFromLobby(currentId)
+		}
+	}()
 
 	for {
 		_, p, err := conn.ReadMessage()
@@ -54,49 +60,48 @@ func (wsh *WebsocketHandler) HandleWebsocket(conn *websocket.Conn) {
 
 		switch wsh.lobby.GetState() {
 		case model.WaitingLobbyState:
-			wsh.handleWaitingLobbyState(p, currentId)
+			currentId = wsh.handleWaitingLobbyState(p, currentId, conn)
 		case model.OngoingGameState:
-			wsh.handleOngoingGameState(p)
+			wsh.handleOngoingGameState(p, currentId)
 		}
 	}
 }
 
-func (wsh *WebsocketHandler) handleWaitingLobbyState(p []byte, id string) {
+func (wsh *WebsocketHandler) handleWaitingLobbyState(p []byte, id string, conn *websocket.Conn) string {
 	var registerMsg model.ClientRegisterMessage
 
-	if err := json.Unmarshal(p, &registerMsg); err == nil {
-		id = wsh.lobby.AddUser(registerMsg.Nickname)
-		return
+	if err := json.Unmarshal(p, &registerMsg); err == nil && id == "" {
+		return wsh.lobby.AddPlayerToLobby(registerMsg.Nickname, conn)
 	}
 
 	var readyMsg model.ClientReadyStateMessage
 
-	if err := json.Unmarshal(p, &readyMsg); err == nil {
-		wsh.lobby.SetUserReadyState(id, readyMsg.Ready)
-		if wsh.lobby.CheckIfEveryoneReady() {
-			wsh.lobby.SetState(model.ReadyLobbyState)
-			//TODO: send message
-		}
-
-		return
+	if err := json.Unmarshal(p, &readyMsg); err == nil && id != "" {
+		wsh.lobby.UpdatePlayerInLobby(&lobby.LobbyPlayer{
+			Id:    id,
+			Ready: readyMsg.Ready,
+		})
+		return id
 	}
 
 	log.Println("Ошибка сериализации в waitingLobbyState!")
 
 	if id != "" {
 		log.Println("Удаляем пользователя: ", id)
-		wsh.lobby.RemoveUser(id)
+		wsh.lobby.RemovePlayerFromLobby(id)
 	}
+	return id
 }
 
-func (wsh *WebsocketHandler) handleOngoingGameState(p []byte) {
+func (wsh *WebsocketHandler) handleOngoingGameState(p []byte, currentId string) {
 	var msg model.ClientGameMessage
 
 	if err := json.Unmarshal(p, &msg); err != nil {
 		log.Println("Ошибка сериализации во время игры: ", err)
-		log.Println("Удаляем пользователя ", msg.Id)
-		wsh.lobby.GetGameLoop().DeletePlayer(msg.Id)
+		return
+	}
 
+	if currentId != msg.Id || wsh.lobby.GetGameLoop() == nil {
 		return
 	}
 

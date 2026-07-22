@@ -1,9 +1,12 @@
 package lobby
 
 import (
+	"encoding/json"
 	"gamedevRooms/internal/game"
 	"gamedevRooms/internal/model"
 	"log"
+
+	"github.com/gorilla/websocket"
 )
 
 type Lobby struct {
@@ -11,11 +14,95 @@ type Lobby struct {
 	players      map[string]*LobbyPlayer
 	playersReady int
 	gameLoop     *game.GameLoop
+	addChan      chan *LobbyPlayer
+	readyChan    chan *LobbyPlayer
+	removeChan   chan string
 }
 
 func NewLobby() *Lobby {
-	return &Lobby{
-		players: make(map[string]*LobbyPlayer),
+	l := &Lobby{
+		players:    make(map[string]*LobbyPlayer),
+		addChan:    make(chan *LobbyPlayer),
+		readyChan:  make(chan *LobbyPlayer),
+		removeChan: make(chan string),
+	}
+	go l.Run()
+	return l
+}
+
+func (l *Lobby) AddPlayerToLobby(nickname string, conn *websocket.Conn) string {
+	player := NewLobbyPlayer(nickname)
+	player.Connection = conn
+	l.addChan <- player
+	return player.Id
+}
+
+func (l *Lobby) UpdatePlayerInLobby(msg *LobbyPlayer) {
+	l.readyChan <- msg
+}
+
+func (l *Lobby) RemovePlayerFromLobby(id string) {
+	l.removeChan <- id
+}
+
+func (l *Lobby) Run() {
+	for {
+		select {
+		case regPlayer := <-l.addChan:
+			l.players[regPlayer.Id] = regPlayer
+			log.Printf("Игрок %s присоединился. Всего: %d", regPlayer.Nickname, len(l.players))
+			l.broadcastLobbyState()
+		case updPlayer := <-l.readyChan:
+			player, exists := l.players[updPlayer.Id]
+			if !exists {
+				continue
+			}
+			wasReady := player.Ready
+
+			if updPlayer.Ready && !wasReady {
+				l.playersReady++
+			} else if !updPlayer.Ready && wasReady {
+				l.playersReady--
+			}
+			log.Printf("Игрок %s готовность: %v (готово: %d/%d)",
+				updPlayer.Id, updPlayer.Ready, l.playersReady, len(l.players))
+
+			l.broadcastLobbyState()
+			if l.playersReady == len(l.players) &&
+				len(l.players) >= model.MinCountOfPlayers &&
+				l.state == model.WaitingLobbyState {
+				log.Println("Все готовы! Запускаем игру...")
+				l.StartGame()
+			}
+		case delPlayer := <-l.removeChan:
+			l.removeUser(delPlayer)
+		}
+	}
+}
+
+func (l *Lobby) broadcastLobbyState() {
+	players := make([]model.LobbyPlayerMessage, 0, len(l.players))
+	for _, p := range l.players {
+		players = append(players, model.LobbyPlayerMessage{
+			Nickname: p.Nickname,
+			Id:       p.Id,
+			Ready:    p.Ready,
+		})
+	}
+
+	msg := model.ServerLobbyMessage{
+		State:   l.state,
+		Players: players,
+	}
+
+	data, _ := json.Marshal(msg)
+
+	for _, p := range l.players {
+		if p.Connection != nil {
+			if err := p.Connection.WriteMessage(websocket.TextMessage, data); err != nil {
+				log.Println("Невозможно отправить состояние лобби игроку")
+			}
+		}
 	}
 }
 
@@ -27,27 +114,7 @@ func (l *Lobby) GetState() string {
 	return l.state
 }
 
-func (l *Lobby) SetUserReadyState(userId string, readyState bool) {
-	l.players[userId].Ready = readyState
-	l.playersReady++
-}
-
-func (l *Lobby) SetState(newState string) {
-	l.state = newState
-}
-
-func (l *Lobby) AddUser(nickname string) string {
-	newPlayer := NewLobbyPlayer(nickname)
-	l.players[newPlayer.Id] = newPlayer
-
-	return newPlayer.Id
-}
-
-func (l *Lobby) CheckIfEveryoneReady() bool {
-	return l.playersReady == len(l.players) && len(l.players) >= model.MinCountOfPlayers
-}
-
-func (l *Lobby) RemoveUser(id string) {
+func (l *Lobby) removeUser(id string) {
 	player, exists := l.players[id]
 	if !exists {
 		return
