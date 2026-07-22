@@ -9,7 +9,7 @@
 </head>
 
 <body>
-    <div class="wrapper-nickname" >
+    <div class="wrapper-nickname" style="display: none">
         <div class="nickname-field">
             <h1>ROOMS</h1>
             <h2>ENTER YOUR NICKNAME</h2>
@@ -17,6 +17,21 @@
                 <input class="input-nickname" type="text" name="username"  maxlength="10" required>
                 <button class="button-send-nickname"type="submit">CONNECT</button>
             </form>
+        </div>
+    </div>
+
+    <div class="wrapper-lobby">
+        <div class="lobby-info">
+            <h1>ROOMS</h1>
+            <div class="lobby-status">
+                <h2>LOBBY STATUS</h2>
+                <h2>PLAYERS CONNECTED: <span id="player-connected">0</span></h2>
+                <div id="lobby-list" class="lobby-list">
+                </div>
+            </div>
+        </div>
+        <div class="wrapper-start-game">
+            <button class="start-game">START GAME</botton>
         </div>
     </div>
     
@@ -38,7 +53,7 @@
         
             </div>
         </div>
-        <div class="screen-game-over" display="none">
+        <div class="screen-game-over">
 
         </div>
     </div>
