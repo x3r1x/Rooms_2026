@@ -30,6 +30,7 @@ export const GAME_CONSTANTS = {
 
     TILE_IMG_PATH: 'assets/tile/tileset x1.png'
 }
+
 export const PLAYER_LOCAL_POINTS = [
     {x: -GAME_CONSTANTS.HALF, y: -GAME_CONSTANTS.HALF},
     {x: GAME_CONSTANTS.HALF, y: -GAME_CONSTANTS.HALF},

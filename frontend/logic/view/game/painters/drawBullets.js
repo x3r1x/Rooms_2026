@@ -1,4 +1,4 @@
-import {GAME_CONSTANTS, GAME_SPRITES} from "../../model/storage/gameConstants.js";
+import {GAME_CONSTANTS, GAME_SPRITES} from "../../../model/game/storage/gameConstants.js";
 
 export function drawBullets(context, playerId, bullets) {
     bullets.forEach(function (bullet) {

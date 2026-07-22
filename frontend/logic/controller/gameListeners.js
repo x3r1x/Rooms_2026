@@ -1,10 +1,10 @@
-import {createBullet} from "../model/factory/createBullet.js";
-import {currentState} from "../model/storage/states.js";
-import {GAME_CONSTANTS} from "../model/storage/gameConstants.js";
+import {createBullet} from "../model/game/factory/createBullet.js";
+import {gameState} from "../model/game/storage/gameState.js";
+import {GAME_CONSTANTS} from "../model/game/storage/gameConstants.js";
 
 export const keys = {};
 
-export function initListeners(canvas) {
+export function initGameListeners(canvas) {
     initWindowListeners()
     initCanvasListeners(canvas);
 
@@ -29,7 +29,7 @@ export function resizeCanvas(canvas) {
 function initCanvasListeners(canvas) {
     canvas.addEventListener('click', function (event) {
         const {x, y} = getMousePos(canvas, event);
-        const direction = Math.atan2(y - currentState.player.y, x - currentState.player.x);
+        const direction = Math.atan2(y - gameState.player.y, x - gameState.player.x);
 
         const localX = GAME_CONSTANTS.PLAYER_VISUAL_WIDTH / 2;
         const localY = GAME_CONSTANTS.PLAYER_VISUAL_HEIGHT / 2;
@@ -37,17 +37,17 @@ function initCanvasListeners(canvas) {
         const rotatedX = localX * Math.cos(direction) - localY * Math.sin(direction);
         const rotatedY = localX * Math.sin(direction) + localY * Math.cos(direction);
 
-        const bulletStartX = currentState.player.x + rotatedX;
-        const bulletStartY = currentState.player.y + rotatedY;
+        const bulletStartX = gameState.player.x + rotatedX;
+        const bulletStartY = gameState.player.y + rotatedY;
 
-        createBullet(currentState, direction, bulletStartX, bulletStartY);
+        createBullet(gameState, direction, bulletStartX, bulletStartY);
     });
 
     canvas.addEventListener('mousemove', function (event) {
         const {x, y} = getMousePos(canvas, event);
 
-        currentState.player.mousePosition.x = x;
-        currentState.player.mousePosition.y = y;
+        gameState.player.mousePosition.x = x;
+        gameState.player.mousePosition.y = y;
     })
 }
 function getMousePos(canvas, event) {

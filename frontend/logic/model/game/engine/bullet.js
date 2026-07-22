@@ -1,4 +1,4 @@
-import {canvas} from "../../main.js";
+import {canvas} from "../../../main.js";
 import {GAME_CONSTANTS} from "../storage/gameConstants.js";
 
 export function getUpdatedBullets(elapsedTime, bullets) {

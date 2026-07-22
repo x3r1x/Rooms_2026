@@ -1,4 +1,4 @@
-import {keys} from '../../controller/listeners.js';
+import {keys} from '../../../controller/gameListeners.js';
 import {updateEnemies, updatePlayer} from "./players.js";
 import {getUpdatedBullets} from "./bullet.js";
 

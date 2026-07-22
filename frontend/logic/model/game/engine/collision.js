@@ -1,4 +1,4 @@
-import {layersForRoom, room} from "../storage/states.js";
+import {layersForRoom, room} from "../storage/gameState.js";
 import {PLAYER_LOCAL_POINTS} from "../storage/gameConstants.js";
 
 const TILE_NORMALS = [{x: 0, y: -1},

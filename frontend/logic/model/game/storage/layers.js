@@ -1,6 +1,6 @@
-import {layersForRoom, room} from "./states.js";
+import {layersForRoom, room} from "./gameState.js";
 
-export function parserMapData(dataJson) {
+export function parseMapData(dataJson) {
     layersForRoom.width = dataJson.width;
     layersForRoom.height = dataJson.height;
     dataJson.layers.forEach(layer => {
@@ -18,7 +18,7 @@ export function parserMapData(dataJson) {
     });
 }
 
-export function parserTileInfo(dataJson) {
+export function parseTileInfo(dataJson) {
     layersForRoom.tileSize = dataJson.tileheight;
     const tileArray = dataJson.tiles;
     tileArray.forEach(tile => {
@@ -26,13 +26,12 @@ export function parserTileInfo(dataJson) {
         tile.properties.forEach(p => {
             property[p.name] = JSON.parse(p.value);
         })
-        const tileInfo = {
+        layersForRoom.tilesInfo[tile.id] = {
             id: tile.id,
             blocksBullet: property.blocksBullet,
             blocksPlayer: property.blocksPlayer,
             hitboxes: property.hitbox,
         };
-        layersForRoom.tilesInfo[tile.id] = tileInfo;
     });
 }
 

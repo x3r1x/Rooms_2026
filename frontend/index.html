@@ -9,7 +9,18 @@
 </head>
 
 <body>
-    <div class="main-game" >
+    <div class="nickname" id="nicknameWindow">
+        <div class="nickname-field">
+            <h1>ROOMS</h1>
+            <h2>ENTER YOUR NICKNAME</h2>
+            <div class="get-nickname">
+                <input class="input-nickname" id="nicknameInput" type="text" name="username"  maxlength="10" required>
+                <button class="button-send-nickname" id="nicknameButton">CONNECT</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-game" id="mainGameWindow">
         <div class="game-info">
             <h1>ROOMS</h1>
             <div class="statistic">
@@ -18,7 +29,7 @@
                     <p class="player-stat-item is-me">
                         <span class="player-stat-name">${p.id}</span>
                         <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
-                    </p> 
+                    </p>
                     <p class="player-stat-item">
                         <span class="player-stat-name">${p.id}</span>
                         <span class="player-stat-hp">${hp=="kill" ? '' : 'HP:'} ${hp}</span>
@@ -128,7 +139,7 @@
                 <h1 class="death-title">YOU DIED</h1>
                 <p class="respawn-text">Respawn in: <span id="respawn-timer">5</span>s</p>
             </div>
-        
+
         </div>
     </div>
 
@@ -137,7 +148,6 @@
     <div class="screen-game-over" display="none">
 
     </div>
-</div>
 
 </body>
 </html>

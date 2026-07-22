@@ -1,6 +1,15 @@
 body {
     margin: 0;
     padding: 0;
+}
+
+.main-game {
+    display: none;
+    width: 100vw;
+    height: 100vh;
+    /*display: flex;*/
+    align-items: center;
+    justify-content: space-around;
 
     background-color: #1f2535;
 }
@@ -11,7 +20,7 @@ body {
     position: relative;
 }
 
-.screen-game{
+.screen-game {
     width: 100%;
     height: 100%;
     display: flex;
@@ -19,8 +28,7 @@ body {
     align-items: center;
 }
 
-
-.wrapper-game-stat{
+.wrapper-game-stat {
     width: 100%;
     height: 100%;
     display: flex;
@@ -29,13 +37,13 @@ body {
     align-items: center;
 }
 
-.block-game-stat{
+.block-game-stat {
     display: flex;
     flex-direction: column;
 }
 
 
-.block-game-stat{
+.block-game-stat {
     display: block;
     width: 70%;
     height: 50%;
@@ -43,7 +51,7 @@ body {
     border: 3px solid white;
 }
 
-.text{
+.text {
     font-weight: 700;
     font-size: 40px;
     color: #e0e0e0;
@@ -53,11 +61,11 @@ body {
 
     letter-spacing: 1px;
 }
-.name{
+
+.name {
     font-weight: 700;
     font-size: 40px;
     color: #e0e0e0;
-
     text-shadow: 0 0 5px #142788,
     0 0 10px #dbe5ff;
 
@@ -74,43 +82,35 @@ body {
     object-fit: contain;
 }
 
-.main-game{
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-}
-
 .game-info {
     width: 35%;
     height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 100%; 
+    height: 100%;
 }
 
 .game-info h1 {
     color: #ffffff;
-    font-size: 6vh;        
-           
+    font-size: 6vh;
+
 }
 
 .statistic {
     width: 100%;
     height: 100%;
-    border: 5px solid #ffffff;  
+    border: 5px solid #ffffff;
     border-radius: 15px;
-    display: flex;  
+    display: flex;
     flex-direction: column;
     align-items: center;
-    overflow-y: hidden; 
-    box-sizing: border-box 
+    overflow-y: hidden;
+    box-sizing: border-box
 }
 
 
-.statistic h2{
+.statistic h2 {
     color: #ffffff;
     font-size: 3vh;
     display: inline-block;
@@ -128,22 +128,26 @@ body {
     flex-direction: column;
     gap: 10px;
     overflow-y: auto;
-    overflow-x:hidden;
-    box-sizing: border-box 
+    overflow-x: hidden;
+    box-sizing: border-box
 }
+
 .players-list::-webkit-scrollbar {
     width: 10px;
-  }
-  .players-list::-webkit-scrollbar-track {
+}
+
+.players-list::-webkit-scrollbar-track {
     background: #f1f1f1;
-  }
-  .players-list::-webkit-scrollbar-thumb {
+}
+
+.players-list::-webkit-scrollbar-thumb {
     background: #f1f1f1;
     border-radius: 15px;
-  }
-  .players-list::-webkit-scrollbar-thumb:hover {
+}
+
+.players-list::-webkit-scrollbar-thumb:hover {
     background: #3e4f74;
-  }
+}
 
 .player-stat-item {
     display: flex;
@@ -171,7 +175,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(10, 22, 40, 0.85); 
+    background-color: rgba(10, 22, 40, 0.85);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -179,7 +183,7 @@ body {
 }
 
 .death-title {
-    color: #ff4444; 
+    color: #ff4444;
     font-size: 10vh;
     font-weight: bold;
     letter-spacing: 5px;
@@ -195,4 +199,89 @@ body {
     font-size: 6vh;
     font-weight: bold;
     color: #ffffff;
+}
+
+.nickname {
+    display: flex;
+    background-image: url('background.png');
+    background-size: cover;
+    background-position: center;
+    justify-content: center;
+    align-content: center;
+    min-height: 100vh;
+    min-width: 100vw;
+    flex-wrap: wrap;
+}
+
+.nickname-field{
+    width: 70%;
+    height: 50%;
+    border: 15px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-content: center;
+    background-color: #0d1f3c;
+
+    border:  10px solid #ffffff;
+    border-radius: 15px;
+    margin: 0;
+    padding: 0;
+    gap: 3vh;
+    align-items: center;
+}
+
+.nickname-field h1{
+    color: #ffffff;
+    font-size: 10vw;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+    font-weight: normal;
+    margin: 0;
+    padding: 0;
+    width: auto;
+    height: auto;
+    margin-top: 1vh;
+
+}
+
+.nickname-field h2{
+    color: #ffffff;
+    font-size: 4vw;
+    letter-spacing: 2px;
+    font-weight: normal;
+    margin: 0;
+    padding: 0;
+    width: fit-content;
+}
+
+.get-nickname{
+    display: flex;
+    flex-direction: column;
+    gap: 5vh;
+    margin: 0;
+    padding: 0;
+    gap: 3vh;
+    flex-wrap: wrap;
+    align-content: center;
+    margin-bottom: 1vh;
+}
+
+.input-nickname{
+    background-color: #183768;
+    border: 5px;
+    width: 60%;
+    font-size: 4vw;
+    border:  5px solid #ffffff;
+    color:#ffffff;
+    border-radius: 15px;
+}
+.button-send-nickname{
+    background-color: #001a2e;
+    border: 5px;
+    width: 60%;
+    font-size: 4vw;
+    color: #ffffff;
+    border:  5px solid #ffffff;
+    border-radius: 15px;
 }
