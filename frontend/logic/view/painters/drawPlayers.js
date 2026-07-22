@@ -1,5 +1,4 @@
 import {GAME_CONSTANTS, GAME_SPRITES} from "../../model/storage/gameConstants.js";
-import {keys} from '../../controller/listeners.js'
 export function drawPlayers(context, mainPlayer, enemies) {
     drawMainPlayer(context, mainPlayer);
 
@@ -24,6 +23,8 @@ function drawMainPlayer(context, player) {
         -GAME_CONSTANTS.PLAYER_VISUAL_WIDTH/2, -GAME_CONSTANTS.PLAYER_VISUAL_HEIGHT/2, GAME_CONSTANTS.PLAYER_VISUAL_WIDTH, GAME_CONSTANTS.PLAYER_VISUAL_HEIGHT
     );
     context.restore();
+    drawHealthBar(context, player);
+
 }
 
 function drawEnemy(context, enemy) {
@@ -44,4 +45,17 @@ function drawEnemy(context, enemy) {
         -GAME_CONSTANTS.PLAYER_VISUAL_WIDTH/2, -GAME_CONSTANTS.PLAYER_VISUAL_HEIGHT/2, GAME_CONSTANTS.PLAYER_VISUAL_WIDTH, GAME_CONSTANTS.PLAYER_VISUAL_HEIGHT
     );
     context.restore();
+    drawHealthBar(context, enemy);
+}
+
+function drawHealthBar(context, player){
+    const sprite = GAME_SPRITES.HEALTH_BAR;
+    const frameWidth = sprite.width / 11;
+    const scale = 0.8;
+    const frameHeight = sprite.height;
+    context.drawImage(
+        sprite,
+        frameWidth, 0, frameWidth, frameHeight,
+        player.x - (scale*frameWidth/2), player.y-(GAME_CONSTANTS.PLAYER_VISUAL_WIDTH), scale*frameWidth, scale*frameHeight
+    );
 }
