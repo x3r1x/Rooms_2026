@@ -1,4 +1,4 @@
-package models
+package model
 
 type Bullet struct {
 	Id        string  `json:"-"`

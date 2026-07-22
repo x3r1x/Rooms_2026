@@ -18,6 +18,8 @@ export const currentState = {
         didShoot: false,
         id: null,
         spriteIndex: 0,
+        hp: null,
+        rebornTime: null
     },
     enemies: [],
     bullets: [],

@@ -3,12 +3,17 @@ package websocket
 import (
 	"encoding/json"
 	"fmt"
-	"gamedevRooms/internal/models"
+	"gamedevRooms/internal/game"
+	"gamedevRooms/internal/model"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/websocket"
 )
+
+type WebsocketHandler struct {
+	gameLoop *game.GameLoop
+}
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
@@ -16,7 +21,11 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func InitWebsocket(w http.ResponseWriter, r *http.Request) {
+func NewWebsocketHandler(gl *game.GameLoop) *WebsocketHandler {
+	return &WebsocketHandler{gameLoop: gl}
+}
+
+func (wsh *WebsocketHandler) InitWebsocket(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
@@ -28,10 +37,10 @@ func InitWebsocket(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 	fmt.Println("New connection established.")
-	HandleWebsocket(conn)
+	wsh.HandleWebsocket(conn)
 }
 
-func HandleWebsocket(conn *websocket.Conn) {
+func (wsh *WebsocketHandler) HandleWebsocket(conn *websocket.Conn) {
 	var currentId string = ""
 	var isRegistered bool = false
 	for {
@@ -41,12 +50,12 @@ func HandleWebsocket(conn *websocket.Conn) {
 			break
 		}
 
-		var msg models.ClientMessage
+		var msg model.ClientMessage
 		if err := json.Unmarshal(p, &msg); err != nil {
 			log.Println("Ошибка сериализации при чтении пакета: ", err)
 			if isRegistered {
 				log.Println("Удаляем пользователя: ", msg.Id)
-				models.Game.LeaveChan <- msg.Id
+				wsh.gameLoop.DeletePlayer(msg.Id)
 			}
 			continue
 		}
@@ -55,26 +64,27 @@ func HandleWebsocket(conn *websocket.Conn) {
 			isRegistered = true
 			currentId = msg.Id
 			fmt.Println("Регистрация пользователя")
-			models.Game.RegisterChan <- models.PlayerState{
+			wsh.gameLoop.RegisterPlayer(&model.PlayerState{
 				Id:         msg.Id,
-				X:          models.PlayerSpawnPointX,
-				Y:          models.PlayerSpawnPointY,
-				A:          models.InitDirection,
-				MoveX:      models.InitDirection,
-				MoveY:      models.InitDirection,
+				Health:     model.MaxPlayerHealth,
+				X:          model.PlayerSpawnPointX,
+				Y:          model.PlayerSpawnPointY,
+				Angle:      model.InitDirection,
+				MoveX:      model.InitDirection,
+				MoveY:      model.InitDirection,
 				Connection: conn,
-			}
+			})
 		} else if currentId != "" {
-			models.Game.InputChan <- models.ClientMessage{
-				Id: msg.Id,
-				MX: msg.MX,
-				MY: msg.MY,
-				A:  msg.A,
-				S:  msg.S,
-			}
+			wsh.gameLoop.UpdatePlayer(model.ClientMessage{
+				Id:      msg.Id,
+				MX:      msg.MX,
+				MY:      msg.MY,
+				Angle:   msg.Angle,
+				IsShoot: msg.IsShoot,
+			})
 		}
 	}
 	if currentId != "" {
-		models.Game.LeaveChan <- currentId
+		wsh.gameLoop.DeletePlayer(currentId)
 	}
 }
