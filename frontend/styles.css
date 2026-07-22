@@ -25,7 +25,7 @@ body {
     justify-content: center;
 }
 
-.start-game {
+.start-game, .restart-game {
     font-size: 7vh;
     font-weight: bold;
     color: #1c1e6e;
@@ -43,7 +43,7 @@ body {
     align-items: center;
 }
 
-.main-game, .wrapper-lobby{
+.main-game, .wrapper-lobby, .screen-game-over{
     height: 100vh;
     display: flex;
     align-items: center;
@@ -59,7 +59,7 @@ body {
     object-fit: contain;
 }
 
-.game-info, .lobby-info{
+.game-info, .lobby-info, .result-info{
     width: 40%;
     height: 90%;
     display: flex;
@@ -67,14 +67,14 @@ body {
     align-items: center;
 }
 
-.game-info h1, .lobby-info h1 {
+.game-info h1, .lobby-info h1, .result-info h1{
     color: #ffffff;
     font-size: 6vh;  
     text-shadow: 0 0 5px rgb(8, 8, 44), 0 0 10px #07182e, 0 0 15px #271977, 0 0 20px #3f37ac;      
            
 }
 
-.statistic, .lobby-status {
+.statistic, .lobby-status, .result-status{
     width: 80%;
     height: 80%;
     border: 5px solid #ffffff;  
@@ -86,7 +86,7 @@ body {
     box-sizing: border-box 
 }
 
-.wrapper-start-game {
+.wrapper-start-game, .wrapper-game-over-message{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -97,7 +97,7 @@ body {
     background-image: url('background.png');
 }
 
-.statistic h2, .lobby-status h2{
+.statistic h2, .lobby-status h2, .result-status h2{
     color: #ffffff;
     font-size: 3vh;
     display: inline-block;
@@ -108,7 +108,7 @@ body {
     text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #1900ff, 0 0 30px #0084ff;
 }
 
-.players-list {
+.players-list, .result-list{
     width: 100%;
     padding: 0;
     margin: 0;
