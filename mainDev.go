@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"gamedevRooms/internal/game"
+	"gamedevRooms/internal/lobby"
 	"gamedevRooms/internal/websocket"
 	"log"
 	"net/http"
@@ -12,15 +12,9 @@ import (
 //var frontendFs embed.FS
 
 func main() {
-	gameState := game.NewGameState()
+	lobby := lobby.NewLobby()
 
-	//mapManager := game.NewMapManager(gameState)
-	//_ = mapManager
-
-	gameLoop := game.NewGameLoop(gameState)
-	go gameLoop.Run()
-
-	wsHandler := websocket.NewWebsocketHandler(gameLoop)
+	wsHandler := websocket.NewWebsocketHandler(lobby)
 	http.HandleFunc("/ws", wsHandler.InitWebsocket)
 
 	//staticFiles, err := fs.Sub(frontendFs, "frontend")

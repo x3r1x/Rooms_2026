@@ -14,7 +14,7 @@ func NewCollisionService(state *GameState) *CollisionService {
 	return &CollisionService{state: state}
 }
 
-func (cs *CollisionService) CheckBulletCollision(bullet model.Bullet) (bool, *model.PlayerState, *model.Object) {
+func (cs *CollisionService) CheckBulletCollision(bullet model.Bullet) (bool, *model.PlayerGameState, *model.Object) {
 	bulletSAT := cs.buildBulletSAT(bullet)
 
 	for _, player := range cs.state.GetAllPlayers() {
@@ -39,7 +39,7 @@ func (cs *CollisionService) CheckBulletCollision(bullet model.Bullet) (bool, *mo
 	return false, nil, nil
 }
 
-func (cs *CollisionService) CheckPlayerObjectCollision(player *model.PlayerState) (bool, *model.Object) {
+func (cs *CollisionService) CheckPlayerObjectCollision(player *model.PlayerGameState) (bool, *model.Object) {
 	playerSAT := cs.buildPlayerSAT(player)
 
 	for _, object := range cs.state.GetObjects() {
@@ -63,7 +63,7 @@ func (cs *CollisionService) buildBulletSAT(bullet model.Bullet) collision.SATBox
 	}
 }
 
-func (cs *CollisionService) buildPlayerSAT(player *model.PlayerState) collision.SATBox {
+func (cs *CollisionService) buildPlayerSAT(player *model.PlayerGameState) collision.SATBox {
 	points := collision.GetPlayerPoints(player.X, player.Y, player.Angle)
 	normals := collision.GetNormals(points)
 	return collision.SATBox{
@@ -97,7 +97,7 @@ func (cs *CollisionService) buildObjectSAT(obj *model.Object) collision.SATBox {
 //	}
 //}
 
-func (cs *CollisionService) HandlePlayerHit(player *model.PlayerState, bullet model.Bullet) {
+func (cs *CollisionService) HandlePlayerHit(player *model.PlayerGameState, bullet model.Bullet) {
 	if player == nil {
 		return
 	}

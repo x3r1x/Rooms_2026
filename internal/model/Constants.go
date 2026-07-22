@@ -44,7 +44,7 @@ const (
 	BottomMarker                 = "bottom"
 	RightMarker                  = "right"
 	ConnectNeighbouredRoomChance = 0.4
-
+	// константы для лобби
 	WaitingLobbyState   = "w"
 	ReadyLobbyState     = "r"
 	CountdownLobbyState = "c"

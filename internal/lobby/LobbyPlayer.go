@@ -1,4 +1,4 @@
-package Lobby
+package lobby
 
 import (
 	"github.com/google/uuid"

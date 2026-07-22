@@ -3,7 +3,7 @@ package websocket
 import (
 	"encoding/json"
 	"fmt"
-	"gamedevRooms/internal/Lobby"
+	"gamedevRooms/internal/lobby"
 	"gamedevRooms/internal/model"
 	"log"
 	"net/http"
@@ -12,7 +12,7 @@ import (
 )
 
 type WebsocketHandler struct {
-	lobby *Lobby.Lobby
+	lobby *lobby.Lobby
 }
 
 var upgrader = websocket.Upgrader{
@@ -21,7 +21,7 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func NewWebsocketHandler(l *Lobby.Lobby) *WebsocketHandler {
+func NewWebsocketHandler(l *lobby.Lobby) *WebsocketHandler {
 	return &WebsocketHandler{
 		lobby: l,
 	}
@@ -54,18 +54,18 @@ func (wsh *WebsocketHandler) HandleWebsocket(conn *websocket.Conn) {
 
 		switch wsh.lobby.GetState() {
 		case model.WaitingLobbyState:
-			wsh.handleWaitingLobbyState(p, &currentId)
+			wsh.handleWaitingLobbyState(p, currentId)
 		case model.OngoingGameState:
 			wsh.handleOngoingGameState(p)
 		}
 	}
 }
 
-func (wsh *WebsocketHandler) handleWaitingLobbyState(p []byte, id *string) {
+func (wsh *WebsocketHandler) handleWaitingLobbyState(p []byte, id string) {
 	var registerMsg model.ClientRegisterMessage
 
 	if err := json.Unmarshal(p, &registerMsg); err == nil {
-		*id = wsh.lobby.AddUser(registerMsg.Nickname)
+		id = wsh.lobby.AddUser(registerMsg.Nickname)
 		return
 	}
 
@@ -83,9 +83,9 @@ func (wsh *WebsocketHandler) handleWaitingLobbyState(p []byte, id *string) {
 
 	log.Println("Ошибка сериализации в waitingLobbyState!")
 
-	if *id != "" {
-		log.Println("Удаляем пользователя: ", *id)
-		wsh.lobby.RemoveUser(*id)
+	if id != "" {
+		log.Println("Удаляем пользователя: ", id)
+		wsh.lobby.RemoveUser(id)
 	}
 }
 
