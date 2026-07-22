@@ -50,15 +50,15 @@ func (mm *MapManager) loadMapObjects() {
 				col := i % model.RoomWidth
 
 				obj := &model.Object{
-					Id:            uuid.New().String(),
-					X:             float64(col) * mm.tileSize,
-					Y:             float64(row) * mm.tileSize,
-					Width:         mm.tileSize,
-					Height:        mm.tileSize,
-					IsSolid:       true,
-					IsDestroyable: false,
-					Health:        0,
-					Type:          "wall",
+					Id:      uuid.New().String(),
+					X:       float64(col) * mm.tileSize,
+					Y:       float64(row) * mm.tileSize,
+					Width:   mm.tileSize,
+					Height:  mm.tileSize,
+					IsSolid: true,
+					//IsDestroyable: false,
+					//Health:        0,
+					Type: "wall",
 				}
 				objects[obj.Id] = obj
 			}
