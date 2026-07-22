@@ -9,7 +9,18 @@
 </head>
 
 <body>
-    <div class="main-game" >
+    <div class="wrapper-nickname" >
+        <div class="nickname-field">
+            <h1>ROOMS</h1>
+            <h2>ENTER YOUR NICKNAME</h2>
+            <form class="get-nickname">
+                <input class="input-nickname" type="text" name="username"  maxlength="10" required>
+                <button class="button-send-nickname"type="submit">CONNECT</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="main-game" style="display: none">
         <div class="game-info">
             <h1>ROOMS</h1>
             <div class="statistic">
@@ -20,7 +31,7 @@
             </div>
             <div class="wrapper-canvas">
                 <canvas id="canvas" class="main__canvas"></canvas>
-                <div id="death-screen" class="death-screen">
+                <div id="death-screen" class="death-screen" style="display: none">
                     <h1 class="death-title">YOU DIED</h1>
                     <p class="respawn-text">Respawn in: <span id="respawn-timer">5</span>s</p>
                 </div>

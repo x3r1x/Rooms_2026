@@ -8,7 +8,9 @@ export function initListeners(canvas) {
     initWindowListeners()
     initCanvasListeners(canvas);
 
-    canvas.addEventListener('resize', resizeCanvas)
+    resizeCanvas(canvas);
+    
+    window.addEventListener('resize', () => resizeCanvas(canvas));
 }
 
 function initWindowListeners() {
@@ -22,24 +24,11 @@ function initWindowListeners() {
 }
 
 export function resizeCanvas(canvas) {
-    const BASE_WIDTH = 900;
-    const BASE_HEIGHT = 756;
-    const container = canvas.parentElement;
-    const containerWidth = container.clientWidth;
-    const containerHeight = container.clientHeight;
-
-    const aspect = BASE_WIDTH / BASE_HEIGHT;
-    let newWidth = containerWidth;
-    let newHeight = containerWidth / aspect;
-
-    if (newHeight > containerHeight) {
-        newHeight = containerHeight;
-        newWidth = containerHeight * aspect;
-    }
-    canvas.width = BASE_WIDTH;
-    canvas.height = BASE_HEIGHT;
-    canvas.style.width = `${newWidth}px`;
-    canvas.style.height = `${newHeight}px`;
+    canvas.width = 900;
+    canvas.height = 756;
+    
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
 }
 
 function initCanvasListeners(canvas) {

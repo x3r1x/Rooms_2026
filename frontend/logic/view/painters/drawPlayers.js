@@ -7,10 +7,11 @@ export function drawPlayers(context, mainPlayer, enemies) {
 
 function drawMainPlayer(context, player) {
     const deathScreen = document.getElementById("death-screen");
+    const respawnTimer = document.getElementById("respawn-timer");
     const spriteSheet = GAME_SPRITES.PLAYER_GOES;
     const frameWidth = spriteSheet.width / 6;
     const frameHeight = spriteSheet.height;
-    if (player.hp > 0){
+    if (player.hp > 0 ){
         deathScreen.style.display = "none"
     if (player.movementDirection.x !== 0 || player.movementDirection.y !== 0) {
         player.spriteIndex = Math.floor(Date.now() / 200) % 6;
@@ -28,8 +29,13 @@ function drawMainPlayer(context, player) {
     context.restore();
     drawHealthBar(context, player);
     } else {
-        deathScreen.style.display = "flex";
+        if (player.hp != null){
+            deathScreen.style.display = "flex";
+            console.log(player.rebornTime);
+            respawnTimer.textContent = Math.floor(player.rebornTime/50);
     }
+        }
+        
     
 
 }
@@ -70,20 +76,4 @@ function drawHealthBar(context, player){
         player.x - (scale*frameWidth/2), player.y-(GAME_CONSTANTS.PLAYER_VISUAL_WIDTH), scale*frameWidth, scale*frameHeight
     );
     
-}
-
-function drawDeathScreen(context, player){
-    const size = GAME_CONSTANTS.PLAYER_VISUAL_SIZE;
-    const deathScreen = document.getElementById("death-screen");
-    deathScreen.style.display = "block";
-    if (player.hp > 0){
-        deathScreen.style.display = "none";
-        context.save();
-        context.translate(player.x, player.y);
-        context.rotate(player.direction);
-        context.drawImage(sprite, -size / 2, -size / 2, size, size);
-        context.restore();
-    } else {
-        
-    }
 }
