@@ -13,6 +13,7 @@ const (
 	PlayerSpawnPointX = 500
 	PlayerSpawnPointY = 500
 	InitDirection     = 0
+	InitValue         = 0
 	PlayerVisualSize  = 40.0
 	PlayerSpeed       = 0.2
 	MaxPlayerHealth   = 100
@@ -20,7 +21,7 @@ const (
 	// константы общие служебные
 	TickTime                     = 16
 	GameDuration                 = 60
-	MaxCountOfPlayers            = 5
+	MaxCountOfPlayers            = 2
 	MinCountOfPlayers            = 2
 	MinBarrierType               = 1
 	MaxBarrierType               = 7
