@@ -6,10 +6,12 @@ export function drawPlayers(context, mainPlayer, enemies) {
 }
 
 function drawMainPlayer(context, player) {
+    const deathScreen = document.getElementById("death-screen");
     const spriteSheet = GAME_SPRITES.PLAYER_GOES;
     const frameWidth = spriteSheet.width / 6;
     const frameHeight = spriteSheet.height;
-    if (enemy.hp > 0){
+    if (player.hp > 0){
+        deathScreen.style.display = "none"
     if (player.movementDirection.x !== 0 || player.movementDirection.y !== 0) {
         player.spriteIndex = Math.floor(Date.now() / 200) % 6;
     } else {
@@ -24,8 +26,11 @@ function drawMainPlayer(context, player) {
         -GAME_CONSTANTS.PLAYER_VISUAL_WIDTH/2, -GAME_CONSTANTS.PLAYER_VISUAL_HEIGHT/2, GAME_CONSTANTS.PLAYER_VISUAL_WIDTH, GAME_CONSTANTS.PLAYER_VISUAL_HEIGHT
     );
     context.restore();
-    }
     drawHealthBar(context, player);
+    } else {
+        deathScreen.style.display = "flex";
+    }
+    
 
 }
 
@@ -48,8 +53,9 @@ function drawEnemy(context, enemy) {
         -GAME_CONSTANTS.PLAYER_VISUAL_WIDTH/2, -GAME_CONSTANTS.PLAYER_VISUAL_HEIGHT/2, GAME_CONSTANTS.PLAYER_VISUAL_WIDTH, GAME_CONSTANTS.PLAYER_VISUAL_HEIGHT
     );
     context.restore();
-}
     drawHealthBar(context, enemy);
+}
+    
 }
 
 function drawHealthBar(context, player){
@@ -57,13 +63,19 @@ function drawHealthBar(context, player){
     const frameWidth = sprite.width / 11;
     const scale = 0.8;
     const frameHeight = sprite.height;
+    player.hpSpriteIndex = 10 - Math.floor(player.hp/10);
     context.drawImage(
         sprite,
-        frameWidth, 0, frameWidth, frameHeight,
+        player.hpSpriteIndex * frameWidth, 0, frameWidth, frameHeight,
         player.x - (scale*frameWidth/2), player.y-(GAME_CONSTANTS.PLAYER_VISUAL_WIDTH), scale*frameWidth, scale*frameHeight
     );
+    
+}
+
+function drawDeathScreen(context, player){
     const size = GAME_CONSTANTS.PLAYER_VISUAL_SIZE;
     const deathScreen = document.getElementById("death-screen");
+    deathScreen.style.display = "block";
     if (player.hp > 0){
         deathScreen.style.display = "none";
         context.save();
@@ -72,7 +84,6 @@ function drawHealthBar(context, player){
         context.drawImage(sprite, -size / 2, -size / 2, size, size);
         context.restore();
     } else {
-        deathScreen.style.display = "absolute";
+        
     }
-    
 }

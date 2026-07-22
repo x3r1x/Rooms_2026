@@ -22,8 +22,24 @@ function initWindowListeners() {
 }
 
 export function resizeCanvas(canvas) {
-    canvas.width = 900;
-    canvas.height = 756;
+    const BASE_WIDTH = 900;
+    const BASE_HEIGHT = 756;
+    const container = canvas.parentElement;
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+
+    const aspect = BASE_WIDTH / BASE_HEIGHT;
+    let newWidth = containerWidth;
+    let newHeight = containerWidth / aspect;
+
+    if (newHeight > containerHeight) {
+        newHeight = containerHeight;
+        newWidth = containerHeight * aspect;
+    }
+    canvas.width = BASE_WIDTH;
+    canvas.height = BASE_HEIGHT;
+    canvas.style.width = `${newWidth}px`;
+    canvas.style.height = `${newHeight}px`;
 }
 
 function initCanvasListeners(canvas) {

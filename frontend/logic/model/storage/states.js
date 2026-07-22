@@ -18,6 +18,7 @@ export const currentState = {
         didShoot: false,
         id: null,
         spriteIndex: 0,
+        hpSpriteIndex: 0,
         hp: null,
         rebornTime: null
     },
