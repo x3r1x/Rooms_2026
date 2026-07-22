@@ -27,6 +27,7 @@ export function initGameState(playerId) {
             didShoot: false,
             id: playerId,
             spriteIndex: 0,
+            hpSpriteIndex: 0,
             hp: null,
             rebornTime: null
         },

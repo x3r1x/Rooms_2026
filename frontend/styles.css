@@ -5,9 +5,9 @@ body {
     background-color: #1f2535;
 }
 
-.wrapper-nickname{
+.wrapper-nickname {
     display: flex;
-    background-image: url('background.png');
+    background-image: url('../assets/images/background.png');
     background-size: cover;        
     background-position: center; 
     justify-content: center;
@@ -16,6 +16,11 @@ body {
     flex-wrap: wrap;
 }
 
+.wrapper-lobby, .main-game, .screen-game-over {
+    height: 100vh;
+    align-items: center;
+    justify-content: space-around;
+}
 
 .wrapper-canvas{
     width: 100%;
@@ -41,13 +46,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.main-game, .wrapper-lobby, .screen-game-over{
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
 }
 
 .main__canvas {
@@ -94,7 +92,7 @@ body {
     height: 80%;
     border: 5px solid#ffffff; 
     border-radius: 15px;
-    background-image: url('background.png');
+    background-image: url('../assets/images/background.png');
 }
 
 .statistic h2, .lobby-status h2, .result-status h2{
