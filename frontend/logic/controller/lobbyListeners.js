@@ -1,11 +1,12 @@
 import {sendReadyState} from "../model/di/messages/clientMessages.js";
+import {updateReadyText} from "../view/app/lobbyView.js";
+
+let isReady = false;
 
 export function initLobbyListeners(socket) {
-    let isReady = false;
-
     document.getElementById("readyButton").onclick = () => {
         isReady = !isReady;
+        updateReadyText(isReady);
         sendReadyState(socket, isReady);
-        console.log("Send!");
     }
 }

@@ -106,6 +106,25 @@ body {
     text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #1900ff, 0 0 30px #0084ff;
 }
 
+.lobby-list {
+    display: flex;
+    flex-direction: column;
+    width: 98%;
+    margin-top: 5px;
+    gap: 5px;
+}
+
+.lobby-list-element {
+    display: inline-block;
+    padding: 15px;
+    border: 5px solid #fff;
+    margin: 0;
+    font-size: 3vh;
+    color: #fff;
+    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #1900ff, 0 0 30px #0084ff;
+    border-radius: 20px;
+}
+
 .players-list, .result-list{
     width: 100%;
     padding: 0;

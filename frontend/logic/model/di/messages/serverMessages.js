@@ -1,4 +1,6 @@
 import {initGameState} from "../../game/storage/gameState.js";
+import {updateStatisticView} from "../../../view/app/statisticsView.js";
+import {updateLobbyView} from "../../../view/app/lobbyView.js";
 
 export function processWaitingMessage(parsedMessage, lobbyState) {
     if (!parsedMessage.oId || !parsedMessage.p) {
@@ -8,6 +10,9 @@ export function processWaitingMessage(parsedMessage, lobbyState) {
 
     lobbyState.clientId = parsedMessage.oId;
     lobbyState.players = parsedMessage.p;
+    lobbyState.players.sort((player1, player2) => player1.n.localeCompare(player2.n))
+
+    updateLobbyView(lobbyState.clientId, lobbyState.players);
 }
 
 export function processReadyMessage(parsedMessage, lobbyState, gameState) {
@@ -41,7 +46,7 @@ export function processGameAssignment(parsedMessage, gameState) {
     gameState.bullets = [];
     parsedMessage.b.forEach((bullet) => processBullet(bullet, gameState));
 
-    updatePlayersStatistic(gameState);
+    updateStatisticView(gameState);
     gameState.didShoot = false;
 }
 
@@ -74,25 +79,4 @@ function processBullet(bullet, state) {
         direction: bullet.a,
         ownerId: bullet.oId
     })
-}
-
-function updatePlayersStatistic(state) {
-    const listElement = document.getElementById("players-list");
-
-
-    const allPlayers = [state.player, ...state.enemies];
-
-    listElement.innerHTML = allPlayers.map(p => {
-        const isMe = p.id === state.player.id;
-        let hp = p.hp;
-        if (hp <= 0){
-            hp = "kill"
-        }
-        return `
-            <p class="player-stat-item ${isMe ? 'is-me' : ''}">
-                <span class="player-stat-name">${p.id}</span>
-                <span class="player-stat-hp">${hp==="kill" ? '' : 'HP:'} ${hp}</span>
-            </p>
-        `;
-    }).join('');
 }
