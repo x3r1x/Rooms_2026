@@ -1,4 +1,4 @@
-import {layersForRoom, room} from "../storage/gameState.js";
+import {gameMap, layersForRoom, room} from "../storage/gameState.js";
 import {PLAYER_LOCAL_POINTS} from "../storage/gameConstants.js";
 
 const TILE_NORMALS = [{x: 0, y: -1},
@@ -7,23 +7,23 @@ const TILE_NORMALS = [{x: 0, y: -1},
     {x: -1, y: 0}];
 
 export function canMoveTo(nextPosition, player) {
-    const personPoints = getPlayerPoints(nextPosition, player.direction);
-    const personNormals = getPlayerNormals(personPoints);
-    const personSAT = {points: personPoints, normals: personNormals};
+     const personPoints = getPlayerPoints(nextPosition, player.direction);
+     const personNormals = getPlayerNormals(personPoints);
+     const personSAT = {points: personPoints, normals: personNormals};
+     const nearby = getNearbyTiles(nextPosition.x, nextPosition.y, gameMap[0]);
+     for (const tile of nearby) {
+         const tileInfo = layersForRoom.tilesInfo[tile.tileId];
+         if (!tileInfo.blocksPlayer) continue;
 
-    const nearby = getNearbyTiles(nextPosition.x, nextPosition.y, room);
-    for (const tile of nearby) {
-        const tileInfo = layersForRoom.tilesInfo[tile.tileId];
-        if (!tileInfo.blocksPlayer) continue;
-
-        for (const hitbox of tileInfo.hitboxes) {
-            const tilePoints = getTileWorldPoints(tile.x, tile.y, hitbox);
-            const tileSAT = {points: tilePoints, normals: TILE_NORMALS};
-            if (checkCollisionSAT(personSAT, tileSAT)) {
-                return false;
-            }
-        }
-    }
+         for (const hitbox of tileInfo.hitboxes) {
+             const tilePoints = getTileWorldPoints(tile.x, tile.y, hitbox);
+             const tileSAT = {points: tilePoints, normals: TILE_NORMALS};
+             if (checkCollisionSAT(personSAT, tileSAT)) {
+                 console.log('COLLISIONS:', tileSAT);
+                 return false;
+             }
+         }
+     }
 
     return true;
 }
@@ -101,7 +101,6 @@ function isOverlapping(projection1, projection2) {
 function getNearbyTiles(x, y, mapData) {
     const center = getTileAtPosition(x, y);
     const map = mapData.collision;
-    console.log(mapData);
     const mapWidth = layersForRoom.width;
     const mapHeight = layersForRoom.height;
     const nearby = [];
