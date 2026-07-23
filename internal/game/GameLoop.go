@@ -163,7 +163,6 @@ func (gl *GameLoop) updateBullets() {
 		bullet.Y += math.Sin(bullet.Direction) * model.MaxBulletSpeed
 
 		if bullet.Life > 0 {
-			// ИСПРАВЛЕНИЕ: Сохраняем объект, в который попала пуля
 			hit, player, obj := gl.collisionService.CheckBulletCollision(bullet)
 			if hit {
 				if player != nil && player.Health > 0 {
@@ -201,31 +200,22 @@ func (gl *GameLoop) updatePlayers() {
 		deltaX := moveX * model.TickTime * model.PlayerSpeed
 		deltaY := moveY * model.TickTime * model.PlayerSpeed
 
-		// ВАЖНО: Сначала пытаемся двигаться по X, потом по Y
-		// Это предотвращает "залипание" в стенах
-
-		// Шаг 1: Движение по X
 		nextX := player.X + deltaX
 		player.X = nextX
 		if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
-			// Если коллизия - откатываем X
 			player.X -= deltaX
 		}
 
-		// Шаг 2: Движение по Y
 		nextY := player.Y + deltaY
 		player.Y = nextY
 		if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
-			// Если коллизия - откатываем Y
 			player.Y -= deltaY
 		}
 
-		// Шаг 3: Финальная проверка и выталкивание
 		if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
 			gl.collisionService.ResolvePlayerCollisionSmooth(player)
 		}
 
-		// Шаг 4: Проверка перехода между комнатами
 		if hit, direction, targetRoomId := gl.collisionService.CheckPlayerExitCollision(player); hit {
 			gl.handleRoomTransition(player, direction, targetRoomId)
 		}
