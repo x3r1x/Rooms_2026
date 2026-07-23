@@ -1,15 +1,16 @@
-import {gameState} from "../../game/storage/gameState.js";
+import {finalStatistics, gameNicknames, gameState, setFinalStatistics} from "../../game/storage/gameState.js";
 import {registerClient, sendGameInfo} from "../messages/clientMessages.js";
 import {
-    processWaitingMessage,
-    processReadyMessage,
+    processCountdownMessage,
     processGameAssignment,
-    processCountdownMessage
+    processReadyMessage,
+    processWaitingMessage
 } from "../messages/serverMessages.js";
 import {APP_STATES} from "../../app/appConstants.js";
 import {
     lobbyState,
     switchToCountdownAppState,
+    switchToEndedGameState,
     switchToOngoingGameState,
     switchToWaitingAppState
 } from "../../app/appState.js";
@@ -44,12 +45,12 @@ export function parseMessage(socket, message) {
             break;
 
         case APP_STATES.READY:
-            switchToCountdownAppState(parsedMessage.c)
+            switchToCountdownAppState(parsedMessage.c, lobbyState, gameNicknames)
             processReadyMessage(parsedMessage, lobbyState, gameState);
             break;
 
         case APP_STATES.COUNTDOWN:
-            switchToCountdownAppState(parsedMessage.c)
+            switchToCountdownAppState(parsedMessage.c, lobbyState, gameNicknames)
             processCountdownMessage(parsedMessage, lobbyState);
             break;
 
@@ -58,11 +59,17 @@ export function parseMessage(socket, message) {
             sendGameInfo(socket, gameState);
 
             if (parsedMessage.type === "a") {
-                processGameAssignment(parsedMessage, gameState);
+                processGameAssignment(parsedMessage, gameState, gameNicknames);
             } else {
                 console.log(`Packet loss: ${parsedMessage.type}!`);
             }
             break;
+
+        case APP_STATES.GAME_END:
+            setFinalStatistics(parsedMessage.r);
+            switchToEndedGameState(socket, gameState.player.id, finalStatistics);
+            break;
+
         default:
             console.log(`Непонятный state - ${parsedMessage.s}`);
     }

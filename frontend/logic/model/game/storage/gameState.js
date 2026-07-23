@@ -1,6 +1,8 @@
 import {GAME_CONSTANTS} from "./gameConstants.js";
 
 export let gameState = null;
+export let gameNicknames = {};
+export let finalStatistics = null;
 
 export function initGameState(playerId) {
     gameState = {
@@ -64,4 +66,9 @@ export const layersForRoom = {
     flap: [],
     objects: [],
     tilesInfo: [],
+}
+
+export function setFinalStatistics(statistic) {
+    finalStatistics = statistic;
+    finalStatistics.sort((player1, player2) => player2.k - player1.k);
 }

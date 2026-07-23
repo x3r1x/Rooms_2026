@@ -4,5 +4,5 @@ export const APP_STATES = {
     READY: "r",
     COUNTDOWN: "c",
     GAME_ONGOING: "o",
-    GAME_END: "e"
+    GAME_END: "f"
 }

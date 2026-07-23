@@ -41,14 +41,14 @@ export function processCountdownMessage(parsedMessage, lobbyState) {
     changeCountdownTimer(lobbyState.countdown);
 }
 
-export function processGameAssignment(parsedMessage, gameState) {
+export function processGameAssignment(parsedMessage, gameState, gameNicknames) {
     gameState.enemies = [];
     parsedMessage.p.forEach((player) => processPlayer(player, gameState));
 
     gameState.bullets = [];
     parsedMessage.b.forEach((bullet) => processBullet(bullet, gameState));
 
-    updateStatisticView(gameState);
+    updateStatisticView(gameState, gameNicknames);
     gameState.didShoot = false;
 }
 
