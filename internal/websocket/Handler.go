@@ -77,7 +77,7 @@ func (wsh *WebsocketHandler) handleWaitingLobbyState(p []byte, id string, conn *
 	var readyMsg model.ClientReadyStateMessage
 
 	if err := json.Unmarshal(p, &readyMsg); err == nil && id != "" {
-		wsh.lobby.UpdatePlayerInLobby(&lobby.LobbyPlayer{
+		wsh.lobby.UpdatePlayerInLobby(&model.LobbyPlayer{
 			Id:    id,
 			Ready: readyMsg.Ready,
 		})

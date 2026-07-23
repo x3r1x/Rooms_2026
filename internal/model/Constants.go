@@ -48,5 +48,5 @@ const (
 	ReadyLobbyState     = "r"
 	CountdownLobbyState = "c"
 	OngoingGameState    = "o"
-	EndedGameState      = "e"
+	FinalGameState      = "f"
 )
