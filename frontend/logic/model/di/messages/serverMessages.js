@@ -1,6 +1,7 @@
 import {initGameState} from "../../game/storage/gameState.js";
 import {updateStatisticView} from "../../../view/app/statisticsView.js";
 import {updateLobbyView} from "../../../view/app/lobbyView.js";
+import {changeCountdownTimer} from "../../../view/app/countdownView.js";
 
 export function processWaitingMessage(parsedMessage, lobbyState) {
     if (!parsedMessage.oId || !parsedMessage.p) {
@@ -16,7 +17,7 @@ export function processWaitingMessage(parsedMessage, lobbyState) {
 }
 
 export function processReadyMessage(parsedMessage, lobbyState, gameState) {
-    if (!parsedMessage.c || !parsedMessage.map) {
+    if (!parsedMessage.c || !parsedMessage.m) {
         console.log(`Не получены некоторые поля! ${parsedMessage}`);
         return;
     }
@@ -37,6 +38,7 @@ export function processCountdownMessage(parsedMessage, lobbyState) {
     }
 
     lobbyState.countdown = parsedMessage.c;
+    changeCountdownTimer(lobbyState.countdown);
 }
 
 export function processGameAssignment(parsedMessage, gameState) {

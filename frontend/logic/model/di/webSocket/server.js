@@ -1,4 +1,4 @@
-import {gameState, lobbyState} from "../../game/storage/gameState.js";
+import {gameState} from "../../game/storage/gameState.js";
 import {registerClient, sendGameInfo} from "../messages/clientMessages.js";
 import {
     processWaitingMessage,
@@ -7,7 +7,12 @@ import {
     processCountdownMessage
 } from "../messages/serverMessages.js";
 import {APP_STATES} from "../../app/appConstants.js";
-import {appState, switchToWaitingAppState} from "../../app/appState.js";
+import {
+    lobbyState,
+    switchToCountdownAppState,
+    switchToOngoingGameState,
+    switchToWaitingAppState
+} from "../../app/appState.js";
 
 export function getSocket(nickname) {
     const socket = new WebSocket("ws://84.201.159.214:8080/ws");
@@ -30,6 +35,7 @@ export function getSocket(nickname) {
 
 export function parseMessage(socket, message) {
     let parsedMessage = JSON.parse(message);
+    console.log(parsedMessage);
 
     switch (parsedMessage.s) {
         case APP_STATES.WAITING:
@@ -38,17 +44,17 @@ export function parseMessage(socket, message) {
             break;
 
         case APP_STATES.READY:
-            appState = APP_STATES.COUNTDOWN;
+            switchToCountdownAppState(parsedMessage.c)
             processReadyMessage(parsedMessage, lobbyState, gameState);
             break;
 
         case APP_STATES.COUNTDOWN:
-            appState = APP_STATES.COUNTDOWN;
+            switchToCountdownAppState(parsedMessage.c)
             processCountdownMessage(parsedMessage, lobbyState);
             break;
 
         case APP_STATES.GAME_ONGOING:
-            appState = APP_STATES.GAME_ONGOING;
+            switchToOngoingGameState();
             sendGameInfo(socket, gameState);
 
             if (parsedMessage.type === "a") {

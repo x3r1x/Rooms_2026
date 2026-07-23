@@ -1,11 +1,5 @@
 import {GAME_CONSTANTS} from "./gameConstants.js";
 
-export const lobbyState = {
-    clientId: null,
-    players: {},
-    countdown: null
-}
-
 export let gameState = null;
 
 export function initGameState(playerId) {
@@ -40,13 +34,12 @@ export function initGameState(playerId) {
     }
 }
 
-export function startGameState(dateNow, playerId) {
+export function startGameState(dateNow) {
     gameState.lastTime = dateNow;
 
     gameState.player.mousePosition.x = 0;
     gameState.player.mousePosition.y = 0;
 
-    gameState.player.id = playerId;
     gameState.player.direction = 0;
     gameState.previousVisualDirection = 0;
 }
