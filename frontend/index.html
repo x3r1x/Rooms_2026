@@ -20,18 +20,22 @@
     </div>
 </div>
 
+<div class="countdown-wrapper" id="countdownWrapper" style="display: none">
+    <p class="countdown-timer" id="countdownTimer">5</p>
+</div>
+
 <div class="wrapper-lobby" id="lobbyWrapper" style="display: none">
     <div class="lobby-info">
         <h1>ROOMS</h1>
         <div class="lobby-status">
             <h2>LOBBY STATUS</h2>
-            <h2>PLAYERS CONNECTED: <span id="player-connected">0</span></h2>
-            <div id="lobby-list" class="lobby-list">
+            <h2>PLAYERS CONNECTED: <span id="playersConnected">0</span></h2>
+            <div id="lobbyList" class="lobby-list">
             </div>
         </div>
     </div>
     <div class="wrapper-start-game">
-        <button class="start-game" id="readyButton">START GAME</button>
+        <button class="start-game" id="readyButton">READY</button>
     </div>
 </div>
 
@@ -40,8 +44,7 @@
         <h1>ROOMS</h1>
         <div class="statistic">
             <h2>STATISTIC</h2>
-            <div id="players-list" class="players-list">
-            </div>
+            <div id="players-list" class="players-list"></div>
         </div>
     </div>
     <div class="wrapper-canvas">

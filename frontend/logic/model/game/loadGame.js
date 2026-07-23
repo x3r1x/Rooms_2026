@@ -20,8 +20,6 @@ export async function loadGame() {
     initMap();
     initSprites();
     assemblyRoom();
-
-    requestAnimationFrame(startGameLoop);
 }
 
 async function loadData() {
@@ -34,7 +32,7 @@ async function loadTileInfo() {
     return await response.json();
 }
 
-function startGameLoop() {
+export function startGameLoop() {
     const currentTime = performance.now();
     const elapsedTime = currentTime - gameState.lastTime;
 

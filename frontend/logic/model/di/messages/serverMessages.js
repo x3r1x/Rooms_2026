@@ -1,5 +1,7 @@
 import {initGameState} from "../../game/storage/gameState.js";
-import {parseMap} from "../preloadingResources/mapHandler.js";
+import {updateStatisticView} from "../../../view/app/statisticsView.js";
+import {updateLobbyView} from "../../../view/app/lobbyView.js";
+import {changeCountdownTimer} from "../../../view/app/countdownView.js";
 
 export function processWaitingMessage(parsedMessage, lobbyState) {
     if (!parsedMessage.oId || !parsedMessage.p) {
@@ -9,10 +11,13 @@ export function processWaitingMessage(parsedMessage, lobbyState) {
 
     lobbyState.clientId = parsedMessage.oId;
     lobbyState.players = parsedMessage.p;
+    lobbyState.players.sort((player1, player2) => player1.n.localeCompare(player2.n))
+
+    updateLobbyView(lobbyState.clientId, lobbyState.players);
 }
 
 export function processReadyMessage(parsedMessage, lobbyState, gameState) {
-    if (!parsedMessage.c || !parsedMessage.map) {
+    if (!parsedMessage.c || !parsedMessage.m) {
         console.log(`Не получены некоторые поля! ${parsedMessage}`);
         return;
     }
@@ -34,6 +39,7 @@ export function processCountdownMessage(parsedMessage, lobbyState) {
     }
 
     lobbyState.countdown = parsedMessage.c;
+    changeCountdownTimer(lobbyState.countdown);
 }
 
 export function processGameAssignment(parsedMessage, gameState) {
@@ -43,7 +49,7 @@ export function processGameAssignment(parsedMessage, gameState) {
     gameState.bullets = [];
     parsedMessage.b.forEach((bullet) => processBullet(bullet, gameState));
 
-    updatePlayersStatistic(gameState);
+    updateStatisticView(gameState);
     gameState.didShoot = false;
 }
 
