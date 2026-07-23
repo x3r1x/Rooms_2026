@@ -1,7 +1,7 @@
 import {gameMap} from "../../game/storage/gameState.js";
 import {assemblyRoom} from "../../game/storage/layers.js";
 
-const dataJson = {
+/*const dataJson = {
     "s": "r",
     "c": 5.0,
     "m": {
@@ -30,18 +30,19 @@ const dataJson = {
             "bT": 5
         }
     }
-}
+}*/
 
 
-export function parseMap() {
+export function parseMap(dataJson) {
     if (!dataJson || !('m' in dataJson)) {
         return;
     }
     const roomsMap = dataJson.m;
-
+    let count = 0;
     for (const uuid in roomsMap) {
+
         const currentRoom = roomsMap[uuid];
-        gameMap[uuid] = {
+        gameMap[count] = {
             id: currentRoom.id,
             type: `barrier${currentRoom.bT}`,
             doors: {
@@ -69,15 +70,14 @@ export function parseMap() {
             collision: []
         };
 
-
+    count ++;
     }
     updateMap();
 }
 
 function updateMap() {
-    console.log(gameMap);
     for (const uuid in gameMap) {
-        console.log(gameMap[uuid]);
         assemblyRoom(gameMap[uuid]);
     }
+    console.log(gameMap);
 }

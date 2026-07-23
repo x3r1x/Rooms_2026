@@ -84,30 +84,6 @@ export function mergeLayers(layers) {
     return {name: "merge", data: layersAnswer};
 }
 
-function checkExit(layers) {
-    const exits = {top: false, left: false, down: false, right: false};
-    for (let layer of layers) {
-        const layerLower = layer.name.toLowerCase();
-        if (layerLower.includes('top')) exits.top = true;
-        if (layerLower.includes('left')) exits.left = true;
-        if (layerLower.includes('down')) exits.down = true;
-        if (layerLower.includes('right')) exits.right = true;
-    }
-    return exits;
-}
-
-export function getFlapList(arrayExit) {
-    const flaps = {top: true, left: true, down: true, right: true};
-    for (let exit of arrayExit) {
-        const exitLower = exit.name.toLowerCase();
-        if (exitLower.includes('top')) flaps.top = false;
-        if (exitLower.includes('left')) flaps.left = false;
-        if (exitLower.includes('down')) flaps.down = false;
-        if (exitLower.includes('right')) flaps.right = false;
-    }
-    return flaps;
-}
-
 export function getFlap(flapList) {
     const flaps = [];
     for (let flap in flapList) {
@@ -138,9 +114,6 @@ export function assemblyRoom(targetRoom) {
     const baseFloor = layersForRoom.floor[0];
     const baseWalls = layersForRoom.walls[0];
 
-    console.log(layersForRoom.floor)
-    console.log(layersForRoom.walls)
-
     targetRoom.exits = assemblyObject(baseFloor, layersExit);
     targetRoom.walls = assemblyObject(baseWalls, layersFlap);
 
@@ -156,6 +129,5 @@ export function assemblyRoom(targetRoom) {
     }
 
     targetRoom.floors = baseFloor;
-    console.log("targetRoom", targetRoom);
     getMapCollision(targetRoom);
 }

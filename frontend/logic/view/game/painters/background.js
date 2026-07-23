@@ -1,18 +1,19 @@
 import {TILE_IMG} from "../../../model/game/storage/gameConstants.js";
-import {layersForRoom, room} from "../../../model/game/storage/gameState.js";
+import {layersForRoom, room, gameMap} from "../../../model/game/storage/gameState.js";
 
 export function drawBackground(canvas, context) {
-    const mapExit = room.exits.data;
-    const mapFloor = room.floors.data;
-    const mapWall = room.walls.data;
-    const mapObject = room.object.data;
+    console.log(gameMap[0]);
+    //const mapExit = gameMap.exits.data;
+    const mapFloor = gameMap[0].floors.data;
+    const mapWall = gameMap[0].walls.data;
+    const mapObject = gameMap[0].object.data;
     const mapWidth = layersForRoom.width;
 
     context.fillStyle = "#1f2535";
     context.fillRect(0, 0, canvas.width, canvas.height);
 
     drawLayer(context, mapFloor, mapWidth);
-    drawLayer(context, mapExit, mapWidth);
+    //drawLayer(context, mapExit, mapWidth);
     drawLayer(context, mapWall, mapWidth);
     drawLayer(context, mapObject, mapWidth);
 }
