@@ -7,23 +7,23 @@ const TILE_NORMALS = [{x: 0, y: -1},
     {x: -1, y: 0}];
 
 export function canMoveTo(nextPosition, player) {
-    // const personPoints = getPlayerPoints(nextPosition, player.direction);
-    // const personNormals = getPlayerNormals(personPoints);
-    // const personSAT = {points: personPoints, normals: personNormals};
-    //
-    // const nearby = getNearbyTiles(nextPosition.x, nextPosition.y, room);
-    // for (const tile of nearby) {
-    //     const tileInfo = layersForRoom.tilesInfo[tile.tileId];
-    //     if (!tileInfo.blocksPlayer) continue;
-    //
-    //     for (const hitbox of tileInfo.hitboxes) {
-    //         const tilePoints = getTileWorldPoints(tile.x, tile.y, hitbox);
-    //         const tileSAT = {points: tilePoints, normals: TILE_NORMALS};
-    //         if (checkCollisionSAT(personSAT, tileSAT)) {
-    //             return false;
-    //         }
-    //     }
-    // }
+    const personPoints = getPlayerPoints(nextPosition, player.direction);
+    const personNormals = getPlayerNormals(personPoints);
+    const personSAT = {points: personPoints, normals: personNormals};
+
+    const nearby = getNearbyTiles(nextPosition.x, nextPosition.y, room);
+    for (const tile of nearby) {
+        const tileInfo = layersForRoom.tilesInfo[tile.tileId];
+        if (!tileInfo.blocksPlayer) continue;
+
+        for (const hitbox of tileInfo.hitboxes) {
+            const tilePoints = getTileWorldPoints(tile.x, tile.y, hitbox);
+            const tileSAT = {points: tilePoints, normals: TILE_NORMALS};
+            if (checkCollisionSAT(personSAT, tileSAT)) {
+                return false;
+            }
+        }
+    }
 
     return true;
 }
