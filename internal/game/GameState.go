@@ -16,6 +16,9 @@ type GameState struct {
 	isGameActive  bool
 	gameStartTime time.Time
 	gameDuration  time.Duration
+	roomManager   *MapManager
+	playerRooms   map[string]string
+	roomPlayers   map[string][]string
 }
 
 func NewGameState() *GameState {
@@ -24,9 +27,51 @@ func NewGameState() *GameState {
 		objects:      make(map[string]*model.Object),
 		bullets:      make([]model.Bullet, 0),
 		gameDuration: model.GameDuration * time.Second,
+		playerRooms:  make(map[string]string),
+		roomPlayers:  make(map[string][]string),
 	}
 }
 
+// ====ROOM====
+func (gs *GameState) GetPlayerRoom(id string) string {
+	if roomId, exists := gs.playerRooms[id]; exists {
+		return roomId
+	}
+	return ""
+}
+
+func (gs *GameState) SetPlayerRoom(id, roomId string) {
+	if oldRoom, exists := gs.playerRooms[id]; exists {
+		gs.removePlayerFromRoom(oldRoom, id)
+	}
+
+	gs.playerRooms[id] = roomId
+	gs.addPlayerToRoom(roomId, id)
+}
+
+func (gs *GameState) GetRoomManager() *MapManager {
+	return gs.roomManager
+}
+
+func (gs *GameState) SetRoomManager(mm *MapManager) {
+	gs.roomManager = mm
+}
+
+func (gs *GameState) addPlayerToRoom(roomId, playerId string) {
+	gs.roomPlayers[roomId] = append(gs.roomPlayers[roomId], playerId)
+}
+
+func (gs *GameState) removePlayerFromRoom(roomId, playerId string) {
+	players := gs.roomPlayers[roomId]
+	for i, id := range players {
+		if id == playerId {
+			gs.roomPlayers[roomId] = append(players[:i], players[i+1:]...)
+			break
+		}
+	}
+}
+
+// ==================
 // ===== OBJECT =====
 func (gs *GameState) GetObjects() map[string]*model.Object {
 	return gs.objects

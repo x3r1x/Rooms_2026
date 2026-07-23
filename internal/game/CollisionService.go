@@ -118,3 +118,40 @@ func (cs *CollisionService) HandlePlayerHit(player *model.PlayerGameState, bulle
 func (cs *CollisionService) calculateDamage(bullet model.Bullet) float64 {
 	return model.BulletDamage * (bullet.Life/model.BulletLife*model.BulletDamageMulti + 1)
 }
+
+func (cs *CollisionService) CheckPlayerExitCollision(player *model.PlayerGameState) (bool, string, string) {
+	// Получаем текущую комнату игрока
+	currentRoomId := cs.state.GetPlayerRoom(player.Id)
+	if currentRoomId == "" {
+		return false, "", ""
+	}
+
+	// Получаем информацию о комнате
+	roomInfo := cs.state.GetRoomManager().GetRoomInfo(currentRoomId)
+	if roomInfo == nil {
+		return false, "", ""
+	}
+
+	// Проверяем каждую сторону выхода
+	exitChecks := map[string]func() bool{
+		model.TopMarker:    func() bool { return player.Y < 0 },
+		model.BottomMarker: func() bool { return player.Y > float64(model.RoomHeight*36) },
+		model.LeftMarker:   func() bool { return player.X < 0 },
+		model.RightMarker:  func() bool { return player.X > float64(model.RoomWidth*36) },
+	}
+
+	for direction, check := range exitChecks {
+		if check() {
+			targetRoomId := roomInfo.GetExit(direction)
+			if targetRoomId != "" {
+				return true, direction, targetRoomId
+			}
+		}
+	}
+
+	return false, "", ""
+}
+
+func (cs *CollisionService) getRoomPixelSize() float64 {
+	return float64(model.RoomWidth * 36)
+}

@@ -105,6 +105,11 @@ func (wsh *WebsocketHandler) handleOngoingGameState(p []byte, currentId string) 
 		return
 	}
 
+	gameLoop := wsh.lobby.GetGameLoop()
+	if gameLoop == nil {
+		return
+	}
+
 	wsh.lobby.GetGameLoop().UpdatePlayer(model.ClientGameMessage{
 		Id:      msg.Id,
 		MX:      msg.MX,
