@@ -5,7 +5,7 @@ import {initSprites} from "../../view/game/sprites.js";
 import {gameState} from "./storage/gameState.js";
 import {updateGame} from "./engine/updateGame.js";
 import {drawGame} from "../../view/game/painters/drawGame.js";
-import {socket} from "../../main.js";
+import {socket} from "../app/appState.js";
 
 export const canvas = document.getElementById("canvas");
 const context = canvas.getContext('2d');

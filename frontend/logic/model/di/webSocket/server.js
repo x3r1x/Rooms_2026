@@ -6,20 +6,19 @@ import {
     processGameAssignment,
     processCountdownMessage
 } from "../messages/serverMessages.js";
-import {socket} from "../../../main.js";
 import {APP_STATES} from "../../app/appConstants.js";
-import {appState} from "../../app/appState.js";
+import {appState, switchToWaitingAppState} from "../../app/appState.js";
 
 export function getSocket(nickname) {
     const socket = new WebSocket("ws://84.201.159.214:8080/ws");
 
     socket.onopen = function (event) {
         console.log(`Открыто соединение - ${event.type}!`);
-        registerClient(socket, nickname)
+        registerClient(socket, nickname);
     }
 
     socket.onmessage = function (event) {
-        parseMessage(event.data)
+        parseMessage(socket, event.data);
     }
 
     socket.onerror = function (error) {
@@ -29,12 +28,12 @@ export function getSocket(nickname) {
     return socket;
 }
 
-export function parseMessage(message) {
+export function parseMessage(socket, message) {
     let parsedMessage = JSON.parse(message);
 
     switch (parsedMessage.s) {
         case APP_STATES.WAITING:
-            appState = APP_STATES.WAITING;
+            switchToWaitingAppState(socket);
             processWaitingMessage(parsedMessage, lobbyState);
             break;
 

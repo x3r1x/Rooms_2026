@@ -1,7 +1,6 @@
 import {initRegistrationListeners} from "./controller/registrationListeners.js";
-import {initAppState} from "./model/app/appState.js";
+import {initAppState, socket} from "./model/app/appState.js";
 
-export let socket = null;
 
 if (!crypto.randomUUID) {
     crypto.randomUUID = function () {
