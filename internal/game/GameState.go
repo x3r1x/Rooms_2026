@@ -9,22 +9,89 @@ import (
 )
 
 type GameState struct {
-	players       map[string]*model.PlayerState
+	players       map[string]*model.PlayerGameState
+	objects       map[string]*model.Object
 	bullets       []model.Bullet
 	tickCount     uint64
 	isGameActive  bool
 	gameStartTime time.Time
 	gameDuration  time.Duration
+	roomManager   *MapManager
+	playerRooms   map[string]string
+	roomPlayers   map[string][]string
 }
 
 func NewGameState() *GameState {
 	return &GameState{
-		players:      make(map[string]*model.PlayerState),
+		players:      make(map[string]*model.PlayerGameState),
+		objects:      make(map[string]*model.Object),
 		bullets:      make([]model.Bullet, 0),
-		isGameActive: false,
-		gameDuration: 60 * time.Second,
+		gameDuration: model.GameDuration * time.Second,
+		playerRooms:  make(map[string]string),
+		roomPlayers:  make(map[string][]string),
 	}
 }
+
+// ====ROOM====
+func (gs *GameState) GetPlayerRoom(id string) string {
+	if roomId, exists := gs.playerRooms[id]; exists {
+		return roomId
+	}
+	return ""
+}
+
+func (gs *GameState) SetPlayerRoom(id, roomId string) {
+	if oldRoom, exists := gs.playerRooms[id]; exists {
+		gs.removePlayerFromRoom(oldRoom, id)
+	}
+
+	gs.playerRooms[id] = roomId
+	gs.addPlayerToRoom(roomId, id)
+}
+
+func (gs *GameState) GetRoomManager() *MapManager {
+	return gs.roomManager
+}
+
+func (gs *GameState) SetRoomManager(mm *MapManager) {
+	gs.roomManager = mm
+}
+
+func (gs *GameState) addPlayerToRoom(roomId, playerId string) {
+	gs.roomPlayers[roomId] = append(gs.roomPlayers[roomId], playerId)
+}
+
+func (gs *GameState) removePlayerFromRoom(roomId, playerId string) {
+	players := gs.roomPlayers[roomId]
+	for i, id := range players {
+		if id == playerId {
+			gs.roomPlayers[roomId] = append(players[:i], players[i+1:]...)
+			break
+		}
+	}
+}
+
+// ==================
+// ===== OBJECT =====
+func (gs *GameState) GetObjects() map[string]*model.Object {
+	return gs.objects
+}
+
+func (gs *GameState) SetObjects(objects map[string]*model.Object) {
+	gs.objects = objects
+}
+
+func (gs *GameState) AddObject(obj *model.Object) {
+	gs.objects[obj.Id] = obj
+}
+
+func (gs *GameState) RemoveObject(id string) {
+	if _, exist := gs.objects[id]; exist {
+		delete(gs.objects, id)
+	}
+}
+
+// ==================
 
 // === LOBBITOMIA ===
 
@@ -51,33 +118,17 @@ func (gs *GameState) GetRemainingSeconds() int {
 	return int((gs.gameDuration - elapsed).Seconds())
 }
 
-func (gs *GameState) IsLobbyEmpty() bool {
-	return len(gs.players) == 0
-}
-
-func (gs *GameState) IsLobbyFull() bool {
-	return len(gs.players) >= 4
-}
-
-func (gs *GameState) HasMinimumPlayer() bool {
-	return len(gs.players) >= 2
-}
-
-func (gs *GameState) CanAddPlayer() bool {
-	return !gs.IsGameActive() && !gs.IsLobbyFull()
-}
-
 // ==================
 
 func (gs *GameState) GetAllBullets() []model.Bullet {
 	return gs.bullets
 }
 
-func (gs *GameState) GetAllPlayers() map[string]*model.PlayerState {
+func (gs *GameState) GetAllPlayers() map[string]*model.PlayerGameState {
 	return gs.players
 }
 
-func (gs *GameState) GetPlayer(id string) (*model.PlayerState, bool) {
+func (gs *GameState) GetPlayer(id string) (*model.PlayerGameState, bool) {
 	player, exist := gs.players[id]
 	return player, exist
 }
@@ -90,7 +141,7 @@ func (gs *GameState) IncrementTick() {
 	gs.tickCount++
 }
 
-func (gs *GameState) AddPlayer(player *model.PlayerState) {
+func (gs *GameState) AddPlayer(player *model.PlayerGameState) {
 	log.Println("Register ", player.Id)
 	gs.players[player.Id] = player
 }
@@ -100,9 +151,9 @@ func (gs *GameState) RemovePlayer(playerId string) {
 	delete(gs.players, playerId)
 }
 
-func (gs *GameState) UpdatePlayer(upd model.ClientMessage) {
+func (gs *GameState) UpdatePlayer(upd model.ClientGameMessage) {
 	player, exist := gs.GetPlayer(upd.Id)
-	if !exist {
+	if !exist || player == nil {
 		return
 	}
 
@@ -121,7 +172,11 @@ func (gs *GameState) UpdatePlayer(upd model.ClientMessage) {
 	}
 }
 
-func (gs *GameState) addBullet(player *model.PlayerState) {
+func (gs *GameState) addBullet(player *model.PlayerGameState) {
 	bullet := factory.BulletFactory(player)
 	gs.bullets = append(gs.bullets, bullet)
+}
+
+func (gs *GameState) GetCountOfPlayers() int {
+	return len(gs.players)
 }

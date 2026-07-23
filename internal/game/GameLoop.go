@@ -13,42 +13,46 @@ import (
 type GameLoop struct {
 	game             *GameState
 	collisionService *CollisionService
-	updateChan       chan model.ClientMessage
-	registerChan     chan *model.PlayerState
+	updateChan       chan model.ClientGameMessage
 	deleteChan       chan string
+	finishChan       chan bool
+	stopChan         chan bool
 }
 
-func NewGameLoop(game *GameState) *GameLoop {
+func NewGameLoop(game *GameState, finishChan chan bool) *GameLoop {
 	return &GameLoop{game: game,
 		collisionService: NewCollisionService(game),
-		updateChan:       make(chan model.ClientMessage),
-		registerChan:     make(chan *model.PlayerState),
+		updateChan:       make(chan model.ClientGameMessage),
 		deleteChan:       make(chan string),
+		finishChan:       finishChan,
+		stopChan:         make(chan bool)}
+}
+
+func (gl *GameLoop) UpdatePlayer(msg model.ClientGameMessage) {
+	if _, exists := gl.game.GetPlayer(msg.Id); !exists {
+		return
 	}
-}
-
-func (gl *GameLoop) RegisterPlayer(player *model.PlayerState) {
-	gl.registerChan <- player
-}
-
-func (gl *GameLoop) UpdatePlayer(msg model.ClientMessage) {
 	gl.updateChan <- msg
 }
 
 func (gl *GameLoop) DeletePlayer(id string) {
 	gl.deleteChan <- id
 }
+
 func (gl *GameLoop) Run() {
 	ticker := time.NewTicker(model.TickTime * time.Millisecond)
 	defer ticker.Stop()
+	defer gl.cleanup()
+	gl.startGame()
 
 	for {
 		select {
-
-		case reg := <-gl.registerChan:
-			gl.handleRegister(reg)
 		case del := <-gl.deleteChan:
 			gl.handleDelete(del)
+			if gl.shouldStop() {
+				log.Println("GameLoop: остановка после удаления игрока")
+				return
+			}
 		case upload := <-gl.updateChan:
 			gl.game.UpdatePlayer(upload)
 		case <-ticker.C:
@@ -59,7 +63,6 @@ func (gl *GameLoop) Run() {
 			gl.updateShooterTimers()
 			gl.updateBullets()
 			gl.updatePlayers()
-
 			remaining := gl.game.GetRemainingSeconds()
 			if remaining <= 0 {
 				gl.endGame()
@@ -68,8 +71,8 @@ func (gl *GameLoop) Run() {
 			if remaining%10 == 0 {
 				log.Printf("Осталось времени: %d секунд", remaining)
 			}
-
-			gl.broadcast(model.ServerMessage{
+			gl.broadcast(model.ServerGameMessage{
+				State:   model.OngoingGameState,
 				Type:    "a",
 				Players: gl.createSnapshot(),
 				Bullets: gl.game.GetAllBullets(),
@@ -78,36 +81,39 @@ func (gl *GameLoop) Run() {
 	}
 }
 
-// === LOBBITOMIA ===
+func (gl *GameLoop) shouldStop() bool {
+	return !gl.game.IsGameActive() || len(gl.game.GetAllPlayers()) == 0
+}
 
-func (gl *GameLoop) handleRegister(player *model.PlayerState) {
-	if !gl.game.CanAddPlayer() {
-		log.Printf(" Отклонено подключение %s: игра активна или лобби заполнено", player.Id)
-		if player.Connection != nil {
-			if err := player.Connection.Close(); err != nil {
-				log.Println("Подключение невозможно закрыть")
-			}
+func (gl *GameLoop) cleanup() {
+	log.Println("GameLoop: очистка ресурсов...")
+	gl.game.SetBullets([]model.Bullet{})
+	gl.game.SetObjects(make(map[string]*model.Object))
+	gl.game.SetGameActive(false)
+	close(gl.updateChan)
+	close(gl.deleteChan)
+	close(gl.stopChan)
+	if gl.finishChan != nil {
+		select {
+		case gl.finishChan <- true:
+			log.Println("GameLoop: отправлен сигнал о завершении в лобби")
+		default:
+			log.Println("GameLoop: канал завершения уже содержит сигнал")
 		}
-		return
-	}
-
-	gl.game.AddPlayer(player)
-	log.Printf("Игрок %s подключился. Всего: %d/4", player.Id, len(gl.game.GetAllPlayers()))
-
-	if gl.game.IsLobbyFull() {
-		log.Println("Лобби заполнено")
-		gl.startGame()
 	}
 }
 
 func (gl *GameLoop) handleDelete(id string) {
 	gl.game.RemovePlayer(id)
 	log.Printf("Игрок %s удален. Осталось: %d", id, len(gl.game.GetAllPlayers()))
-
-	if gl.game.IsGameActive() {
-		if len(gl.game.GetAllPlayers()) <= 1 {
-			log.Println("Игрок вышел, игра завершена досрочно")
-			gl.endGame()
+	if gl.game.IsGameActive() && len(gl.game.GetAllPlayers()) <= 1 {
+		log.Println("Игрок вышел, игра завершена досрочно")
+		gl.endGame()
+		select {
+		case gl.stopChan <- true:
+			log.Println("GameLoop: отправлен сигнал остановки")
+		default:
+			log.Println("GameLoop: stopChan уже содержит сигнал")
 		}
 	}
 }
@@ -124,41 +130,28 @@ func (gl *GameLoop) endGame() {
 		return
 	}
 	gl.game.SetGameActive(false)
-	winner := gl.getWinner()
-	log.Println("WINNER ID: ", winner)
-	gl.resetGame()
+	stats := gl.getStatistics()
+	log.Println(stats)
+	if gl.game.GetCountOfPlayers() > 0 {
+		gl.broadcastFinal(model.ServerEndMessage{
+			State:  model.FinalGameState,
+			Result: stats,
+		})
+	}
 }
 
-func (gl *GameLoop) getWinner() string {
-	var winner string
-	maxHealth := -1.0
-
+func (gl *GameLoop) getStatistics() []model.PlayerFinalState {
+	stats := make([]model.PlayerFinalState, len(gl.game.GetAllPlayers()))
 	for _, player := range gl.game.GetAllPlayers() {
-		if player.Health > maxHealth {
-			maxHealth = player.Health
-			winner = player.Id
-		}
+		stats = append(stats, model.PlayerFinalState{
+			Nickname: player.Nickname,
+			Id:       player.Id,
+			Deaths:   player.DeathCount,
+			Kills:    player.BodyCount,
+		})
 	}
-
-	if winner == "" {
-		return "Никто"
-	}
-	return winner
+	return stats
 }
-
-func (gl *GameLoop) resetGame() {
-	gl.game.SetBullets([]model.Bullet{})
-	for _, player := range gl.game.GetAllPlayers() {
-		player.Health = model.MaxPlayerHealth
-		player.X = model.PlayerSpawnPointX
-		player.Y = model.PlayerSpawnPointY
-		player.Angle = model.InitDirection
-		player.RebornTimer = 0
-		player.ShootTimer = 0
-	}
-}
-
-// ==================
 
 func (gl *GameLoop) updateShooterTimers() {
 	for _, player := range gl.game.GetAllPlayers() {
@@ -176,12 +169,17 @@ func (gl *GameLoop) updateBullets() {
 		bullet.Y += math.Sin(bullet.Direction) * model.MaxBulletSpeed
 
 		if bullet.Life > 0 {
-			hit, player := gl.collisionService.CheckBulletCollision(bullet)
-			if hit && player.Health > 0 {
-				gl.collisionService.HandleHit(player, bullet)
-			} else {
-				activeBullets = append(activeBullets, bullet)
+			// ИСПРАВЛЕНИЕ: Сохраняем объект, в который попала пуля
+			hit, player, obj := gl.collisionService.CheckBulletCollision(bullet)
+			if hit {
+				if player != nil && player.Health > 0 {
+					gl.collisionService.HandlePlayerHit(player, bullet)
+				} else if obj != nil {
+					log.Printf("Пуля попала в стену ID: %s", obj.Id)
+				}
+				continue
 			}
+			activeBullets = append(activeBullets, bullet)
 		}
 	}
 	gl.game.SetBullets(activeBullets)
@@ -189,27 +187,115 @@ func (gl *GameLoop) updateBullets() {
 
 func (gl *GameLoop) updatePlayers() {
 	for _, player := range gl.game.GetAllPlayers() {
-		vectorLength := math.Sqrt(player.MoveX*player.MoveX + player.MoveY*player.MoveY)
-
-		if vectorLength != 0 {
-			player.MoveX /= vectorLength
-			player.MoveY /= vectorLength
+		if player.Health <= 0 {
+			if player.RebornTimer > 0 {
+				player.RebornTimer--
+			} else if player.RebornTimer == 0 {
+				player.Health = model.MaxPlayerHealth
+				player.RebornTimer = model.PlayerRebornTimer
+			}
+			continue
 		}
 
-		player.X += player.MoveX * model.TickTime * model.PlayerSpeed
-		player.Y += player.MoveY * model.TickTime * model.PlayerSpeed
+		vectorLength := math.Sqrt(player.MoveX*player.MoveX + player.MoveY*player.MoveY)
+		var moveX, moveY float64
+		if vectorLength != 0 {
+			moveX = player.MoveX / vectorLength
+			moveY = player.MoveY / vectorLength
+		}
+
+		deltaX := moveX * model.TickTime * model.PlayerSpeed
+		deltaY := moveY * model.TickTime * model.PlayerSpeed
+
+		nextX := player.X + deltaX
+		nextY := player.Y + deltaY
+
+		if gl.canMoveTo(nextX, nextY, player) {
+			player.X = nextX
+			player.Y = nextY
+		}
+
+		if hit, direction, targetRoomId := gl.collisionService.CheckPlayerExitCollision(player); hit {
+			gl.handleRoomTransition(player, direction, targetRoomId)
+		}
 	}
 }
 
-func (gl *GameLoop) createSnapshot() []model.PlayerState {
-	snapshot := make([]model.PlayerState, 0, len(gl.game.GetAllPlayers()))
+func (gl *GameLoop) canMoveTo(nextX, nextY float64, player *model.PlayerGameState) bool {
+	oldX, oldY := player.X, player.Y
+
+	// Проверяем движение по X
+	player.X = nextX
+	if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
+		player.X = oldX
+		return false
+	}
+
+	// Проверяем движение по Y
+	player.X = oldX // Возвращаем X обратно
+	player.Y = nextY
+	if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
+		player.Y = oldY
+		return false
+	}
+
+	// Если по отдельным осям прошло, проверяем диагональ
+	player.X = nextX
+	player.Y = nextY
+	if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
+		player.X = oldX
+		player.Y = oldY
+		return false
+	}
+
+	return true
+}
+
+func (gl *GameLoop) handleRoomTransition(player *model.PlayerGameState, direction, targetRoomId string) {
+	roomPixelWidth := float64(model.RoomWidth * int(model.TileSize))
+	roomPixelHeight := float64(model.RoomHeight * int(model.TileSize))
+	halfSize := model.PlayerHalfSize
+
+	switch direction {
+	case model.TopMarker:
+		player.Y = roomPixelHeight - halfSize - 1
+	case model.BottomMarker:
+		player.Y = halfSize + 1
+	case model.LeftMarker:
+		player.X = roomPixelWidth - halfSize - 1
+	case model.RightMarker:
+		player.X = halfSize + 1
+	}
+	gl.game.SetPlayerRoom(player.Id, targetRoomId)
+}
+
+func (gl *GameLoop) createSnapshot() []model.PlayerGameState {
+	snapshot := make([]model.PlayerGameState, 0, len(gl.game.GetAllPlayers()))
 	for _, player := range gl.game.GetAllPlayers() {
 		snapshot = append(snapshot, *player)
 	}
 	return snapshot
 }
 
-func (gl *GameLoop) broadcast(message model.ServerMessage) {
+func (gl *GameLoop) broadcast(message model.ServerGameMessage) {
+	data, err := json.Marshal(message)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	for id, p := range gl.game.GetAllPlayers() {
+		if p.Connection == nil {
+			continue
+		}
+		err := p.Connection.WriteMessage(websocket.TextMessage, data)
+		if err != nil {
+			log.Println("Ошибка отправки: ", err)
+			gl.deleteChan <- id
+		}
+	}
+}
+
+func (gl *GameLoop) broadcastFinal(message model.ServerEndMessage) {
 	data, err := json.Marshal(message)
 	if err != nil {
 		log.Println(err)
