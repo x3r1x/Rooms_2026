@@ -54,6 +54,10 @@ export const room = {
     collision: []
 }
 
+export const map= {
+
+}
+
 export const layersForRoom = {
     width: 0,
     height:0,

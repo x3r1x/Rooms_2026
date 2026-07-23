@@ -24,6 +24,7 @@ export function processReadyMessage(parsedMessage, lobbyState, gameState) {
 
     if (gameState == null) {
         initGameState(lobbyState.clientId);
+        parseMap(parsedMessage);
         //TODO: parse map
     }
 
