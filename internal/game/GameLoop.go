@@ -14,7 +14,6 @@ type GameLoop struct {
 	game             *GameState
 	collisionService *CollisionService
 	updateChan       chan model.ClientGameMessage
-	registerChan     chan *model.PlayerGameState
 	deleteChan       chan string
 }
 
@@ -22,13 +21,8 @@ func NewGameLoop(game *GameState) *GameLoop {
 	return &GameLoop{game: game,
 		collisionService: NewCollisionService(game),
 		updateChan:       make(chan model.ClientGameMessage),
-		registerChan:     make(chan *model.PlayerGameState),
 		deleteChan:       make(chan string),
 	}
-}
-
-func (gl *GameLoop) RegisterPlayer(player *model.PlayerGameState) {
-	gl.registerChan <- player
 }
 
 func (gl *GameLoop) UpdatePlayer(msg model.ClientGameMessage) {
@@ -46,8 +40,6 @@ func (gl *GameLoop) Run() {
 	for {
 		select {
 
-		case reg := <-gl.registerChan:
-			gl.handleRegister(reg)
 		case del := <-gl.deleteChan:
 			gl.handleDelete(del)
 		case upload := <-gl.updateChan:
@@ -100,26 +92,6 @@ func (gl *GameLoop) restartGame() {
 }
 
 // === LOBBITOMIA ===
-
-func (gl *GameLoop) handleRegister(player *model.PlayerGameState) {
-	if !gl.game.CanAddPlayer() {
-		log.Printf(" Отклонено подключение %s: игра активна или лобби заполнено", player.Id)
-		if player.Connection != nil {
-			if err := player.Connection.Close(); err != nil {
-				log.Println("Подключение невозможно закрыть")
-			}
-		}
-		return
-	}
-
-	gl.game.AddPlayer(player)
-	log.Printf("Игрок %s подключился. Всего: %d/4", player.Id, len(gl.game.GetAllPlayers()))
-
-	if gl.game.IsLobbyFull() {
-		log.Println("Лобби заполнено")
-		gl.startGame()
-	}
-}
 
 func (gl *GameLoop) handleDelete(id string) {
 	gl.game.RemovePlayer(id)

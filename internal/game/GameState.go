@@ -23,7 +23,6 @@ func NewGameState() *GameState {
 		players:      make(map[string]*model.PlayerGameState),
 		objects:      make(map[string]*model.Object),
 		bullets:      make([]model.Bullet, 0),
-		isGameActive: false,
 		gameDuration: model.GameDuration * time.Second,
 	}
 }
@@ -72,22 +71,6 @@ func (gs *GameState) GetRemainingSeconds() int {
 		return 0
 	}
 	return int((gs.gameDuration - elapsed).Seconds())
-}
-
-func (gs *GameState) IsLobbyEmpty() bool {
-	return len(gs.players) == 0
-}
-
-func (gs *GameState) IsLobbyFull() bool {
-	return len(gs.players) >= model.MaxCountOfPlayers
-}
-
-func (gs *GameState) HasMinimumPlayer() bool {
-	return len(gs.players) >= model.MinCountOfPlayers
-}
-
-func (gs *GameState) CanAddPlayer() bool {
-	return !gs.IsGameActive() && !gs.IsLobbyFull()
 }
 
 // ==================
@@ -147,4 +130,8 @@ func (gs *GameState) UpdatePlayer(upd model.ClientGameMessage) {
 func (gs *GameState) addBullet(player *model.PlayerGameState) {
 	bullet := factory.BulletFactory(player)
 	gs.bullets = append(gs.bullets, bullet)
+}
+
+func (gs *GameState) GetCountOfPlayers() int {
+	return len(gs.players)
 }

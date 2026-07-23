@@ -53,3 +53,8 @@ type ServerCountdownMessage struct {
 	State     string `json:"s"`
 	Countdown int    `json:"c"`
 }
+
+type ServerEndMessage struct {
+	State  string             `json:"s"`
+	Result []PlayerFinalState `json:"r"`
+}

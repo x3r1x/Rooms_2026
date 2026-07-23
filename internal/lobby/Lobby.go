@@ -153,16 +153,12 @@ func (l *Lobby) StartGame() {
 	}
 
 	gameState := game.NewGameState()
-	mapManager := game.NewMapManager(gameState)
-	roomMessages := mapManager.GetRoomMessages()
-
-	l.sendReadyState(roomMessages)
-	l.doCountdown()
 
 	for _, player := range l.players {
 		if player.Ready {
 			gameState.AddPlayer(&model.PlayerGameState{
 				Id:          player.Id,
+				Nickname:    player.Nickname,
 				Health:      model.MaxPlayerHealth,
 				X:           model.PlayerSpawnPointX,
 				Y:           model.PlayerSpawnPointY,
@@ -177,6 +173,12 @@ func (l *Lobby) StartGame() {
 			})
 		}
 	}
+
+	mapManager := game.NewMapManager(gameState)
+	roomMessages := mapManager.GetRoomMessages()
+	l.sendReadyState(roomMessages)
+	l.doCountdown()
+
 	l.gameLoop = game.NewGameLoop(gameState)
 	l.state = model.OngoingGameState
 
