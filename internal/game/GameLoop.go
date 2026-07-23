@@ -141,7 +141,7 @@ func (gl *GameLoop) endGame() {
 }
 
 func (gl *GameLoop) getStatistics() []model.PlayerFinalState {
-	stats := make([]model.PlayerFinalState, len(gl.game.GetAllPlayers()))
+	stats := make([]model.PlayerFinalState, 0, len(gl.game.GetAllPlayers()))
 	for _, player := range gl.game.GetAllPlayers() {
 		stats = append(stats, model.PlayerFinalState{
 			Nickname: player.Nickname,

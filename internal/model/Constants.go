@@ -2,7 +2,7 @@ package model
 
 const (
 	// константы для пуль
-	MaxBulletSpeed     = 22.5
+	MaxBulletSpeed     = 25.0
 	BulletLife         = 60.0
 	ShootCooldown      = 3
 	BulletLength       = 25.0
@@ -15,13 +15,13 @@ const (
 	PlayerSpawnPointY = 400
 	InitDirection     = 0
 	InitValue         = 0
-	PlayerVisualSize  = 40.0
+	PlayerVisualSize  = 30.0
 	PlayerSpeed       = 0.4
 	MaxPlayerHealth   = 100
 	PlayerRebornTimer = 300
 	// константы общие служебные
 	TickTime                     = 16
-	GameDuration                 = 20
+	GameDuration                 = 90
 	MinCountOfPlayers            = 2
 	MinBarrierType               = 1
 	MaxBarrierType               = 7
