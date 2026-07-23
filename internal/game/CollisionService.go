@@ -18,7 +18,6 @@ func NewCollisionService(state *GameState) *CollisionService {
 func (cs *CollisionService) CheckBulletCollision(bullet model.Bullet) (bool, *model.PlayerGameState, *model.Object) {
 	bulletSAT := cs.buildBulletSAT(bullet)
 
-	// Проверка коллизии с игроками
 	for _, player := range cs.state.GetAllPlayers() {
 		if player.Id == bullet.OwnerId {
 			continue
@@ -26,13 +25,12 @@ func (cs *CollisionService) CheckBulletCollision(bullet model.Bullet) (bool, *mo
 		if player.Health <= 0 {
 			continue
 		}
-		playerSAT := cs.buildPlayerSAT(player)
+		playerSAT := cs.buildPlayerSAT(player, true)
 		if collision.CheckCollisionSAT(bulletSAT, playerSAT) {
 			return true, player, nil
 		}
 	}
 
-	// Проверка коллизии с объектами (стенами)
 	for _, object := range cs.state.GetObjects() {
 		if !object.IsSolid {
 			continue
@@ -47,7 +45,7 @@ func (cs *CollisionService) CheckBulletCollision(bullet model.Bullet) (bool, *mo
 }
 
 func (cs *CollisionService) CheckPlayerObjectCollision(player *model.PlayerGameState) (bool, *model.Object) {
-	playerSAT := cs.buildPlayerSAT(player)
+	playerSAT := cs.buildPlayerSAT(player, false)
 
 	for _, object := range cs.state.GetObjects() {
 		if !object.IsSolid {
@@ -70,9 +68,19 @@ func (cs *CollisionService) buildBulletSAT(bullet model.Bullet) collision.SATBox
 	}
 }
 
-func (cs *CollisionService) buildPlayerSAT(player *model.PlayerGameState) collision.SATBox {
-	points := collision.GetPlayerPoints(player.X, player.Y, player.Angle)
-	normals := collision.GetNormals(points)
+func (cs *CollisionService) buildPlayerSAT(player *model.PlayerGameState, rotated bool) collision.SATBox {
+	var points []collision.Point
+	var normals []collision.Point
+
+	if rotated {
+		points = collision.GetPlayerPoints(player.X, player.Y, player.Angle)
+		normals = collision.GetNormals(points)
+	} else {
+		halfSize := model.PlayerHalfSize
+		points = collision.GetAxisAlignedPoints(player.X, player.Y, halfSize)
+		normals = collision.GetRectNormals()
+	}
+
 	return collision.SATBox{
 		Points:  points,
 		Normals: normals,
@@ -80,8 +88,6 @@ func (cs *CollisionService) buildPlayerSAT(player *model.PlayerGameState) collis
 }
 
 func (cs *CollisionService) buildObjectSAT(obj *model.Object) collision.SATBox {
-	// Для объектов (стен) используем GetObjectPoints (от левого верхнего угла)
-	// и стандартные нормали для прямоугольников
 	points := collision.GetObjectPoints(obj.X, obj.Y, obj.Width, obj.Height)
 	normals := collision.GetRectNormals()
 	return collision.SATBox{

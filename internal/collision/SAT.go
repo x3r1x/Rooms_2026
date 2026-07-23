@@ -134,3 +134,12 @@ func getMinMax(points []Point, axis Point) (float64, float64) {
 func isOverlapping(min1, max1, min2, max2 float64) bool {
 	return (max1+model.Epsilon >= min2) && (max2+model.Epsilon >= min1)
 }
+
+func GetAxisAlignedPoints(centerX, centerY, halfSize float64) []Point {
+	return []Point{
+		{centerX - halfSize, centerY - halfSize},
+		{centerX + halfSize, centerY - halfSize},
+		{centerX + halfSize, centerY + halfSize},
+		{centerX - halfSize, centerY + halfSize},
+	}
+}

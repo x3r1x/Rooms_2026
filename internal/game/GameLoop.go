@@ -201,64 +201,37 @@ func (gl *GameLoop) updatePlayers() {
 		deltaX := moveX * model.TickTime * model.PlayerSpeed
 		deltaY := moveY * model.TickTime * model.PlayerSpeed
 
-		nextX := player.X + deltaX
-		nextY := player.Y + deltaY
+		// ВАЖНО: Сначала пытаемся двигаться по X, потом по Y
+		// Это предотвращает "залипание" в стенах
 
-		if gl.canMoveTo(nextX, nextY, player) {
-			player.X = nextX
-			player.Y = nextY
+		// Шаг 1: Движение по X
+		nextX := player.X + deltaX
+		player.X = nextX
+		if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
+			// Если коллизия - откатываем X
+			player.X -= deltaX
 		}
 
+		// Шаг 2: Движение по Y
+		nextY := player.Y + deltaY
+		player.Y = nextY
+		if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
+			// Если коллизия - откатываем Y
+			player.Y -= deltaY
+		}
+
+		// Шаг 3: Финальная проверка и выталкивание
 		if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
 			gl.collisionService.ResolvePlayerCollisionSmooth(player)
 		}
 
+		// Шаг 4: Проверка перехода между комнатами
 		if hit, direction, targetRoomId := gl.collisionService.CheckPlayerExitCollision(player); hit {
 			gl.handleRoomTransition(player, direction, targetRoomId)
 		}
 	}
 }
 
-func (gl *GameLoop) canMoveTo(nextX, nextY float64, player *model.PlayerGameState) bool {
-	oldX, oldY := player.X, player.Y
-
-	bestX, bestY := oldX, oldY
-	moved := false
-
-	player.X = nextX
-	if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); !hit {
-		bestX = nextX
-		moved = true
-	}
-	player.X = oldX
-
-	player.Y = nextY
-	if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); !hit {
-		bestY = nextY
-		moved = true
-	}
-	player.Y = oldY
-
-	player.X = nextX
-	player.Y = nextY
-	if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); !hit {
-		bestX = nextX
-		bestY = nextY
-		moved = true
-	} else {
-		player.X = oldX
-		player.Y = oldY
-	}
-
-	player.X = bestX
-	player.Y = bestY
-
-	if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
-		gl.collisionService.ResolvePlayerCollisionSmooth(player)
-	}
-
-	return moved
-}
 func (gl *GameLoop) handleRoomTransition(player *model.PlayerGameState, direction, targetRoomId string) {
 	roomPixelWidth := float64(model.RoomWidth * int(model.TileSize))
 	roomPixelHeight := float64(model.RoomHeight * int(model.TileSize))
