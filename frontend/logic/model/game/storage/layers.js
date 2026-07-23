@@ -117,15 +117,14 @@ export function assemblyRoom(targetRoom) {
     targetRoom.exits = assemblyObject(baseFloor, layersExit);
     targetRoom.walls = assemblyObject(baseWalls, layersFlap);
 
-    const matchingObjects = layersForRoom.objects.filter(obj =>
+    const matchingObject = layersForRoom.objects.find(obj =>
         obj.name.toLowerCase().includes(targetRoom.type.toLowerCase())
     );
 
-    if (matchingObjects.length > 0) {
-        let randomIndexObjects = Math.floor(Math.random() * matchingObjects.length);
-        targetRoom.object = matchingObjects[randomIndexObjects];
+    if (matchingObject) {
+        targetRoom.object = matchingObject;
     } else {
-        targetRoom.object = {name: "empty", data: []};
+        targetRoom.object = { name: "empty", data: [] };
     }
 
     targetRoom.floors = baseFloor;
