@@ -39,19 +39,7 @@ export function getMapCollision(){
     room.collision = assemblyObject(room.walls, room.object);
 }
 
-function getRandomArray(array) {
-    const lenArray = Math.floor(Math.random() * array.length) + 1;
-    const result = [];
-
-    for (let i = 0; i < lenArray; i++) {
-        const randomIndex = Math.floor(Math.random() * array.length);
-        result[i] = array[randomIndex];
-    }
-
-    return result;
-}
-
-function assemblyObject(object1, object2) {
+export function assemblyObject(object1, object2) {
     const resultData = [...object1.data];
 
     for (let i = 0; i < resultData.length; i++) {
@@ -66,7 +54,7 @@ function assemblyObject(object1, object2) {
     };
 }
 
-function mergeLayers(layers) {
+export function mergeLayers(layers) {
     let layersAnswer = [...layers[0].data];
 
     for (let i = 1; i < layers.length; i++) {
@@ -77,27 +65,7 @@ function mergeLayers(layers) {
     return {name: "merge", data: layersAnswer};
 }
 
-function checkExit(layers) {
-    const exits = {top: false, left: false, down: false, right: false};
-    for (let layer of layers) {
-        const layerLower = layer.name.toLowerCase();
-        if (layerLower.includes('top')) {
-            exits.top = true;
-        }
-        if (layerLower.includes('left')) {
-            exits.left = true;
-        }
-        if (layerLower.includes('down')) {
-            exits.down = true;
-        }
-        if (layerLower.includes('right')) {
-            exits.right = true;
-        }
-    }
-    return exits;
-}
-
-function getFlapList(arrayExit) {
+export function getFlapList(arrayExit) {
     const flaps = {top: true, left: true, down: true, right: true};
     for (let exit of arrayExit) {
         const exitLower = exit.name.toLowerCase();
@@ -118,7 +86,7 @@ function getFlapList(arrayExit) {
 
 }
 
-function getFlap(flapList) {
+export function getFlap(flapList) {
     const flaps = [];
     for (let flap in flapList) {
         if (flapList[flap] === true) {

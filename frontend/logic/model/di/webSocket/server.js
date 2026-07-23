@@ -8,6 +8,7 @@ import {
 } from "../messages/serverMessages.js";
 import {APP_STATES} from "../../app/appConstants.js";
 import {appState, switchToWaitingAppState} from "../../app/appState.js";
+import {parseMap} from "../preloadingResources/mapHandler.js";
 
 export function getSocket(nickname) {
     const socket = new WebSocket("ws://84.201.159.214:8080/ws");
