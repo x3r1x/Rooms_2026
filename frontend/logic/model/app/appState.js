@@ -40,7 +40,7 @@ export function switchToCountdownAppState(countdown, lobbyState, gameNicknames) 
             gameNicknames[player.id] = player.n;
         })
 
-        loadGame()
+        loadGame();
         showCountdownWindow(countdown);
     }
 }

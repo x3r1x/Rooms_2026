@@ -2,6 +2,7 @@ import {initGameState} from "../../game/storage/gameState.js";
 import {updateStatisticView} from "../../../view/app/statisticsView.js";
 import {updateLobbyView} from "../../../view/app/lobbyView.js";
 import {changeCountdownTimer} from "../../../view/app/countdownView.js";
+import {parseMap} from "../preloadingResources/mapHandler.js";
 
 export function processWaitingMessage(parsedMessage, lobbyState) {
     if (!parsedMessage.oId || !parsedMessage.p) {
@@ -24,6 +25,7 @@ export function processReadyMessage(parsedMessage, lobbyState, gameState) {
 
     if (gameState == null) {
         initGameState(lobbyState.clientId);
+        parseMap(parsedMessage);
         //TODO: parse map
     }
 

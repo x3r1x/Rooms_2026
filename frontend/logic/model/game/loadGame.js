@@ -1,5 +1,5 @@
 import {initGameListeners, resizeCanvas} from "../../controller/gameListeners.js";
-import {assemblyRoom, parseMapData, parseTileInfo} from "./storage/layers.js";
+import {assemblyRoom, parseMapData} from "./storage/layers.js";
 import {initMap} from "../../view/game/maps.js";
 import {initSprites} from "../../view/game/sprites.js";
 import {gameState} from "./storage/gameState.js";
@@ -16,7 +16,6 @@ export async function loadGame() {
     const mapData = await loadData();
     const tileInfo = await loadTileInfo();
     parseMapData(mapData);
-    parseTileInfo(tileInfo);
     initMap();
     initSprites();
     assemblyRoom();
