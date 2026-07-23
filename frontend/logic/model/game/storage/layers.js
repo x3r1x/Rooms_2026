@@ -17,7 +17,7 @@ export function parseMapData(dataJson) {
     });
 }
 
-/*export function parserTileInfo(dataJson) {
+export function parseTileInfo(dataJson) {
     layersForRoom.tileSize = dataJson.tileheight;
     const tileArray = dataJson.tiles;
     tileArray.forEach(tile => {
@@ -33,7 +33,7 @@ export function parseMapData(dataJson) {
         };
         layersForRoom.tilesInfo[tile.id] = tileInfo;
     });
-}*/
+}
 
 export function getMapCollision(targetRoom) {
     targetRoom.collision = assemblyObject(targetRoom.walls, targetRoom.object);
@@ -72,12 +72,12 @@ export function assemblyObject(object1, object2) {
 
 export function mergeLayers(layers) {
     if (!layers || layers.length === 0 || !layers[0]?.data) {
-        return { name: "empty", data: [] };
+        return {name: "empty", data: []};
     }
     let layersAnswer = [...layers[0].data];
 
     for (let i = 1; i < layers.length; i++) {
-        let tempObj = assemblyObject({ data: layersAnswer }, layers[i]);
+        let tempObj = assemblyObject({data: layersAnswer}, layers[i]);
         layersAnswer = tempObj.data;
     }
 
@@ -135,8 +135,11 @@ export function assemblyRoom(targetRoom) {
     const arrayExit = getExit(targetRoom.exit);
     const layersExit = mergeLayers(arrayExit);
 
-    const baseFloor = layersForRoom.floor[0] || { name: "empty", data: [] };
-    const baseWalls = layersForRoom.walls[0] || { name: "empty", data: [] };
+    const baseFloor = layersForRoom.floor[0];
+    const baseWalls = layersForRoom.walls[0];
+
+    console.log(layersForRoom.floor)
+    console.log(layersForRoom.walls)
 
     targetRoom.exits = assemblyObject(baseFloor, layersExit);
     targetRoom.walls = assemblyObject(baseWalls, layersFlap);
@@ -149,7 +152,7 @@ export function assemblyRoom(targetRoom) {
         let randomIndexObjects = Math.floor(Math.random() * matchingObjects.length);
         targetRoom.object = matchingObjects[randomIndexObjects];
     } else {
-        targetRoom.object = { name: "empty", data: [] };
+        targetRoom.object = {name: "empty", data: []};
     }
 
     targetRoom.floors = baseFloor;

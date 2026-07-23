@@ -29,6 +29,7 @@ export function switchToWaitingAppState(socket) {
         appState = APP_STATES.WAITING;
         initLobbyListeners(socket);
         switchWindowFromRegistrationToLobby();
+        loadGame();
     }
 }
 
@@ -40,7 +41,6 @@ export function switchToCountdownAppState(countdown, lobbyState, gameNicknames) 
             gameNicknames[player.id] = player.n;
         })
 
-        loadGame();
         showCountdownWindow(countdown);
     }
 }

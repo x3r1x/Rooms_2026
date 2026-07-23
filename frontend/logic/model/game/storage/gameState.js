@@ -56,7 +56,7 @@ export const room = {
     collision: []
 }
 
-export const map= {
+export const gameMap= {
 
 }
 

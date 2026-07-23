@@ -1,4 +1,4 @@
-import { map} from "../../game/storage/gameState.js";
+import {gameMap} from "../../game/storage/gameState.js";
 import {assemblyRoom} from "../../game/storage/layers.js";
 
 const dataJson = {
@@ -41,7 +41,7 @@ export function parseMap() {
 
     for (const uuid in roomsMap) {
         const currentRoom = roomsMap[uuid];
-        map[uuid] = {
+        gameMap[uuid] = {
             id: currentRoom.id,
             type: `barrier${currentRoom.bT}`,
             doors: {
@@ -75,7 +75,9 @@ export function parseMap() {
 }
 
 function updateMap() {
-    for (const uuid in map) {
-        assemblyRoom(map[uuid]);
+    console.log(gameMap);
+    for (const uuid in gameMap) {
+        console.log(gameMap[uuid]);
+        assemblyRoom(gameMap[uuid]);
     }
 }
