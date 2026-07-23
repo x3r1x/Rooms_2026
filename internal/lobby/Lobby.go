@@ -77,6 +77,11 @@ func (l *Lobby) Run() {
 			}
 			wasReady := player.Ready
 
+			if player.Ready == updPlayer.Ready {
+				continue
+			}
+			player.Ready = updPlayer.Ready
+
 			if updPlayer.Ready && !wasReady {
 				l.playersReady++
 			} else if !updPlayer.Ready && wasReady {

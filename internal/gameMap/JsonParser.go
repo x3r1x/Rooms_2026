@@ -14,7 +14,7 @@ func NewJsonParser() *JsonParser {
 }
 
 func (jp *JsonParser) ParseTilesInfo() map[int16]*Tile {
-	tilesJson, err := os.Open("./internal/gameMap/tile/tileInfo.json")
+	tilesJson, err := os.Open("gameMap/tileInfo.json")
 
 	if err != nil {
 		fmt.Println("Error opening tiles JSON:", err)
@@ -32,7 +32,7 @@ func (jp *JsonParser) ParseTilesInfo() map[int16]*Tile {
 }
 
 func (jp *JsonParser) ParseRoomsInfo(tiles map[int16]*Tile) *RoomGenerator {
-	roomsJson, err := os.Open("./internal/gameMap/tile//allRoom.json")
+	roomsJson, err := os.Open("gameMap/allRoom.json")
 
 	if err != nil {
 		fmt.Println("Error opening rooms JSON:", err)
