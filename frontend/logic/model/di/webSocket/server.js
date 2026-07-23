@@ -40,8 +40,8 @@ export function parseMessage(socket, message) {
 
     switch (parsedMessage.s) {
         case APP_STATES.WAITING:
-            switchToWaitingAppState(socket);
             processWaitingMessage(parsedMessage, lobbyState);
+            switchToWaitingAppState(socket, lobbyState.clientId);
             break;
 
         case APP_STATES.READY:

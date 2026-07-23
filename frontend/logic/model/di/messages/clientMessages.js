@@ -6,8 +6,9 @@ export function registerClient(socket, nickname) {
     socket.send(JSON.stringify(message))
 }
 
-export function sendReadyState(socket, ready) {
+export function sendReadyState(socket,  ready, clientId) {
     const message = {
+        "id": clientId,
         "r": ready
     }
 

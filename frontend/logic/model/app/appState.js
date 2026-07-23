@@ -24,10 +24,10 @@ export function initAppState() {
     appState = APP_STATES.REGISTRATION;
 }
 
-export function switchToWaitingAppState(socket) {
+export function switchToWaitingAppState(socket, clientId) {
     if (appState !== APP_STATES.WAITING) {
         appState = APP_STATES.WAITING;
-        initLobbyListeners(socket);
+        initLobbyListeners(socket, clientId);
         switchWindowFromRegistrationToLobby();
         loadGame();
     }
