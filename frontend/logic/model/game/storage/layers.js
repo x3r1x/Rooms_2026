@@ -1,4 +1,4 @@
-import {layersForRoom, room} from "./gameState.js";
+import {layersForRoom} from "./gameState.js";
 
 export function parseMapData(dataJson) {
     layersForRoom.width = dataJson.width;
@@ -14,29 +14,45 @@ export function parseMapData(dataJson) {
             layersForRoom.flap.push({name: layer.name, data: layer.data});
         else if (layer.name.includes('barrier'))
             layersForRoom.objects.push({name: layer.name, data: layer.data});
-
     });
 }
 
-export function parseTileInfo(dataJson) {
+/*export function parserTileInfo(dataJson) {
     layersForRoom.tileSize = dataJson.tileheight;
     const tileArray = dataJson.tiles;
     tileArray.forEach(tile => {
         const property = {};
         tile.properties.forEach(p => {
             property[p.name] = JSON.parse(p.value);
-        })
-        layersForRoom.tilesInfo[tile.id] = {
+        });
+        const tileInfo = {
             id: tile.id,
             blocksBullet: property.blocksBullet,
             blocksPlayer: property.blocksPlayer,
             hitboxes: property.hitbox,
         };
+        layersForRoom.tilesInfo[tile.id] = tileInfo;
     });
+}*/
+
+export function getMapCollision(targetRoom) {
+    targetRoom.collision = assemblyObject(targetRoom.walls, targetRoom.object);
 }
 
-export function getMapCollision(){
-    room.collision = assemblyObject(room.walls, room.object);
+function getExit(exitList) {
+    const exits = [];
+    for (let exit in exitList) {
+        if (exitList[exit] === true) {
+            const found = layersForRoom.exit.find(f => f.name.toLowerCase().includes(exit));
+            if (found) {
+                exits.push({
+                    name: found.name,
+                    data: found.data
+                });
+            }
+        }
+    }
+    return exits;
 }
 
 export function assemblyObject(object1, object2) {
@@ -55,6 +71,9 @@ export function assemblyObject(object1, object2) {
 }
 
 export function mergeLayers(layers) {
+    if (!layers || layers.length === 0 || !layers[0]?.data) {
+        return { name: "empty", data: [] };
+    }
     let layersAnswer = [...layers[0].data];
 
     for (let i = 1; i < layers.length; i++) {
@@ -65,25 +84,28 @@ export function mergeLayers(layers) {
     return {name: "merge", data: layersAnswer};
 }
 
+function checkExit(layers) {
+    const exits = {top: false, left: false, down: false, right: false};
+    for (let layer of layers) {
+        const layerLower = layer.name.toLowerCase();
+        if (layerLower.includes('top')) exits.top = true;
+        if (layerLower.includes('left')) exits.left = true;
+        if (layerLower.includes('down')) exits.down = true;
+        if (layerLower.includes('right')) exits.right = true;
+    }
+    return exits;
+}
+
 export function getFlapList(arrayExit) {
     const flaps = {top: true, left: true, down: true, right: true};
     for (let exit of arrayExit) {
         const exitLower = exit.name.toLowerCase();
-        if (exitLower.includes('top')) {
-            flaps.top = false;
-        }
-        if (exitLower.includes('left')) {
-            flaps.left = false;
-        }
-        if (exitLower.includes('down')) {
-            flaps.down = false;
-        }
-        if (exitLower.includes('right')) {
-            flaps.right = false;
-        }
+        if (exitLower.includes('top')) flaps.top = false;
+        if (exitLower.includes('left')) flaps.left = false;
+        if (exitLower.includes('down')) flaps.down = false;
+        if (exitLower.includes('right')) flaps.right = false;
     }
     return flaps;
-
 }
 
 export function getFlap(flapList) {
@@ -102,24 +124,35 @@ export function getFlap(flapList) {
     return flaps;
 }
 
-export function assemblyRoom() {
-    const arrayExit = getRandomArray(layersForRoom.exit);
+export function assemblyRoom(targetRoom) {
+    if (!targetRoom || !targetRoom.flap || !targetRoom.exit) {
+        return;
+    }
 
-    room.exit = checkExit(arrayExit);
-    room.flap = getFlapList(arrayExit);
-    const arrayFlap = getFlap(room.flap);
-
+    const arrayFlap = getFlap(targetRoom.flap);
     const layersFlap = mergeLayers(arrayFlap);
+
+    const arrayExit = getExit(targetRoom.exit);
     const layersExit = mergeLayers(arrayExit);
 
-    room.exits = assemblyObject(layersForRoom.floor[0], layersExit);
-    room.walls = assemblyObject(layersForRoom.walls[0], layersFlap);
+    const baseFloor = layersForRoom.floor[0] || { name: "empty", data: [] };
+    const baseWalls = layersForRoom.walls[0] || { name: "empty", data: [] };
 
-    let randomIndexObjects = Math.floor(Math.random() * (layersForRoom.objects.length));
-    room.object = layersForRoom.objects[randomIndexObjects];
+    targetRoom.exits = assemblyObject(baseFloor, layersExit);
+    targetRoom.walls = assemblyObject(baseWalls, layersFlap);
 
-    room.floors = layersForRoom.floor[0];
+    const matchingObjects = layersForRoom.objects.filter(obj =>
+        obj.name.toLowerCase().includes(targetRoom.type.toLowerCase())
+    );
 
-    getMapCollision();
+    if (matchingObjects.length > 0) {
+        let randomIndexObjects = Math.floor(Math.random() * matchingObjects.length);
+        targetRoom.object = matchingObjects[randomIndexObjects];
+    } else {
+        targetRoom.object = { name: "empty", data: [] };
+    }
+
+    targetRoom.floors = baseFloor;
+    console.log("targetRoom", targetRoom);
+    getMapCollision(targetRoom);
 }
-

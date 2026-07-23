@@ -1,0 +1,50 @@
+{s: 'w', oId: '0d236a74-0be4-47b4-a149-8a4d262f6ce4', p: Array(1)}oId: "0d236a74-0be4-47b4-a149-8a4d262f6ce4"p: [{…}]s: "w"[[Prototype]]: Object
+server.js:38 {s: 'w', oId: '0d236a74-0be4-47b4-a149-8a4d262f6ce4', p: Array(2)}
+server.js:38 {s: 'w', oId: '0d236a74-0be4-47b4-a149-8a4d262f6ce4', p: Array(2)}
+server.js:38 {s: 'w', oId: '0d236a74-0be4-47b4-a149-8a4d262f6ce4', p: Array(2)}
+server.js:38 {s: 'r', c: 5, m: {…}}
+mapHandler.js:76 undefined
+mapHandler.js:81 []
+mapHandler.js:92 Uncaught TypeError: Cannot read properties of undefined (reading 'data')
+at updateMap (mapHandler.js:92:52)
+at parseMap (mapHandler.js:66:5)
+at processReadyMessage (serverMessages.js:28:9)
+at parseMessage (server.js:48:13)
+at socket.onmessage (server.js:26:9)
+updateMap @ mapHandler.js:92
+parseMap @ mapHandler.js:66
+processReadyMessage @ serverMessages.js:28
+parseMessage @ server.js:48
+socket.onmessage @ server.js:26
+server.js:38 {s: 'c', c: 5}
+layers.js:18 {width: 25, height: 21, tileSize: 0, floor: Array(1), walls: Array(1), …}
+layers.js:106 Uncaught (in promise) ReferenceError: getRandomArray is not defined
+at assemblyRoom (layers.js:106:23)
+at loadGame (loadGame.js:22:5)
+assemblyRoom @ layers.js:106
+loadGame @ loadGame.js:22
+await in loadGame
+switchToCountdownAppState @ appState.js:35
+parseMessage @ server.js:47
+socket.onmessage @ server.js:26
+server.js:38 {s: 'c', c: 4}
+server.js:38 {s: 'c', c: 3}
+server.js:38 {s: 'c', c: 2}
+server.js:38 {s: 'c', c: 1}
+server.js:38 {s: 'o', type: 'a', p: Array(2), b: Array(0)}
+collision.js:111 Uncaught TypeError: Cannot read properties of undefined (reading '312')
+at getNearbyTiles (collision.js:111:40)
+at canMoveTo (collision.js:14:20)
+at updatePlayer (players.js:10:9)
+at updateGame (updateGame.js:7:5)
+at startGameLoop (loadGame.js:39:5)
+getNearbyTiles @ collision.js:111
+canMoveTo @ collision.js:14
+updatePlayer @ players.js:10
+updateGame @ updateGame.js:7
+startGameLoop @ loadGame.js:39
+requestAnimationFrame
+switchToOngoingGameState @ appState.js:44
+parseMessage @ server.js:57
+socket.onmessage @ server.js:26
+server.js:38 {s: 'o', type: 'a', p: Array(2), b: Array(0)}

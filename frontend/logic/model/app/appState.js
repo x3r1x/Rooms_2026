@@ -32,7 +32,7 @@ export function switchToWaitingAppState(socket) {
 export function switchToCountdownAppState(countdown) {
     if (appState !== APP_STATES.COUNTDOWN) {
         appState = APP_STATES.COUNTDOWN;
-        loadGame()
+        loadGame();
         showCountdownWindow(countdown);
     }
 }

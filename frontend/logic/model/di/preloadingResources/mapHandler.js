@@ -1,5 +1,5 @@
-import {layersForRoom, map} from "../../game/storage/gameState.js";
-import {assemblyObject, getFlap, getFlapList, mergeLayers} from "../../game/storage/layers.js";
+import { map} from "../../game/storage/gameState.js";
+import {assemblyRoom} from "../../game/storage/layers.js";
 
 const dataJson = {
     "s": "r",
@@ -43,15 +43,23 @@ export function parseMap() {
         const currentRoom = roomsMap[uuid];
         map[uuid] = {
             id: currentRoom.id,
-            type: currentRoom.bT,
+            type: `barrier${currentRoom.bT}`,
             doors: {
                 top: currentRoom.eT || null,
                 left: currentRoom.eL || null,
                 bottom: currentRoom.eB || null,
                 right: currentRoom.eR || null
             },
+            exits: [],
+            floors: [],
             walls: [],
             object: [],
+            exit: {
+                top: Boolean(currentRoom.eT),
+                left: Boolean(currentRoom.eL),
+                down: Boolean(currentRoom.eB),
+                right: Boolean(currentRoom.eR)
+            },
             flap: {
                 top: !currentRoom.eT,
                 left: !currentRoom.eL,
@@ -68,28 +76,6 @@ export function parseMap() {
 
 function updateMap() {
     for (const uuid in map) {
-        const currentRoom = map[uuid];
-
-        const arrayFlap = getFlap(currentRoom.flap);
-
-        let assembledWalls = layersForRoom.walls[0];
-        console.log(assembledWalls);
-        if (arrayFlap.length > 0) {
-            const layersFlap = mergeLayers(arrayFlap);
-            assembledWalls = assemblyObject(layersForRoom.walls[0], layersFlap);
-        }
-        console.log(layersForRoom.walls);
-
-        const targetObjectName = `barrier${currentRoom.type}`;
-        const objectLayer = layersForRoom.objects.find(obj => obj.name.toLowerCase() === targetObjectName.toLowerCase());
-
-        currentRoom.object = objectLayer ? objectLayer.data : [];
-
-        if (objectLayer) {
-            const collisionResult = assemblyObject(assembledWalls, objectLayer);
-            currentRoom.collision = collisionResult.data;
-        } else {
-            currentRoom.collision = assembledWalls.data;
-        }
+        assemblyRoom(map[uuid]);
     }
 }
