@@ -17,16 +17,21 @@ func NewCollisionService(state *GameState) *CollisionService {
 func (cs *CollisionService) CheckBulletCollision(bullet model.Bullet) (bool, *model.PlayerGameState, *model.Object) {
 	bulletSAT := cs.buildBulletSAT(bullet)
 
+	// Проверка коллизии с игроками
 	for _, player := range cs.state.GetAllPlayers() {
 		if player.Id == bullet.OwnerId {
 			continue
 		}
-
+		if player.Health <= 0 {
+			continue
+		}
 		playerSAT := cs.buildPlayerSAT(player)
 		if collision.CheckCollisionSAT(bulletSAT, playerSAT) {
 			return true, player, nil
 		}
 	}
+
+	// Проверка коллизии с объектами (стенами)
 	for _, object := range cs.state.GetObjects() {
 		if !object.IsSolid {
 			continue
@@ -36,6 +41,7 @@ func (cs *CollisionService) CheckBulletCollision(bullet model.Bullet) (bool, *mo
 			return true, nil, object
 		}
 	}
+
 	return false, nil, nil
 }
 
@@ -73,38 +79,22 @@ func (cs *CollisionService) buildPlayerSAT(player *model.PlayerGameState) collis
 }
 
 func (cs *CollisionService) buildObjectSAT(obj *model.Object) collision.SATBox {
+	// Для объектов (стен) используем GetObjectPoints (от левого верхнего угла)
+	// и стандартные нормали для прямоугольников
 	points := collision.GetObjectPoints(obj.X, obj.Y, obj.Width, obj.Height)
-	normals := collision.GetNormals(points)
+	normals := collision.GetRectNormals()
 	return collision.SATBox{
 		Points:  points,
 		Normals: normals,
 	}
 }
 
-//func (cs *CollisionService) HandleObjectHit(obj *model.Object, bullet model.Bullet) {
-//	if obj == nil {
-//		return
-//	}
-//	if !obj.IsDestroyable {
-//		return
-//	}
-//	obj.Health -= cs.calculateDamage(bullet)
-//
-//	log.Printf("HIT! Object %s took %.2f damage. Health: %.2f\n")
-//	if obj.Health < 0 {
-//		cs.state.RemoveObject(obj.Id)
-//		log.Printf("Object %s was destroyed", obj.Id)
-//	}
-//}
-
 func (cs *CollisionService) HandlePlayerHit(player *model.PlayerGameState, bullet model.Bullet) {
 	if player == nil {
 		return
 	}
 	player.Health -= cs.calculateDamage(bullet)
-
-	log.Printf("HIT! Player %s took %.2f damage. Health: %.2f\n",
-		player.Id, player.Health)
+	log.Printf("HIT! Player %s took damage. Health: %.2f", player.Id, player.Health)
 
 	if player.Health < 0 {
 		if killer, exist := cs.state.GetPlayer(bullet.OwnerId); exist {
@@ -120,24 +110,25 @@ func (cs *CollisionService) calculateDamage(bullet model.Bullet) float64 {
 }
 
 func (cs *CollisionService) CheckPlayerExitCollision(player *model.PlayerGameState) (bool, string, string) {
-	// Получаем текущую комнату игрока
 	currentRoomId := cs.state.GetPlayerRoom(player.Id)
 	if currentRoomId == "" {
 		return false, "", ""
 	}
 
-	// Получаем информацию о комнате
 	roomInfo := cs.state.GetRoomManager().GetRoomInfo(currentRoomId)
 	if roomInfo == nil {
 		return false, "", ""
 	}
 
-	// Проверяем каждую сторону выхода
+	roomPixelWidth := float64(model.RoomWidth * int(model.TileSize))
+	roomPixelHeight := float64(model.RoomHeight * int(model.TileSize))
+	halfSize := model.PlayerHalfSize
+
 	exitChecks := map[string]func() bool{
-		model.TopMarker:    func() bool { return player.Y < 0 },
-		model.BottomMarker: func() bool { return player.Y > float64(model.RoomHeight*36) },
-		model.LeftMarker:   func() bool { return player.X < 0 },
-		model.RightMarker:  func() bool { return player.X > float64(model.RoomWidth*36) },
+		model.TopMarker:    func() bool { return player.Y-halfSize < 0 },
+		model.BottomMarker: func() bool { return player.Y+halfSize > roomPixelHeight },
+		model.LeftMarker:   func() bool { return player.X-halfSize < 0 },
+		model.RightMarker:  func() bool { return player.X+halfSize > roomPixelWidth },
 	}
 
 	for direction, check := range exitChecks {
@@ -148,10 +139,9 @@ func (cs *CollisionService) CheckPlayerExitCollision(player *model.PlayerGameSta
 			}
 		}
 	}
-
 	return false, "", ""
 }
 
 func (cs *CollisionService) getRoomPixelSize() float64 {
-	return float64(model.RoomWidth * 36)
+	return float64(model.RoomWidth * int(model.TileSize))
 }

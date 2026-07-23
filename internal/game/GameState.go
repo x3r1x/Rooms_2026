@@ -153,7 +153,7 @@ func (gs *GameState) RemovePlayer(playerId string) {
 
 func (gs *GameState) UpdatePlayer(upd model.ClientGameMessage) {
 	player, exist := gs.GetPlayer(upd.Id)
-	if !exist {
+	if !exist || player == nil {
 		return
 	}
 
