@@ -132,5 +132,5 @@ func getMinMax(points []Point, axis Point) (float64, float64) {
 }
 
 func isOverlapping(min1, max1, min2, max2 float64) bool {
-	return (max1 >= min2) && (max2 >= min1)
+	return (max1+model.Epsilon >= min2) && (max2+model.Epsilon >= min1)
 }

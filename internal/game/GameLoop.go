@@ -68,9 +68,6 @@ func (gl *GameLoop) Run() {
 				gl.endGame()
 				return
 			}
-			if remaining%10 == 0 {
-				log.Printf("Осталось времени: %d секунд", remaining)
-			}
 			gl.broadcast(model.ServerGameMessage{
 				State:   model.OngoingGameState,
 				Type:    "a",
@@ -90,9 +87,6 @@ func (gl *GameLoop) cleanup() {
 	gl.game.SetBullets([]model.Bullet{})
 	gl.game.SetObjects(make(map[string]*model.Object))
 	gl.game.SetGameActive(false)
-	close(gl.updateChan)
-	close(gl.deleteChan)
-	close(gl.stopChan)
 	if gl.finishChan != nil {
 		select {
 		case gl.finishChan <- true:
@@ -215,6 +209,10 @@ func (gl *GameLoop) updatePlayers() {
 			player.Y = nextY
 		}
 
+		if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
+			gl.collisionService.ResolvePlayerCollisionSmooth(player)
+		}
+
 		if hit, direction, targetRoomId := gl.collisionService.CheckPlayerExitCollision(player); hit {
 			gl.handleRoomTransition(player, direction, targetRoomId)
 		}
@@ -224,33 +222,43 @@ func (gl *GameLoop) updatePlayers() {
 func (gl *GameLoop) canMoveTo(nextX, nextY float64, player *model.PlayerGameState) bool {
 	oldX, oldY := player.X, player.Y
 
-	// Проверяем движение по X
+	bestX, bestY := oldX, oldY
+	moved := false
+
 	player.X = nextX
-	if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
-		player.X = oldX
-		return false
+	if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); !hit {
+		bestX = nextX
+		moved = true
 	}
+	player.X = oldX
 
-	// Проверяем движение по Y
-	player.X = oldX // Возвращаем X обратно
 	player.Y = nextY
-	if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
-		player.Y = oldY
-		return false
+	if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); !hit {
+		bestY = nextY
+		moved = true
 	}
+	player.Y = oldY
 
-	// Если по отдельным осям прошло, проверяем диагональ
 	player.X = nextX
 	player.Y = nextY
-	if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
+	if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); !hit {
+		bestX = nextX
+		bestY = nextY
+		moved = true
+	} else {
 		player.X = oldX
 		player.Y = oldY
-		return false
 	}
 
-	return true
+	player.X = bestX
+	player.Y = bestY
+
+	if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
+		gl.collisionService.ResolvePlayerCollisionSmooth(player)
+	}
+
+	return moved
 }
-
 func (gl *GameLoop) handleRoomTransition(player *model.PlayerGameState, direction, targetRoomId string) {
 	roomPixelWidth := float64(model.RoomWidth * int(model.TileSize))
 	roomPixelHeight := float64(model.RoomHeight * int(model.TileSize))

@@ -4,6 +4,7 @@ import (
 	"gamedevRooms/internal/collision"
 	"gamedevRooms/internal/model"
 	"log"
+	"math"
 )
 
 type CollisionService struct {
@@ -144,4 +145,38 @@ func (cs *CollisionService) CheckPlayerExitCollision(player *model.PlayerGameSta
 
 func (cs *CollisionService) getRoomPixelSize() float64 {
 	return float64(model.RoomWidth * int(model.TileSize))
+}
+
+func (cs *CollisionService) ResolvePlayerCollisionSmooth(player *model.PlayerGameState) bool {
+	hit, obj := cs.CheckPlayerObjectCollision(player)
+	if !hit {
+		return false
+	}
+
+	playerHalf := model.PlayerHalfSize
+
+	rightOverlap := (player.X + playerHalf) - obj.X
+	leftOverlap := (obj.X + obj.Width) - (player.X - playerHalf)
+
+	bottomOverlap := (player.Y + playerHalf) - obj.Y
+	topOverlap := (obj.Y + obj.Height) - (player.Y - playerHalf)
+
+	minOverlapX := math.Min(rightOverlap, leftOverlap)
+	minOverlapY := math.Min(bottomOverlap, topOverlap)
+
+	if minOverlapX < minOverlapY {
+		if rightOverlap < leftOverlap {
+			player.X = obj.X - playerHalf - 0.01
+		} else {
+			player.X = obj.X + obj.Width + playerHalf + 0.01
+		}
+	} else {
+		if bottomOverlap < topOverlap {
+			player.Y = obj.Y - playerHalf - 0.01
+		} else {
+			player.Y = obj.Y + obj.Height + playerHalf + 0.01
+		}
+	}
+
+	return true
 }

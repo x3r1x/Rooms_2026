@@ -4,7 +4,7 @@ const (
 	// константы для пуль
 	MaxBulletSpeed     = 25.0
 	BulletLife         = 60.0
-	ShootCooldown      = 3
+	ShootCooldown      = 15
 	BulletLength       = 25.0
 	BulletWidth        = 5.0
 	BulletDamage       = 10.0
@@ -15,7 +15,7 @@ const (
 	PlayerSpawnPointY = 400
 	InitDirection     = 0
 	InitValue         = 0
-	PlayerVisualSize  = 30.0
+	PlayerVisualSize  = 40.0
 	PlayerSpeed       = 0.4
 	MaxPlayerHealth   = 100
 	PlayerRebornTimer = 300
@@ -46,6 +46,7 @@ const (
 	ConnectNeighbouredRoomChance = 0.4
 	TileSize                     = 36
 	PlayerHalfSize               = PlayerVisualSize / 2.0
+	Epsilon                      = 0.001
 	// константы для лобби
 	WaitingLobbyState   = "w"
 	ReadyLobbyState     = "r"
