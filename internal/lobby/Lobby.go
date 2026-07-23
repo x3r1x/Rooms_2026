@@ -11,21 +11,26 @@ import (
 )
 
 type Lobby struct {
-	state        string
-	players      map[string]*LobbyPlayer
-	playersReady int
-	gameLoop     *game.GameLoop
-	addChan      chan *LobbyPlayer
-	readyChan    chan *LobbyPlayer
-	removeChan   chan string
+	state           string
+	players         map[string]*LobbyPlayer
+	playersReady    int
+	gameLoop        *game.GameLoop
+	addChan         chan *LobbyPlayer
+	readyChan       chan *LobbyPlayer
+	removeChan      chan string
+	getStateChan    chan chan string
+	getGameLoopChan chan chan *game.GameLoop
 }
 
 func NewLobby() *Lobby {
 	l := &Lobby{
-		players:    make(map[string]*LobbyPlayer),
-		addChan:    make(chan *LobbyPlayer),
-		readyChan:  make(chan *LobbyPlayer),
-		removeChan: make(chan string),
+		state:           model.WaitingLobbyState,
+		players:         make(map[string]*LobbyPlayer),
+		addChan:         make(chan *LobbyPlayer),
+		readyChan:       make(chan *LobbyPlayer),
+		removeChan:      make(chan string),
+		getStateChan:    make(chan chan string),
+		getGameLoopChan: make(chan chan *game.GameLoop),
 	}
 	go l.Run()
 	return l
@@ -44,6 +49,18 @@ func (l *Lobby) UpdatePlayerInLobby(msg *LobbyPlayer) {
 
 func (l *Lobby) RemovePlayerFromLobby(id string) {
 	l.removeChan <- id
+}
+
+func (l *Lobby) GetState() string {
+	responseChan := make(chan string)
+	l.getStateChan <- responseChan
+	return <-responseChan
+}
+
+func (l *Lobby) GetGameLoop() *game.GameLoop {
+	responseChan := make(chan *game.GameLoop)
+	l.getGameLoopChan <- responseChan
+	return <-responseChan
 }
 
 func (l *Lobby) Run() {
@@ -77,6 +94,10 @@ func (l *Lobby) Run() {
 			}
 		case delPlayer := <-l.removeChan:
 			l.removeUser(delPlayer)
+		case responseChan := <-l.getStateChan:
+			responseChan <- l.state
+		case responseChan := <-l.getGameLoopChan:
+			responseChan <- l.gameLoop
 		}
 	}
 }
@@ -105,14 +126,6 @@ func (l *Lobby) broadcastLobbyState() {
 			}
 		}
 	}
-}
-
-func (l *Lobby) GetGameLoop() *game.GameLoop {
-	return l.gameLoop
-}
-
-func (l *Lobby) GetState() string {
-	return l.state
 }
 
 func (l *Lobby) removeUser(id string) {
