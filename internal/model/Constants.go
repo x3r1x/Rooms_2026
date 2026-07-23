@@ -2,13 +2,14 @@ package model
 
 const (
 	// константы для пуль
-	MaxBulletSpeed    = 22.5
-	BulletLife        = 60.0
-	ShootCooldown     = 15
-	BulletLength      = 25.0
-	BulletWidth       = 5.0
-	BulletDamage      = 10.0
-	BulletDamageMulti = 1.2
+	MaxBulletSpeed     = 22.5
+	BulletLife         = 60.0
+	ShootCooldown      = 15
+	BulletLength       = 25.0
+	BulletWidth        = 5.0
+	BulletDamage       = 10.0
+	BulletDamageMulti  = 1.2
+	BulletBarrelOffset = 15.0
 	// константы для игроков
 	PlayerSpawnPointX = 500
 	PlayerSpawnPointY = 500
