@@ -1,9 +1,5 @@
 package domain
 
-import (
-	"github.com/google/uuid"
-)
-
 type LobbyPlayer struct {
 	Nickname string
 	Id       string
@@ -13,7 +9,7 @@ type LobbyPlayer struct {
 func NewLobbyPlayer(nickname string) *LobbyPlayer {
 	return &LobbyPlayer{
 		Nickname: nickname,
-		Id:       uuid.New().String(),
+		Id:       GenerateID(),
 		Ready:    false,
 	}
 }
