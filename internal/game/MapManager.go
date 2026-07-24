@@ -20,7 +20,7 @@ func NewMapManager(gameState *GameState) *MapManager {
 	mm := &MapManager{
 		gameMap:   gameMap,
 		gameState: gameState,
-		tileSize:  model.TileSize, // Используем константу из model
+		tileSize:  model.TileSize,
 	}
 	mm.loadMapObjects()
 	return mm
@@ -38,7 +38,6 @@ func (mm *MapManager) loadMapObjects() {
 			}
 
 			isSolid := false
-			// ИСПРАВЛЕНИЕ: Ищем свойство "blocksPlayer", как указано в tileInfo.json
 			for _, prop := range tile.Properties {
 				if prop.Name == "blocksPlayer" {
 					if val, ok := prop.Value.(bool); ok && val {
@@ -92,7 +91,6 @@ func (mm *MapManager) GetRoomMessages() map[string]model.RoomMessage {
 	return result
 }
 
-// GetRoomInfo возвращает комнату по её ID
 func (mm *MapManager) GetRoomInfo(roomId string) *mapModel.Room {
 	if mm.gameMap == nil {
 		return nil
@@ -104,7 +102,6 @@ func (mm *MapManager) GetRoomInfo(roomId string) *mapModel.Room {
 	return rooms[roomId]
 }
 
-// GetExit возвращает ID соседней комнаты в указанном направлении
 func (mm *MapManager) GetExit(roomId, direction string) string {
 	room := mm.GetRoomInfo(roomId)
 	if room == nil {

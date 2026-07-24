@@ -103,6 +103,15 @@ func (cs *CollisionService) HandlePlayerHit(player *model.PlayerGameState, bulle
 	player.Health -= cs.calculateDamage(bullet)
 	log.Printf("HIT! Player %s took damage. Health: %.2f", player.Id, player.Health)
 
+	knockbackX := math.Cos(bullet.Direction) * cs.calculateKnockbackKoef(bullet)
+	knockbackY := math.Sin(bullet.Direction) * cs.calculateKnockbackKoef(bullet)
+	player.X += knockbackX
+	player.Y += knockbackY
+
+	if hit, _ := cs.CheckPlayerObjectCollision(player); hit {
+		cs.ResolvePlayerCollisionSmooth(player)
+	}
+
 	if player.Health < 0 {
 		if killer, exist := cs.state.GetPlayer(bullet.OwnerId); exist {
 			killer.BodyCount++
@@ -113,7 +122,11 @@ func (cs *CollisionService) HandlePlayerHit(player *model.PlayerGameState, bulle
 }
 
 func (cs *CollisionService) calculateDamage(bullet model.Bullet) float64 {
-	return model.BulletDamage * (bullet.Life/model.BulletLife*model.BulletDamageMulti + 1)
+	return math.Round(model.BulletDamage * (bullet.Life/model.BulletLife*model.BulletDamageMulti + 1))
+}
+
+func (cs *CollisionService) calculateKnockbackKoef(bullet model.Bullet) float64 {
+	return model.KnockbackForce * (bullet.Life/model.BulletLife*model.BulletDamageMulti + 1)
 }
 
 func (cs *CollisionService) CheckPlayerExitCollision(player *model.PlayerGameState) (bool, string, string) {

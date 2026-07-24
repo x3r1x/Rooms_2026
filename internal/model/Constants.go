@@ -9,13 +9,15 @@ const (
 	BulletWidth        = 5.0
 	BulletDamage       = 10.0
 	BulletDamageMulti  = 1.2
-	BulletBarrelOffset = 15.0
+	BulletBarrelOffset = 24.0
+	RecoilDistance     = 8.0
+	KnockbackForce     = 12.0
 	// константы для игроков
 	PlayerSpawnPointX = 710
 	PlayerSpawnPointY = 400
 	InitDirection     = 0
 	InitValue         = 0
-	PlayerVisualSize  = 40.0
+	PlayerVisualSize  = 34.0
 	PlayerSpeed       = 0.4
 	MaxPlayerHealth   = 100
 	PlayerRebornTimer = 300
