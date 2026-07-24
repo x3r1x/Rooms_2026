@@ -1,4 +1,4 @@
-package mapModel
+package generator
 
 type Tile struct {
 	Id         int16            `json:"id"`

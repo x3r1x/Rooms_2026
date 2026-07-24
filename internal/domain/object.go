@@ -9,3 +9,12 @@ type Object struct {
 	Type    string  `json:"type"`
 	IsSolid bool    `json:"isSolid"`
 }
+
+func GetObjectPoints(x, y, width, height float64) []Point {
+	return []Point{
+		{x, y},
+		{x + width, y},
+		{x + width, y + height},
+		{x, y + height},
+	}
+}

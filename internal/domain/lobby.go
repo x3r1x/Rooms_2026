@@ -2,14 +2,12 @@ package domain
 
 import (
 	"github.com/google/uuid"
-	"github.com/gorilla/websocket"
 )
 
 type LobbyPlayer struct {
-	Nickname   string
-	Id         string
-	Ready      bool
-	Connection *websocket.Conn
+	Nickname string
+	Id       string
+	Ready    bool
 }
 
 func NewLobbyPlayer(nickname string) *LobbyPlayer {

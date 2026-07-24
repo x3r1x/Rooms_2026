@@ -2,6 +2,7 @@ package lobby
 
 import (
 	"encoding/json"
+	"gamedevRooms/internal/adapters/map"
 	"gamedevRooms/internal/domain"
 	"gamedevRooms/internal/game"
 	"gamedevRooms/internal/model"
@@ -188,7 +189,7 @@ func (l *Lobby) StartGame() {
 		}
 	}
 
-	mapManager := game.NewMapManager(gameState)
+	mapManager := _map.NewMapManager(gameState)
 	roomMessages := mapManager.GetRoomMessages()
 	l.sendReadyState(roomMessages)
 	l.doCountdown()

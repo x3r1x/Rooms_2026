@@ -1,4 +1,4 @@
-package mapModel
+package generator
 
 import (
 	"fmt"

@@ -3,8 +3,8 @@ package main
 import (
 	"embed"
 	"fmt"
+	"gamedevRooms/internal/adapters/websocket"
 	"gamedevRooms/internal/lobby"
-	"gamedevRooms/internal/websocket"
 	"io/fs"
 	"log"
 	"net/http"

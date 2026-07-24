@@ -2,6 +2,7 @@ package game
 
 import (
 	"fmt"
+	"gamedevRooms/internal/adapters/map"
 	"gamedevRooms/internal/domain"
 	"gamedevRooms/internal/factory"
 	"gamedevRooms/internal/model"
@@ -17,7 +18,7 @@ type GameState struct {
 	isGameActive  bool
 	gameStartTime time.Time
 	gameDuration  time.Duration
-	roomManager   *MapManager
+	roomManager   *_map.MapManager
 	playerRooms   map[string]string
 	roomPlayers   map[string][]string
 }
@@ -50,11 +51,11 @@ func (gs *GameState) SetPlayerRoom(id, roomId string) {
 	gs.addPlayerToRoom(roomId, id)
 }
 
-func (gs *GameState) GetRoomManager() *MapManager {
+func (gs *GameState) GetRoomManager() *_map.MapManager {
 	return gs.roomManager
 }
 
-func (gs *GameState) SetRoomManager(mm *MapManager) {
+func (gs *GameState) SetRoomManager(mm *_map.MapManager) {
 	gs.roomManager = mm
 }
 

@@ -159,10 +159,6 @@ func (gl *GameLoop) updateShooterTimers() {
 func (gl *GameLoop) updateBullets() {
 	activeBullets := make([]model.Bullet, 0)
 	for _, bullet := range gl.game.GetAllBullets() {
-		bullet.Life--
-		bullet.X += math.Cos(bullet.Direction) * domain.MaxBulletSpeed
-		bullet.Y += math.Sin(bullet.Direction) * domain.MaxBulletSpeed
-
 		if bullet.Life > 0 {
 			hit, player, obj := gl.collisionService.CheckBulletCollision(bullet)
 			if hit {

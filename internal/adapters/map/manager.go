@@ -1,8 +1,9 @@
-package game
+package _map
 
 import (
+	"gamedevRooms/internal/adapters/map/generator"
 	"gamedevRooms/internal/domain"
-	mapModel "gamedevRooms/internal/gameMap"
+	"gamedevRooms/internal/game"
 	"gamedevRooms/internal/model"
 	"log"
 	"strconv"
@@ -11,14 +12,14 @@ import (
 )
 
 type MapManager struct {
-	gameMap   *mapModel.Map
-	gameState *GameState
+	gameMap   *generator.Map
+	gameState *game.GameState
 	tileSize  float64
 }
 
-func NewMapManager(gameState *GameState) *MapManager {
+func NewMapManager(gameState *game.GameState) *MapManager {
 	//gameMap := mapModel.NewMap(gameState.GetCountOfPlayers()/3 + 1)
-	gameMap := mapModel.NewMap(1)
+	gameMap := generator.NewMap(1)
 	mm := &MapManager{
 		gameMap:   gameMap,
 		gameState: gameState,
@@ -93,7 +94,7 @@ func (mm *MapManager) GetRoomMessages() map[string]domain.RoomMessage {
 	return result
 }
 
-func (mm *MapManager) GetRoomInfo(roomId string) *mapModel.Room {
+func (mm *MapManager) GetRoomInfo(roomId string) *generator.Room {
 	if mm.gameMap == nil {
 		return nil
 	}

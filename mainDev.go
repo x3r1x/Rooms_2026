@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	"gamedevRooms/internal/adapters/websocket"
 	"gamedevRooms/internal/lobby"
-	"gamedevRooms/internal/websocket"
 	"log"
 	"net/http"
 )
