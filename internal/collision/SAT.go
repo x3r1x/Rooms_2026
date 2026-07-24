@@ -14,7 +14,6 @@ type SATBox struct {
 	Normals []Point
 }
 
-// GetPlayerPoints рассчитывает точки относительно центра игрока
 func GetPlayerPoints(centerX, centerY, angle float64) []Point {
 	cosAngle := math.Cos(angle)
 	sinAngle := math.Sin(angle)
@@ -37,7 +36,6 @@ func GetPlayerPoints(centerX, centerY, angle float64) []Point {
 	return points
 }
 
-// GetBulletPoints рассчитывает точки пули относительно её центра (x, y)
 func GetBulletPoints(x, y, angle float64) []Point {
 	cosAngle := math.Cos(angle)
 	sinAngle := math.Sin(angle)
@@ -61,8 +59,6 @@ func GetBulletPoints(x, y, angle float64) []Point {
 	return points
 }
 
-// GetObjectPoints рассчитывает точки объекта (стены) от левого верхнего угла (x, y)
-// Это соответствует логике фронтенда и данным из Tiled
 func GetObjectPoints(x, y, width, height float64) []Point {
 	return []Point{
 		{x, y},
@@ -72,7 +68,6 @@ func GetObjectPoints(x, y, width, height float64) []Point {
 	}
 }
 
-// GetRectNormals возвращает стандартные нормали для axis-aligned прямоугольника
 func GetRectNormals() []Point {
 	return []Point{
 		{X: 0, Y: -1},
@@ -132,5 +127,14 @@ func getMinMax(points []Point, axis Point) (float64, float64) {
 }
 
 func isOverlapping(min1, max1, min2, max2 float64) bool {
-	return (max1 >= min2) && (max2 >= min1)
+	return (max1+model.Epsilon >= min2) && (max2+model.Epsilon >= min1)
+}
+
+func GetAxisAlignedPoints(centerX, centerY, halfSize float64) []Point {
+	return []Point{
+		{centerX - halfSize, centerY - halfSize},
+		{centerX + halfSize, centerY - halfSize},
+		{centerX + halfSize, centerY + halfSize},
+		{centerX - halfSize, centerY + halfSize},
+	}
 }

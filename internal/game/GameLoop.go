@@ -68,9 +68,6 @@ func (gl *GameLoop) Run() {
 				gl.endGame()
 				return
 			}
-			if remaining%10 == 0 {
-				log.Printf("Осталось времени: %d секунд", remaining)
-			}
 			gl.broadcast(model.ServerGameMessage{
 				State:   model.OngoingGameState,
 				Type:    "a",
@@ -90,9 +87,6 @@ func (gl *GameLoop) cleanup() {
 	gl.game.SetBullets([]model.Bullet{})
 	gl.game.SetObjects(make(map[string]*model.Object))
 	gl.game.SetGameActive(false)
-	close(gl.updateChan)
-	close(gl.deleteChan)
-	close(gl.stopChan)
 	if gl.finishChan != nil {
 		select {
 		case gl.finishChan <- true:
@@ -141,7 +135,7 @@ func (gl *GameLoop) endGame() {
 }
 
 func (gl *GameLoop) getStatistics() []model.PlayerFinalState {
-	stats := make([]model.PlayerFinalState, len(gl.game.GetAllPlayers()))
+	stats := make([]model.PlayerFinalState, 0, len(gl.game.GetAllPlayers()))
 	for _, player := range gl.game.GetAllPlayers() {
 		stats = append(stats, model.PlayerFinalState{
 			Nickname: player.Nickname,
@@ -169,7 +163,6 @@ func (gl *GameLoop) updateBullets() {
 		bullet.Y += math.Sin(bullet.Direction) * model.MaxBulletSpeed
 
 		if bullet.Life > 0 {
-			// ИСПРАВЛЕНИЕ: Сохраняем объект, в который попала пуля
 			hit, player, obj := gl.collisionService.CheckBulletCollision(bullet)
 			if hit {
 				if player != nil && player.Health > 0 {
@@ -208,47 +201,25 @@ func (gl *GameLoop) updatePlayers() {
 		deltaY := moveY * model.TickTime * model.PlayerSpeed
 
 		nextX := player.X + deltaX
-		nextY := player.Y + deltaY
+		player.X = nextX
+		if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
+			player.X -= deltaX
+		}
 
-		if gl.canMoveTo(nextX, nextY, player) {
-			player.X = nextX
-			player.Y = nextY
+		nextY := player.Y + deltaY
+		player.Y = nextY
+		if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
+			player.Y -= deltaY
+		}
+
+		if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
+			gl.collisionService.ResolvePlayerCollisionSmooth(player)
 		}
 
 		if hit, direction, targetRoomId := gl.collisionService.CheckPlayerExitCollision(player); hit {
 			gl.handleRoomTransition(player, direction, targetRoomId)
 		}
 	}
-}
-
-func (gl *GameLoop) canMoveTo(nextX, nextY float64, player *model.PlayerGameState) bool {
-	oldX, oldY := player.X, player.Y
-
-	// Проверяем движение по X
-	player.X = nextX
-	if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
-		player.X = oldX
-		return false
-	}
-
-	// Проверяем движение по Y
-	player.X = oldX // Возвращаем X обратно
-	player.Y = nextY
-	if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
-		player.Y = oldY
-		return false
-	}
-
-	// Если по отдельным осям прошло, проверяем диагональ
-	player.X = nextX
-	player.Y = nextY
-	if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
-		player.X = oldX
-		player.Y = oldY
-		return false
-	}
-
-	return true
 }
 
 func (gl *GameLoop) handleRoomTransition(player *model.PlayerGameState, direction, targetRoomId string) {

@@ -179,10 +179,10 @@ func (l *Lobby) StartGame() {
 				MoveX:       model.InitValue,
 				MoveY:       model.InitValue,
 				Connection:  player.Connection,
-				ShootTimer:  0,
-				RebornTimer: 0,
-				BodyCount:   0,
-				DeathCount:  0,
+				ShootTimer:  model.InitValue,
+				RebornTimer: model.InitValue,
+				BodyCount:   model.InitValue,
+				DeathCount:  model.InitValue,
 			})
 		}
 	}
