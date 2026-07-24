@@ -5,6 +5,6 @@ export function initRegistrationListeners(socket) {
     button.onclick = () => {
         const nicknameInput = document.getElementById("nicknameInput");
         socket = getSocket(nicknameInput.value);
-        button.disabled = true;
+        button.onclick = () => {};
     }
 }

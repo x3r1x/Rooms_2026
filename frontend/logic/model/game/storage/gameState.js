@@ -46,9 +46,7 @@ export function startGameState(dateNow) {
     gameState.previousVisualDirection = 0;
 }
 
-export const gameMap= {
-
-}
+export const gameMap= {}
 
 export const layersForRoom = {
     width: 0,
@@ -65,4 +63,10 @@ export const layersForRoom = {
 export function setFinalStatistics(statistic) {
     finalStatistics = statistic;
     finalStatistics.sort((player1, player2) => player2.k - player1.k);
+}
+
+export function resetGameStateStorage() {
+    gameState = null;
+    gameNicknames = {};
+    finalStatistics = null;
 }

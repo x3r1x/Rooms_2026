@@ -8,10 +8,13 @@ import {
 } from "../../view/app/windowSwitcher.js";
 import {initLobbyListeners} from "../../controller/lobbyListeners.js";
 import {loadGame, startGameLoop} from "../game/loadGame.js";
-import {finalStatistics, gameNicknames, gameState, startGameState} from "../game/storage/gameState.js";
+import {
+    resetGameStateStorage,
+    startGameState
+} from "../game/storage/gameState.js";
 import {initGameEndListeners} from "../../controller/gameEndListeners.js";
 import {fillResultWindow} from "../../view/app/gameEndView.js";
-import {initRegistrationListeners} from "../../controller/registrationListeners";
+import {initRegistrationListeners} from "../../controller/registrationListeners.js";
 
 export let appState = null
 export let socket = null
@@ -77,7 +80,5 @@ export function resetStates() {
     lobbyState.clientId = null;
     lobbyState.players = {};
     lobbyState.countdown = null;
-    gameState = null;
-    gameNicknames = {};
-    finalStatistics = null;
+    resetGameStateStorage();
 }

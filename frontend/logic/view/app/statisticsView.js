@@ -2,7 +2,7 @@ export function updateStatisticView(gameState, gameNicknames) {
     const listElement = document.getElementById("players-list");
 
     const allPlayers = [gameState.player, ...gameState.enemies];
-    allPlayers.sort((player1, player2) => player1.nickname.localeCompare(player2.nickname));
+    allPlayers.sort((p1, p2) => gameNicknames[p1.id].localeCompare(gameNicknames[p2.id]));
 
     listElement.innerHTML = allPlayers.map(p => {
         const isMe = p.id === gameState.player.id;

@@ -2,7 +2,6 @@ import {TILE_IMG} from "../../../model/game/storage/gameConstants.js";
 import {layersForRoom, gameMap} from "../../../model/game/storage/gameState.js";
 
 export function drawBackground(canvas, context) {
-    console.log(gameMap[0]);
     //const mapExit = gameMap.exits.data;
     const mapFloor = gameMap[0].floors.data;
     const mapWall = gameMap[0].walls.data;
