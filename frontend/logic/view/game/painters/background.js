@@ -1,5 +1,5 @@
 import {TILE_IMG} from "../../../model/game/storage/gameConstants.js";
-import {layersForRoom, room, gameMap} from "../../../model/game/storage/gameState.js";
+import {layersForRoom, gameMap} from "../../../model/game/storage/gameState.js";
 
 export function drawBackground(canvas, context) {
     console.log(gameMap[0]);
