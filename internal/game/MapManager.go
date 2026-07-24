@@ -1,6 +1,7 @@
 package game
 
 import (
+	"gamedevRooms/internal/domain"
 	mapModel "gamedevRooms/internal/gameMap"
 	"gamedevRooms/internal/model"
 	"log"
@@ -21,7 +22,7 @@ func NewMapManager(gameState *GameState) *MapManager {
 	mm := &MapManager{
 		gameMap:   gameMap,
 		gameState: gameState,
-		tileSize:  model.TileSize,
+		tileSize:  domain.TileSize,
 	}
 	mm.loadMapObjects()
 	return mm
@@ -49,8 +50,8 @@ func (mm *MapManager) loadMapObjects() {
 			}
 
 			if isSolid {
-				row := i / model.RoomWidth
-				col := i % model.RoomWidth
+				row := i / domain.RoomWidth
+				col := i % domain.RoomWidth
 				obj := &model.Object{
 					Id:      uuid.New().String(),
 					X:       float64(col) * mm.tileSize,
@@ -70,8 +71,8 @@ func (mm *MapManager) loadMapObjects() {
 	mm.gameState.SetObjects(objects)
 }
 
-func (mm *MapManager) GetRoomMessages() map[string]model.RoomMessage {
-	result := make(map[string]model.RoomMessage)
+func (mm *MapManager) GetRoomMessages() map[string]domain.RoomMessage {
+	result := make(map[string]domain.RoomMessage)
 	for id, room := range mm.gameMap.GetGameMap() {
 		barrierNum := 1
 		barrierStr := room.GetBarrierType()
@@ -80,11 +81,11 @@ func (mm *MapManager) GetRoomMessages() map[string]model.RoomMessage {
 				barrierNum = num
 			}
 		}
-		result[id] = model.RoomMessage{
-			ExitTop:    room.GetExit(model.TopMarker),
-			ExitLeft:   room.GetExit(model.LeftMarker),
-			ExitBottom: room.GetExit(model.BottomMarker),
-			ExitRight:  room.GetExit(model.RightMarker),
+		result[id] = domain.RoomMessage{
+			ExitTop:    room.GetExit(domain.TopMarker),
+			ExitLeft:   room.GetExit(domain.LeftMarker),
+			ExitBottom: room.GetExit(domain.BottomMarker),
+			ExitRight:  room.GetExit(domain.RightMarker),
 			Id:         room.GetId(),
 			BorderType: barrierNum,
 		}

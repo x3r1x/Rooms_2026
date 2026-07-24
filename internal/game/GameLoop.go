@@ -2,6 +2,7 @@ package game
 
 import (
 	"encoding/json"
+	"gamedevRooms/internal/domain"
 	"gamedevRooms/internal/model"
 	"log"
 	"math"
@@ -13,7 +14,7 @@ import (
 type GameLoop struct {
 	game             *GameState
 	collisionService *CollisionService
-	updateChan       chan model.ClientGameMessage
+	updateChan       chan domain.ClientGameMessage
 	deleteChan       chan string
 	finishChan       chan bool
 	stopChan         chan bool
@@ -22,13 +23,13 @@ type GameLoop struct {
 func NewGameLoop(game *GameState, finishChan chan bool) *GameLoop {
 	return &GameLoop{game: game,
 		collisionService: NewCollisionService(game),
-		updateChan:       make(chan model.ClientGameMessage),
+		updateChan:       make(chan domain.ClientGameMessage),
 		deleteChan:       make(chan string),
 		finishChan:       finishChan,
 		stopChan:         make(chan bool)}
 }
 
-func (gl *GameLoop) UpdatePlayer(msg model.ClientGameMessage) {
+func (gl *GameLoop) UpdatePlayer(msg domain.ClientGameMessage) {
 	if _, exists := gl.game.GetPlayer(msg.Id); !exists {
 		return
 	}
@@ -40,7 +41,7 @@ func (gl *GameLoop) DeletePlayer(id string) {
 }
 
 func (gl *GameLoop) Run() {
-	ticker := time.NewTicker(model.TickTime * time.Millisecond)
+	ticker := time.NewTicker(domain.TickTime * time.Millisecond)
 	defer ticker.Stop()
 	defer gl.cleanup()
 	gl.startGame()
@@ -68,8 +69,8 @@ func (gl *GameLoop) Run() {
 				gl.endGame()
 				return
 			}
-			gl.broadcast(model.ServerGameMessage{
-				State:   model.OngoingGameState,
+			gl.broadcast(domain.ServerGameMessage{
+				State:   domain.OngoingGameState,
 				Type:    "a",
 				Players: gl.createSnapshot(),
 				Bullets: gl.game.GetAllBullets(),
@@ -127,8 +128,8 @@ func (gl *GameLoop) endGame() {
 	stats := gl.getStatistics()
 	log.Println(stats)
 	if gl.game.GetCountOfPlayers() > 0 {
-		gl.broadcastFinal(model.ServerEndMessage{
-			State:  model.FinalGameState,
+		gl.broadcastFinal(domain.ServerEndMessage{
+			State:  domain.FinalGameState,
 			Result: stats,
 		})
 	}
@@ -159,8 +160,8 @@ func (gl *GameLoop) updateBullets() {
 	activeBullets := make([]model.Bullet, 0)
 	for _, bullet := range gl.game.GetAllBullets() {
 		bullet.Life--
-		bullet.X += math.Cos(bullet.Direction) * model.MaxBulletSpeed
-		bullet.Y += math.Sin(bullet.Direction) * model.MaxBulletSpeed
+		bullet.X += math.Cos(bullet.Direction) * domain.MaxBulletSpeed
+		bullet.Y += math.Sin(bullet.Direction) * domain.MaxBulletSpeed
 
 		if bullet.Life > 0 {
 			hit, player, obj := gl.collisionService.CheckBulletCollision(bullet)
@@ -184,8 +185,8 @@ func (gl *GameLoop) updatePlayers() {
 			if player.RebornTimer > 0 {
 				player.RebornTimer--
 			} else if player.RebornTimer == 0 {
-				player.Health = model.MaxPlayerHealth
-				player.RebornTimer = model.PlayerRebornTimer
+				player.Health = domain.MaxPlayerHealth
+				player.RebornTimer = domain.PlayerRebornTimer
 			}
 			continue
 		}
@@ -197,8 +198,8 @@ func (gl *GameLoop) updatePlayers() {
 			moveY = player.MoveY / vectorLength
 		}
 
-		deltaX := moveX * model.TickTime * model.PlayerSpeed
-		deltaY := moveY * model.TickTime * model.PlayerSpeed
+		deltaX := moveX * domain.TickTime * domain.PlayerSpeed
+		deltaY := moveY * domain.TickTime * domain.PlayerSpeed
 
 		nextX := player.X + deltaX
 		player.X = nextX
@@ -223,18 +224,18 @@ func (gl *GameLoop) updatePlayers() {
 }
 
 func (gl *GameLoop) handleRoomTransition(player *model.PlayerGameState, direction, targetRoomId string) {
-	roomPixelWidth := float64(model.RoomWidth * int(model.TileSize))
-	roomPixelHeight := float64(model.RoomHeight * int(model.TileSize))
-	halfSize := model.PlayerHalfSize
+	roomPixelWidth := float64(domain.RoomWidth * int(domain.TileSize))
+	roomPixelHeight := float64(domain.RoomHeight * int(domain.TileSize))
+	halfSize := domain.PlayerHalfSize
 
 	switch direction {
-	case model.TopMarker:
+	case domain.TopMarker:
 		player.Y = roomPixelHeight - halfSize - 1
-	case model.BottomMarker:
+	case domain.BottomMarker:
 		player.Y = halfSize + 1
-	case model.LeftMarker:
+	case domain.LeftMarker:
 		player.X = roomPixelWidth - halfSize - 1
-	case model.RightMarker:
+	case domain.RightMarker:
 		player.X = halfSize + 1
 	}
 	gl.game.SetPlayerRoom(player.Id, targetRoomId)
@@ -248,7 +249,7 @@ func (gl *GameLoop) createSnapshot() []model.PlayerGameState {
 	return snapshot
 }
 
-func (gl *GameLoop) broadcast(message model.ServerGameMessage) {
+func (gl *GameLoop) broadcast(message domain.ServerGameMessage) {
 	data, err := json.Marshal(message)
 	if err != nil {
 		log.Println(err)
@@ -266,7 +267,7 @@ func (gl *GameLoop) broadcast(message model.ServerGameMessage) {
 	}
 }
 
-func (gl *GameLoop) broadcastFinal(message model.ServerEndMessage) {
+func (gl *GameLoop) broadcastFinal(message domain.ServerEndMessage) {
 	data, err := json.Marshal(message)
 	if err != nil {
 		log.Println(err)

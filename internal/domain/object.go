@@ -1,4 +1,4 @@
-package model
+package domain
 
 type Object struct {
 	Id      string  `json:"id"`
@@ -8,6 +8,4 @@ type Object struct {
 	Height  float64 `json:"height"`
 	Type    string  `json:"type"`
 	IsSolid bool    `json:"isSolid"`
-	//IsDestroyable bool    `json:"isDestroyable"`
-	//Health        float64 `json:"health"`
 }

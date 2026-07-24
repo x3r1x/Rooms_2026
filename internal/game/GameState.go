@@ -2,6 +2,7 @@ package game
 
 import (
 	"fmt"
+	"gamedevRooms/internal/domain"
 	"gamedevRooms/internal/factory"
 	"gamedevRooms/internal/model"
 	"log"
@@ -26,7 +27,7 @@ func NewGameState() *GameState {
 		players:      make(map[string]*model.PlayerGameState),
 		objects:      make(map[string]*model.Object),
 		bullets:      make([]model.Bullet, 0),
-		gameDuration: model.GameDuration * time.Second,
+		gameDuration: domain.GameDuration * time.Second,
 		playerRooms:  make(map[string]string),
 		roomPlayers:  make(map[string][]string),
 	}
@@ -151,7 +152,7 @@ func (gs *GameState) RemovePlayer(playerId string) {
 	delete(gs.players, playerId)
 }
 
-func (gs *GameState) UpdatePlayer(upd model.ClientGameMessage) {
+func (gs *GameState) UpdatePlayer(upd domain.ClientGameMessage) {
 	player, exist := gs.GetPlayer(upd.Id)
 	if !exist || player == nil {
 		return
@@ -163,12 +164,12 @@ func (gs *GameState) UpdatePlayer(upd model.ClientGameMessage) {
 
 	if gs.isGameActive && player.Health > 0 && upd.IsShoot && player.ShootTimer <= 0 {
 		gs.addBullet(player)
-		player.ShootTimer = model.ShootCooldown
+		player.ShootTimer = domain.ShootCooldown
 	}
 	if player.Health < 0 && player.RebornTimer != 0 {
 		player.RebornTimer--
 	} else if player.Health < 0 && player.RebornTimer == 0 {
-		player.Health = model.MaxPlayerHealth
+		player.Health = domain.MaxPlayerHealth
 	}
 }
 

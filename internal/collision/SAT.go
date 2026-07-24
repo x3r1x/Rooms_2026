@@ -1,7 +1,7 @@
 package collision
 
 import (
-	"gamedevRooms/internal/model"
+	"gamedevRooms/internal/domain"
 	"math"
 )
 
@@ -17,7 +17,7 @@ type SATBox struct {
 func GetPlayerPoints(centerX, centerY, angle float64) []Point {
 	cosAngle := math.Cos(angle)
 	sinAngle := math.Sin(angle)
-	halfSize := model.PlayerHalfSize
+	halfSize := domain.PlayerHalfSize
 
 	localPoints := []Point{
 		{-halfSize, -halfSize},
@@ -39,8 +39,8 @@ func GetPlayerPoints(centerX, centerY, angle float64) []Point {
 func GetBulletPoints(x, y, angle float64) []Point {
 	cosAngle := math.Cos(angle)
 	sinAngle := math.Sin(angle)
-	halfW := model.BulletWidth / 2.0
-	halfH := model.BulletLength / 2.0
+	halfW := domain.BulletWidth / 2.0
+	halfH := domain.BulletLength / 2.0
 
 	localPoints := []Point{
 		{-halfW, -halfH},
@@ -127,7 +127,7 @@ func getMinMax(points []Point, axis Point) (float64, float64) {
 }
 
 func isOverlapping(min1, max1, min2, max2 float64) bool {
-	return (max1+model.Epsilon >= min2) && (max2+model.Epsilon >= min1)
+	return (max1+domain.Epsilon >= min2) && (max2+domain.Epsilon >= min1)
 }
 
 func GetAxisAlignedPoints(centerX, centerY, halfSize float64) []Point {

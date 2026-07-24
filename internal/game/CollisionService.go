@@ -2,6 +2,7 @@ package game
 
 import (
 	"gamedevRooms/internal/collision"
+	"gamedevRooms/internal/domain"
 	"gamedevRooms/internal/model"
 	"log"
 	"math"
@@ -76,7 +77,7 @@ func (cs *CollisionService) buildPlayerSAT(player *model.PlayerGameState, rotate
 		points = collision.GetPlayerPoints(player.X, player.Y, player.Angle)
 		normals = collision.GetNormals(points)
 	} else {
-		halfSize := model.PlayerHalfSize
+		halfSize := domain.PlayerHalfSize
 		points = collision.GetAxisAlignedPoints(player.X, player.Y, halfSize)
 		normals = collision.GetRectNormals()
 	}
@@ -117,12 +118,12 @@ func (cs *CollisionService) HandlePlayerHit(player *model.PlayerGameState, bulle
 			killer.BodyCount++
 		}
 		player.DeathCount++
-		player.RebornTimer = model.PlayerRebornTimer
+		player.RebornTimer = domain.PlayerRebornTimer
 	}
 }
 
 func (cs *CollisionService) calculateDamage(bullet model.Bullet) float64 {
-	return math.Round(model.BulletDamage * (bullet.Life/model.BulletLife*model.BulletDamageMulti + 1))
+	return math.Round(domain.BulletDamage * (bullet.Life/domain.BulletLife*domain.BulletDamageMulti + 1))
 }
 
 //func (cs *CollisionService) calculateKnockbackKoef(bullet model.Bullet) float64 {
@@ -140,15 +141,15 @@ func (cs *CollisionService) CheckPlayerExitCollision(player *model.PlayerGameSta
 		return false, "", ""
 	}
 
-	roomPixelWidth := float64(model.RoomWidth * int(model.TileSize))
-	roomPixelHeight := float64(model.RoomHeight * int(model.TileSize))
-	halfSize := model.PlayerHalfSize
+	roomPixelWidth := float64(domain.RoomWidth * int(domain.TileSize))
+	roomPixelHeight := float64(domain.RoomHeight * int(domain.TileSize))
+	halfSize := domain.PlayerHalfSize
 
 	exitChecks := map[string]func() bool{
-		model.TopMarker:    func() bool { return player.Y-halfSize < 0 },
-		model.BottomMarker: func() bool { return player.Y+halfSize > roomPixelHeight },
-		model.LeftMarker:   func() bool { return player.X-halfSize < 0 },
-		model.RightMarker:  func() bool { return player.X+halfSize > roomPixelWidth },
+		domain.TopMarker:    func() bool { return player.Y-halfSize < 0 },
+		domain.BottomMarker: func() bool { return player.Y+halfSize > roomPixelHeight },
+		domain.LeftMarker:   func() bool { return player.X-halfSize < 0 },
+		domain.RightMarker:  func() bool { return player.X+halfSize > roomPixelWidth },
 	}
 
 	for direction, check := range exitChecks {
@@ -163,7 +164,7 @@ func (cs *CollisionService) CheckPlayerExitCollision(player *model.PlayerGameSta
 }
 
 func (cs *CollisionService) getRoomPixelSize() float64 {
-	return float64(model.RoomWidth * int(model.TileSize))
+	return float64(domain.RoomWidth * int(domain.TileSize))
 }
 
 func (cs *CollisionService) ResolvePlayerCollisionSmooth(player *model.PlayerGameState) bool {
@@ -172,7 +173,7 @@ func (cs *CollisionService) ResolvePlayerCollisionSmooth(player *model.PlayerGam
 		return false
 	}
 
-	playerHalf := model.PlayerHalfSize
+	playerHalf := domain.PlayerHalfSize
 
 	rightOverlap := (player.X + playerHalf) - obj.X
 	leftOverlap := (obj.X + obj.Width) - (player.X - playerHalf)
@@ -185,15 +186,15 @@ func (cs *CollisionService) ResolvePlayerCollisionSmooth(player *model.PlayerGam
 
 	if minOverlapX < minOverlapY {
 		if rightOverlap < leftOverlap {
-			player.X = obj.X - playerHalf - model.Epsilon
+			player.X = obj.X - playerHalf - domain.Epsilon
 		} else {
-			player.X = obj.X + obj.Width + playerHalf + model.Epsilon
+			player.X = obj.X + obj.Width + playerHalf + domain.Epsilon
 		}
 	} else {
 		if bottomOverlap < topOverlap {
-			player.Y = obj.Y - playerHalf - model.Epsilon
+			player.Y = obj.Y - playerHalf - domain.Epsilon
 		} else {
-			player.Y = obj.Y + obj.Height + playerHalf + model.Epsilon
+			player.Y = obj.Y + obj.Height + playerHalf + domain.Epsilon
 		}
 	}
 

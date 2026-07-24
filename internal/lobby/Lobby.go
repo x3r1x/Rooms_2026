@@ -2,6 +2,7 @@ package lobby
 
 import (
 	"encoding/json"
+	"gamedevRooms/internal/domain"
 	"gamedevRooms/internal/game"
 	"gamedevRooms/internal/model"
 	"log"
@@ -12,11 +13,11 @@ import (
 
 type Lobby struct {
 	state           string
-	players         map[string]*model.LobbyPlayer
+	players         map[string]*domain.LobbyPlayer
 	playersReady    int
 	gameLoop        *game.GameLoop
-	addChan         chan *model.LobbyPlayer
-	readyChan       chan *model.LobbyPlayer
+	addChan         chan *domain.LobbyPlayer
+	readyChan       chan *domain.LobbyPlayer
 	removeChan      chan string
 	getStateChan    chan chan string
 	getGameLoopChan chan chan *game.GameLoop
@@ -25,10 +26,10 @@ type Lobby struct {
 
 func NewLobby() *Lobby {
 	l := &Lobby{
-		state:           model.WaitingLobbyState,
-		players:         make(map[string]*model.LobbyPlayer),
-		addChan:         make(chan *model.LobbyPlayer),
-		readyChan:       make(chan *model.LobbyPlayer),
+		state:           domain.WaitingLobbyState,
+		players:         make(map[string]*domain.LobbyPlayer),
+		addChan:         make(chan *domain.LobbyPlayer),
+		readyChan:       make(chan *domain.LobbyPlayer),
 		removeChan:      make(chan string),
 		getStateChan:    make(chan chan string),
 		getGameLoopChan: make(chan chan *game.GameLoop),
@@ -39,13 +40,13 @@ func NewLobby() *Lobby {
 }
 
 func (l *Lobby) AddPlayerToLobby(nickname string, conn *websocket.Conn) string {
-	player := model.NewLobbyPlayer(nickname)
+	player := domain.NewLobbyPlayer(nickname)
 	player.Connection = conn
 	l.addChan <- player
 	return player.Id
 }
 
-func (l *Lobby) UpdatePlayerInLobby(msg *model.LobbyPlayer) {
+func (l *Lobby) UpdatePlayerInLobby(msg *domain.LobbyPlayer) {
 	l.readyChan <- msg
 }
 
@@ -94,8 +95,8 @@ func (l *Lobby) Run() {
 
 			l.broadcastLobbyState()
 			if l.playersReady == len(l.players) &&
-				len(l.players) >= model.MinCountOfPlayers &&
-				l.state == model.WaitingLobbyState {
+				len(l.players) >= domain.MinCountOfPlayers &&
+				l.state == domain.WaitingLobbyState {
 				log.Println("Все готовы! Запускаем игру...")
 				l.StartGame()
 			}
@@ -112,9 +113,9 @@ func (l *Lobby) Run() {
 }
 
 func (l *Lobby) broadcastLobbyState() {
-	players := make([]model.LobbyPlayerMessage, 0, len(l.players))
+	players := make([]domain.LobbyPlayerMessage, 0, len(l.players))
 	for _, p := range l.players {
-		players = append(players, model.LobbyPlayerMessage{
+		players = append(players, domain.LobbyPlayerMessage{
 			Nickname: p.Nickname,
 			Id:       p.Id,
 			Ready:    p.Ready,
@@ -122,7 +123,7 @@ func (l *Lobby) broadcastLobbyState() {
 	}
 
 	for _, p := range l.players {
-		msg := model.ServerLobbyMessage{
+		msg := domain.ServerLobbyMessage{
 			State:   l.state,
 			OwnId:   p.Id,
 			Players: players,
@@ -147,7 +148,7 @@ func (l *Lobby) removeUser(id string) {
 		l.playersReady--
 	}
 
-	if l.state == model.OngoingGameState || l.gameLoop != nil {
+	if l.state == domain.OngoingGameState || l.gameLoop != nil {
 		l.gameLoop.DeletePlayer(player.Id)
 		if player.Ready {
 			l.playersReady--
@@ -161,7 +162,7 @@ func (l *Lobby) removeUser(id string) {
 }
 
 func (l *Lobby) StartGame() {
-	if l.state == model.OngoingGameState || len(l.players) == 0 {
+	if l.state == domain.OngoingGameState || len(l.players) == 0 {
 		return
 	}
 
@@ -172,17 +173,17 @@ func (l *Lobby) StartGame() {
 			gameState.AddPlayer(&model.PlayerGameState{
 				Id:          player.Id,
 				Nickname:    player.Nickname,
-				Health:      model.MaxPlayerHealth,
-				X:           model.PlayerSpawnPointX,
-				Y:           model.PlayerSpawnPointY,
-				Angle:       model.InitDirection,
-				MoveX:       model.InitValue,
-				MoveY:       model.InitValue,
+				Health:      domain.MaxPlayerHealth,
+				X:           domain.PlayerSpawnPointX,
+				Y:           domain.PlayerSpawnPointY,
+				Angle:       domain.InitDirection,
+				MoveX:       domain.InitValue,
+				MoveY:       domain.InitValue,
 				Connection:  player.Connection,
-				ShootTimer:  model.InitValue,
-				RebornTimer: model.InitValue,
-				BodyCount:   model.InitValue,
-				DeathCount:  model.InitValue,
+				ShootTimer:  domain.InitValue,
+				RebornTimer: domain.InitValue,
+				BodyCount:   domain.InitValue,
+				DeathCount:  domain.InitValue,
 			})
 		}
 	}
@@ -193,15 +194,15 @@ func (l *Lobby) StartGame() {
 	l.doCountdown()
 
 	l.gameLoop = game.NewGameLoop(gameState, l.gameFinishChan)
-	l.state = model.OngoingGameState
+	l.state = domain.OngoingGameState
 
 	go l.gameLoop.Run()
 	l.playersReady = 0
 }
 
-func (l *Lobby) sendReadyState(roomMessages map[string]model.RoomMessage) {
-	msg := model.ServerReadyMessage{
-		State:     model.ReadyLobbyState,
+func (l *Lobby) sendReadyState(roomMessages map[string]domain.RoomMessage) {
+	msg := domain.ServerReadyMessage{
+		State:     domain.ReadyLobbyState,
 		Countdown: 5.0,
 		Map:       roomMessages,
 	}
@@ -217,8 +218,8 @@ func (l *Lobby) sendReadyState(roomMessages map[string]model.RoomMessage) {
 
 func (l *Lobby) doCountdown() {
 	for i := 5; i > 0; i-- {
-		msg := model.ServerCountdownMessage{
-			State:     model.CountdownLobbyState,
+		msg := domain.ServerCountdownMessage{
+			State:     domain.CountdownLobbyState,
 			Countdown: i,
 		}
 		data, _ := json.Marshal(msg)
@@ -234,7 +235,7 @@ func (l *Lobby) doCountdown() {
 func (l *Lobby) returnToLobby() {
 	log.Println("Игра завершена! Возврат в лобби...")
 
-	l.state = model.WaitingLobbyState
+	l.state = domain.WaitingLobbyState
 	l.playersReady = 0
 	l.gameLoop = nil
 

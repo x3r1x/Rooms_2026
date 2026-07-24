@@ -2,7 +2,7 @@ package mapModel
 
 import (
 	"fmt"
-	"gamedevRooms/internal/model"
+	"gamedevRooms/internal/domain"
 	"math/rand/v2"
 	"strconv"
 
@@ -24,7 +24,7 @@ func NewRoomGenerator(jp *JsonParser) *RoomGenerator {
 }
 
 func (rg *RoomGenerator) CreateRoomWithRandomBarrier() *Room {
-	var randomBarrierId = rand.IntN(model.MaxBarrierType) + model.MinBarrierType
+	var randomBarrierId = rand.IntN(domain.MaxBarrierType) + domain.MinBarrierType
 
 	return NewRoom(
 		RoomExits{},
@@ -35,10 +35,10 @@ func (rg *RoomGenerator) CreateRoomWithRandomBarrier() *Room {
 }
 
 func (rg *RoomGenerator) ProcessRoomExits(room *Room) {
-	rg.processExit(room, room.exits.Top, model.TopMarker)
-	rg.processExit(room, room.exits.Left, model.LeftMarker)
-	rg.processExit(room, room.exits.Bottom, model.BottomMarker)
-	rg.processExit(room, room.exits.Right, model.RightMarker)
+	rg.processExit(room, room.exits.Top, domain.TopMarker)
+	rg.processExit(room, room.exits.Left, domain.LeftMarker)
+	rg.processExit(room, room.exits.Bottom, domain.BottomMarker)
+	rg.processExit(room, room.exits.Right, domain.RightMarker)
 }
 
 func (rg *RoomGenerator) processExit(room *Room, exitType, marker string) {
@@ -77,10 +77,10 @@ func (rg *RoomGenerator) mergeMatrix(matrix1, matrix2 []*Tile) []*Tile {
 }
 
 func (rg *RoomGenerator) getBarrierByNumber(barrierNumber int) []*Tile {
-	if model.BarriersAmount-barrierNumber < 0 {
+	if domain.BarriersAmount-barrierNumber < 0 {
 		fmt.Println("Попытка взять неправильный индекс барьера:", barrierNumber)
 		return make([]*Tile, 0)
 	}
 
-	return rg.barriers[model.BarriersAmount-barrierNumber]
+	return rg.barriers[domain.BarriersAmount-barrierNumber]
 }

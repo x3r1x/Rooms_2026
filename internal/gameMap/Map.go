@@ -1,7 +1,7 @@
 package mapModel
 
 import (
-	"gamedevRooms/internal/model"
+	"gamedevRooms/internal/domain"
 	"math/rand/v2"
 )
 
@@ -20,10 +20,10 @@ type mapPoint struct {
 }
 
 var directions = []roomDirection{
-	{dx: 0, dy: 1, name: model.BottomMarker, opposite: model.TopMarker},
-	{dx: -1, dy: 0, name: model.LeftMarker, opposite: model.RightMarker},
-	{dx: 0, dy: -1, name: model.TopMarker, opposite: model.BottomMarker},
-	{dx: 1, dy: 0, name: model.RightMarker, opposite: model.LeftMarker},
+	{dx: 0, dy: 1, name: domain.BottomMarker, opposite: domain.TopMarker},
+	{dx: -1, dy: 0, name: domain.LeftMarker, opposite: domain.RightMarker},
+	{dx: 0, dy: -1, name: domain.TopMarker, opposite: domain.BottomMarker},
+	{dx: 1, dy: 0, name: domain.RightMarker, opposite: domain.LeftMarker},
 }
 
 func NewMap(roomsCount int) *Map {
@@ -92,7 +92,7 @@ func connectNeighbouredRooms(grid map[mapPoint]*Room) {
 			}
 
 			if neighbour, exists := grid[neighborMapPoint]; exists {
-				if room.GetExit(direction.name) == "" && rand.Float64() < model.ConnectNeighbouredRoomChance {
+				if room.GetExit(direction.name) == "" && rand.Float64() < domain.ConnectNeighbouredRoomChance {
 					room.SetExit(direction.name, neighbour.id)
 					neighbour.SetExit(direction.opposite, room.id)
 				}

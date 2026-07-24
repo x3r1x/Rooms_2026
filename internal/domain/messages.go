@@ -1,4 +1,4 @@
-package model
+package domain
 
 type ClientRegisterMessage struct {
 	Nickname string `json:"n"`

@@ -2,7 +2,7 @@ package mapModel
 
 import (
 	"fmt"
-	"gamedevRooms/internal/model"
+	"gamedevRooms/internal/domain"
 )
 
 type RoomExits struct {
@@ -30,13 +30,13 @@ func NewRoom(exits RoomExits, id, barrierType string, matrix []*Tile) *Room {
 
 func (r *Room) SetExit(direction, roomId string) {
 	switch direction {
-	case model.TopMarker:
+	case domain.TopMarker:
 		r.exits.Top = roomId
-	case model.LeftMarker:
+	case domain.LeftMarker:
 		r.exits.Left = roomId
-	case model.RightMarker:
+	case domain.RightMarker:
 		r.exits.Right = roomId
-	case model.BottomMarker:
+	case domain.BottomMarker:
 		r.exits.Bottom = roomId
 	}
 }
@@ -51,13 +51,13 @@ func (r *Room) GetId() string {
 
 func (r *Room) GetExit(direction string) string {
 	switch direction {
-	case model.TopMarker:
+	case domain.TopMarker:
 		return r.exits.Top
-	case model.LeftMarker:
+	case domain.LeftMarker:
 		return r.exits.Left
-	case model.RightMarker:
+	case domain.RightMarker:
 		return r.exits.Right
-	case model.BottomMarker:
+	case domain.BottomMarker:
 		return r.exits.Bottom
 	}
 
@@ -73,12 +73,12 @@ func (r *Room) GetMatrix() []*Tile {
 }
 
 func (r *Room) PrintMatrix() {
-	for i := 0; i < model.RoomHeight; i++ {
-		for j := 0; j < model.RoomWidth; j++ {
-			if r.matrix[i*model.RoomWidth+j] == nil {
+	for i := 0; i < domain.RoomHeight; i++ {
+		for j := 0; j < domain.RoomWidth; j++ {
+			if r.matrix[i*domain.RoomWidth+j] == nil {
 				fmt.Print("- ")
 			} else {
-				fmt.Print(r.matrix[i*model.RoomWidth+j].Id, " ")
+				fmt.Print(r.matrix[i*domain.RoomWidth+j].Id, " ")
 			}
 		}
 

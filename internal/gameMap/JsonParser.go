@@ -3,7 +3,7 @@ package mapModel
 import (
 	"encoding/json"
 	"fmt"
-	"gamedevRooms/internal/model"
+	"gamedevRooms/internal/domain"
 	"os"
 )
 
@@ -170,8 +170,8 @@ func (jp *JsonParser) getLayersData(decoder *json.Decoder, tiles map[int16]*Tile
 
 func (jp *JsonParser) getRoomGenerator(data [][]int16, tiles map[int16]*Tile) *RoomGenerator {
 	var roomGenerator = RoomGenerator{
-		baseRoom:  jp.attachTilesToData(data[model.BaseRoomIndex], tiles),
-		baseWalls: jp.attachTilesToData(data[model.BaseWallsIndex], tiles),
+		baseRoom:  jp.attachTilesToData(data[domain.BaseRoomIndex], tiles),
+		baseWalls: jp.attachTilesToData(data[domain.BaseWallsIndex], tiles),
 		exits:     jp.getRoomGeneratorExits(data, tiles),
 		flaps:     jp.getRoomGeneratorFlaps(data, tiles),
 		barriers:  jp.getRoomGeneratorBarriers(data, tiles),
@@ -183,10 +183,10 @@ func (jp *JsonParser) getRoomGenerator(data [][]int16, tiles map[int16]*Tile) *R
 func (jp *JsonParser) getRoomGeneratorExits(data [][]int16, tiles map[int16]*Tile) map[string][]*Tile {
 	var exits = make(map[string][]*Tile)
 
-	exits[model.TopMarker] = jp.attachTilesToData(data[model.ExitTopIndex], tiles)
-	exits[model.LeftMarker] = jp.attachTilesToData(data[model.ExitLeftIndex], tiles)
-	exits[model.BottomMarker] = jp.attachTilesToData(data[model.ExitBottomIndex], tiles)
-	exits[model.RightMarker] = jp.attachTilesToData(data[model.ExitRightIndex], tiles)
+	exits[domain.TopMarker] = jp.attachTilesToData(data[domain.ExitTopIndex], tiles)
+	exits[domain.LeftMarker] = jp.attachTilesToData(data[domain.ExitLeftIndex], tiles)
+	exits[domain.BottomMarker] = jp.attachTilesToData(data[domain.ExitBottomIndex], tiles)
+	exits[domain.RightMarker] = jp.attachTilesToData(data[domain.ExitRightIndex], tiles)
 
 	return exits
 }
@@ -194,10 +194,10 @@ func (jp *JsonParser) getRoomGeneratorExits(data [][]int16, tiles map[int16]*Til
 func (jp *JsonParser) getRoomGeneratorFlaps(data [][]int16, tiles map[int16]*Tile) map[string][]*Tile {
 	var flaps = make(map[string][]*Tile)
 
-	flaps[model.TopMarker] = jp.attachTilesToData(data[model.FlapTopIndex], tiles)
-	flaps[model.LeftMarker] = jp.attachTilesToData(data[model.FlapLeftIndex], tiles)
-	flaps[model.BottomMarker] = jp.attachTilesToData(data[model.FlapBottomIndex], tiles)
-	flaps[model.RightMarker] = jp.attachTilesToData(data[model.FlapRightIndex], tiles)
+	flaps[domain.TopMarker] = jp.attachTilesToData(data[domain.FlapTopIndex], tiles)
+	flaps[domain.LeftMarker] = jp.attachTilesToData(data[domain.FlapLeftIndex], tiles)
+	flaps[domain.BottomMarker] = jp.attachTilesToData(data[domain.FlapBottomIndex], tiles)
+	flaps[domain.RightMarker] = jp.attachTilesToData(data[domain.FlapRightIndex], tiles)
 
 	return flaps
 }
@@ -206,14 +206,14 @@ func (jp *JsonParser) getRoomGeneratorBarriers(data [][]int16, tiles map[int16]*
 	var barriers = make([][]*Tile, 0)
 
 	for i := 1; i <= 7; i++ {
-		barriers = append(barriers, jp.attachTilesToData(data[model.BarriersStartIndex-1+i], tiles))
+		barriers = append(barriers, jp.attachTilesToData(data[domain.BarriersStartIndex-1+i], tiles))
 	}
 
 	return barriers
 }
 
 func (jp *JsonParser) attachTilesToData(data []int16, tiles map[int16]*Tile) []*Tile {
-	var tilesArray = make([]*Tile, model.RoomHeight*model.RoomWidth)
+	var tilesArray = make([]*Tile, domain.RoomHeight*domain.RoomWidth)
 
 	for id, tileType := range data {
 		tilesArray[id] = tiles[tileType]

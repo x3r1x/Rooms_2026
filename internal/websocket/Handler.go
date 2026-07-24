@@ -3,8 +3,8 @@ package websocket
 import (
 	"encoding/json"
 	"fmt"
+	"gamedevRooms/internal/domain"
 	"gamedevRooms/internal/lobby"
-	"gamedevRooms/internal/model"
 	"log"
 	"net/http"
 
@@ -59,25 +59,25 @@ func (wsh *WebsocketHandler) HandleWebsocket(conn *websocket.Conn) {
 		}
 
 		switch wsh.lobby.GetState() {
-		case model.WaitingLobbyState:
+		case domain.WaitingLobbyState:
 			currentId = wsh.handleWaitingLobbyState(p, currentId, conn)
-		case model.OngoingGameState:
+		case domain.OngoingGameState:
 			wsh.handleOngoingGameState(p, currentId)
 		}
 	}
 }
 
 func (wsh *WebsocketHandler) handleWaitingLobbyState(p []byte, id string, conn *websocket.Conn) string {
-	var registerMsg model.ClientRegisterMessage
+	var registerMsg domain.ClientRegisterMessage
 
 	if err := json.Unmarshal(p, &registerMsg); err == nil && id == "" {
 		return wsh.lobby.AddPlayerToLobby(registerMsg.Nickname, conn)
 	}
 
-	var readyMsg model.ClientReadyStateMessage
+	var readyMsg domain.ClientReadyStateMessage
 
 	if err := json.Unmarshal(p, &readyMsg); err == nil && id != "" {
-		wsh.lobby.UpdatePlayerInLobby(&model.LobbyPlayer{
+		wsh.lobby.UpdatePlayerInLobby(&domain.LobbyPlayer{
 			Id:    id,
 			Ready: readyMsg.Ready,
 		})
@@ -94,7 +94,7 @@ func (wsh *WebsocketHandler) handleWaitingLobbyState(p []byte, id string, conn *
 }
 
 func (wsh *WebsocketHandler) handleOngoingGameState(p []byte, currentId string) {
-	var msg model.ClientGameMessage
+	var msg domain.ClientGameMessage
 
 	if err := json.Unmarshal(p, &msg); err != nil {
 		log.Println("Ошибка сериализации во время игры: ", err)
@@ -110,7 +110,7 @@ func (wsh *WebsocketHandler) handleOngoingGameState(p []byte, currentId string) 
 		return
 	}
 
-	wsh.lobby.GetGameLoop().UpdatePlayer(model.ClientGameMessage{
+	wsh.lobby.GetGameLoop().UpdatePlayer(domain.ClientGameMessage{
 		Id:      msg.Id,
 		MX:      msg.MX,
 		MY:      msg.MY,
