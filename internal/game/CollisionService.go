@@ -185,15 +185,15 @@ func (cs *CollisionService) ResolvePlayerCollisionSmooth(player *model.PlayerGam
 
 	if minOverlapX < minOverlapY {
 		if rightOverlap < leftOverlap {
-			player.X = obj.X - playerHalf - 0.01
+			player.X = obj.X - playerHalf - model.Epsilon
 		} else {
-			player.X = obj.X + obj.Width + playerHalf + 0.01
+			player.X = obj.X + obj.Width + playerHalf + model.Epsilon
 		}
 	} else {
 		if bottomOverlap < topOverlap {
-			player.Y = obj.Y - playerHalf - 0.01
+			player.Y = obj.Y - playerHalf - model.Epsilon
 		} else {
-			player.Y = obj.Y + obj.Height + playerHalf + 0.01
+			player.Y = obj.Y + obj.Height + playerHalf + model.Epsilon
 		}
 	}
 
