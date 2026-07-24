@@ -1,14 +1,28 @@
-package _map
+package
 
 import (
 	"gamedevRooms/internal/adapters/map/generator"
 	"gamedevRooms/internal/domain"
 	"gamedevRooms/internal/game"
-	"gamedevRooms/internal/model"
 	"log"
 	"strconv"
 
 	"github.com/google/uuid"
+)
+map
+
+import (
+	"gamedevRooms/internal/adapters/map/generator"
+	"gamedevRooms/internal/domain"
+	"gamedevRooms/internal/game"
+	"log"
+	"strconv"
+
+	"github.com/google/uuid"
+)
+
+import (
+	"gamedevRooms/internal/model"
 )
 
 type MapManager struct {
