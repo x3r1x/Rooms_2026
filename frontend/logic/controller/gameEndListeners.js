@@ -1,7 +1,7 @@
-import {switchWindowToRegistration} from "../view/app/windowSwitcher.js";
+import {switchToRegistrationAppState} from "../model/app/appState.js";
 
 export function initGameEndListeners() {
     document.getElementById("restartGame").onclick = () => {
-        switchWindowToRegistration();
+        switchToRegistrationAppState();
     }
 }

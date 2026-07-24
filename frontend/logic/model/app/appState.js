@@ -3,13 +3,15 @@ import {
     showCountdownWindow,
     switchWindowFromLobbyToGame,
     switchWindowFromRegistrationToLobby,
-    switchWindowToGameEnd
+    switchWindowToGameEnd,
+    switchWindowToRegistration
 } from "../../view/app/windowSwitcher.js";
 import {initLobbyListeners} from "../../controller/lobbyListeners.js";
 import {loadGame, startGameLoop} from "../game/loadGame.js";
-import {startGameState} from "../game/storage/gameState.js";
+import {finalStatistics, gameNicknames, gameState, startGameState} from "../game/storage/gameState.js";
 import {initGameEndListeners} from "../../controller/gameEndListeners.js";
 import {fillResultWindow} from "../../view/app/gameEndView.js";
+import {initRegistrationListeners} from "../../controller/registrationListeners";
 
 export let appState = null
 export let socket = null
@@ -22,6 +24,13 @@ export const lobbyState = {
 
 export function initAppState() {
     appState = APP_STATES.REGISTRATION;
+}
+
+export function switchToRegistrationAppState() {
+    appState = APP_STATES.REGISTRATION;
+    resetStates();
+    initRegistrationListeners(socket);
+    switchWindowToRegistration();
 }
 
 export function switchToWaitingAppState(socket, clientId) {
@@ -60,4 +69,15 @@ export function switchToEndedGameState(socket, clientId, result) {
     initGameEndListeners();
     fillResultWindow(clientId, result);
     switchWindowToGameEnd();
+}
+
+export function resetStates() {
+    appState = null;
+    socket = null;
+    lobbyState.clientId = null;
+    lobbyState.players = {};
+    lobbyState.countdown = null;
+    gameState = null;
+    gameNicknames = {};
+    finalStatistics = null;
 }
