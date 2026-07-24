@@ -10,8 +10,7 @@ import {initLobbyListeners} from "../../controller/lobbyListeners.js";
 import {loadGame, startGameLoop} from "../game/loadGame.js";
 import {finalStatistics, gameNicknames, gameState, startGameState} from "../game/storage/gameState.js";
 import {initGameEndListeners} from "../../controller/gameEndListeners.js";
-import {fillResultWindow} from "../../view/app/gameEndView.js";
-import {initRegistrationListeners} from "../../controller/registrationListeners";
+import {fillResultWindow} from "../../view/app/gameEndView.js";import {initRegistrationListeners} from "../../controller/registrationListeners.js";
 
 export let appState = null
 export let socket = null
