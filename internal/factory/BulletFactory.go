@@ -24,9 +24,9 @@ func BulletFactory(player *model.PlayerGameState) model.Bullet {
 		Life:      model.BulletLife,
 		OwnerId:   player.Id,
 	}
-	recoilX := -math.Cos(player.Angle) * model.RecoilDistance
-	recoilY := -math.Sin(player.Angle) * model.RecoilDistance
-	player.X += recoilX
-	player.Y += recoilY
+	//recoilX := -math.Cos(player.Angle) * model.RecoilDistance
+	//recoilY := -math.Sin(player.Angle) * model.RecoilDistance
+	//player.X += recoilX
+	//player.Y += recoilY
 	return bullet
 }
