@@ -167,12 +167,14 @@ func (l *LobbyService) removeUser(id string) {
 		l.playersReady--
 	}
 
+	l.broadcastService.RemoveConnection(id)
 	if l.state == domain.OngoingGameState && l.gameService != nil {
 		l.gameService.DeletePlayer(id)
 	}
 
 	delete(l.players, id)
 	log.Printf("Игрок %s покинул лобби. Осталось: %d", id, len(l.players))
+	l.broadcastLobbyState()
 }
 
 func (l *LobbyService) doCountdown() {

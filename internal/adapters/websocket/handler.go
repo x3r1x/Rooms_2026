@@ -94,22 +94,33 @@ func (wsh *WebsocketHandler) handleWaitingLobbyState(p []byte, id string, conn *
 }
 
 func (wsh *WebsocketHandler) handleOngoingGameState(p []byte, currentId string) {
-	var msg domain.ClientGameMessage
+	log.Printf("handleOngoingGameState вызван, currentId=%s, длина сообщения=%d", currentId, len(p))
 
+	var msg domain.ClientGameMessage
 	if err := json.Unmarshal(p, &msg); err != nil {
 		log.Println("Ошибка сериализации во время игры: ", err)
 		return
 	}
 
+	log.Printf("Получено сообщение: Id=%s, MX=%f, MY=%f", msg.Id, msg.MX, msg.MY)
+
+	if currentId == "" {
+		log.Println("ОШИБКА: currentId пустой!")
+		return
+	}
+
 	if currentId != msg.Id {
+		log.Printf("Несоответствие ID: currentId=%s, msg.Id=%s", currentId, msg.Id)
 		return
 	}
 
 	gameService := wsh.lobby.GetGameService()
 	if gameService == nil {
+		log.Println("ОШИБКА: GameService is nil!")
 		return
 	}
 
+	log.Printf("Отправляем обновление в GameService для игрока %s", msg.Id)
 	gameService.UpdatePlayer(domain.ClientGameMessage{
 		Id:      msg.Id,
 		MX:      msg.MX,

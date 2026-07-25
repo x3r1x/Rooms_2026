@@ -42,6 +42,7 @@ func NewGameService(
 }
 
 func (gs *GameService) UpdatePlayer(msg domain.ClientGameMessage) {
+	log.Printf("Получено обновление для игрока %s: MX=%f, MY=%f", msg.Id, msg.MX, msg.MY)
 	if _, exists := gs.gameState.GetPlayer(msg.Id); !exists {
 		return
 	}
