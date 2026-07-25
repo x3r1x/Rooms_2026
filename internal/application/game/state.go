@@ -1,7 +1,8 @@
-package application
+package game
 
 import (
 	"fmt"
+	"gamedevRooms/internal/application/factory"
 	"gamedevRooms/internal/domain"
 	"log"
 	"time"
@@ -161,7 +162,7 @@ func (gs *GameState) UpdatePlayer(upd domain.ClientGameMessage) {
 	player.MoveY = upd.MY
 
 	if gs.isGameActive && player.Health > 0 && upd.IsShoot && player.ShootTimer <= 0 {
-		gs.addBullet(player)
+		gs.AddBullet(player)
 		player.ShootTimer = domain.ShootCooldown
 	}
 	if player.Health < 0 && player.RebornTimer != 0 {
@@ -171,8 +172,8 @@ func (gs *GameState) UpdatePlayer(upd domain.ClientGameMessage) {
 	}
 }
 
-func (gs *GameState) addBullet(player *domain.PlayerGameState) {
-	bullet := NewBulletFactory().BulletFactory(player)
+func (gs *GameState) AddBullet(player *domain.PlayerGameState) {
+	bullet := factory.NewBulletFactory().CreateBullet(player)
 	gs.bullets = append(gs.bullets, bullet)
 }
 

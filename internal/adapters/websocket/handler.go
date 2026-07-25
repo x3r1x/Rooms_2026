@@ -3,8 +3,8 @@ package websocket
 import (
 	"encoding/json"
 	"fmt"
+	"gamedevRooms/internal/application/lobby"
 	"gamedevRooms/internal/domain"
-	"gamedevRooms/internal/lobby"
 	"log"
 	"net/http"
 
@@ -12,8 +12,7 @@ import (
 )
 
 type WebsocketHandler struct {
-	lobby          *lobby.Lobby
-	gameController ports
+	lobby *lobby.LobbyService
 }
 
 var upgrader = websocket.Upgrader{
@@ -22,7 +21,7 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func NewWebsocketHandler(l *lobby.Lobby) *WebsocketHandler {
+func NewWebsocketHandler(l *lobby.LobbyService) *WebsocketHandler {
 	return &WebsocketHandler{
 		lobby: l,
 	}
@@ -102,16 +101,16 @@ func (wsh *WebsocketHandler) handleOngoingGameState(p []byte, currentId string) 
 		return
 	}
 
-	if currentId != msg.Id || wsh.lobby.GetGameLoop() == nil {
+	if currentId != msg.Id {
 		return
 	}
 
-	gameLoop := wsh.lobby.GetGameLoop()
-	if gameLoop == nil {
+	gameService := wsh.lobby.GetGameService()
+	if gameService == nil {
 		return
 	}
 
-	wsh.lobby.GetGameLoop().UpdatePlayer(domain.ClientGameMessage{
+	gameService.UpdatePlayer(domain.ClientGameMessage{
 		Id:      msg.Id,
 		MX:      msg.MX,
 		MY:      msg.MY,

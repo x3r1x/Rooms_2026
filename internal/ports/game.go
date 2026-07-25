@@ -16,7 +16,7 @@ type GameStateProvider interface {
 
 	GetAllBullets() []domain.Bullet
 	SetBullets(bullets []domain.Bullet)
-	AddBullet(bullet domain.Bullet)
+	AddBullet(player *domain.PlayerGameState)
 
 	IsGameActive() bool
 	SetGameActive(active bool)

@@ -2,18 +2,45 @@ package main
 
 import (
 	"fmt"
+	"gamedevRooms/internal/adapters/broadcast"
+	"gamedevRooms/internal/adapters/collision"
+	"gamedevRooms/internal/adapters/map"
 	"gamedevRooms/internal/adapters/websocket"
-	"gamedevRooms/internal/lobby"
+	"gamedevRooms/internal/application/factory"
+	"gamedevRooms/internal/application/game"
+	"gamedevRooms/internal/application/lobby"
 	"log"
 	"net/http"
 )
 
 func main() {
-	lobby := lobby.NewLobby()
 
-	wsHandler := websocket.NewWebsocketHandler(lobby)
+	broadcastService := broadcast.NewBroadcastService()
+	gameState := game.NewGameState()
+	mapManager := _map.NewMapManager()
+	collisionService := collision.NewCollisionService(gameState)
+	bulletFactory := factory.NewBulletFactory()
+
+	gameService := game.NewGameService(
+		gameState,
+		collisionService,
+		mapManager,
+		broadcastService,
+		bulletFactory,
+	)
+
+	lobbyService := lobby.NewLobbyService(
+		gameState,
+		mapManager,
+		broadcastService,
+	)
+
+	go gameService.Run()
+
+	wsHandler := websocket.NewWebsocketHandler(lobbyService)
+
 	http.HandleFunc("/ws", wsHandler.InitWebsocket)
 
-	fmt.Println("server listening at port 8080")
+	fmt.Println("Server listening at port 8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

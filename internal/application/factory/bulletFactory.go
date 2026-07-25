@@ -1,4 +1,4 @@
-package application
+package factory
 
 import (
 	"gamedevRooms/internal/domain"
@@ -11,7 +11,7 @@ func NewBulletFactory() *BulletFactory {
 	return &BulletFactory{}
 }
 
-func (bf *BulletFactory) BulletFactory(player *domain.PlayerGameState) domain.Bullet {
+func (bf *BulletFactory) CreateBullet(player *domain.PlayerGameState) domain.Bullet {
 
 	barrelLength := domain.PlayerHalfSize + domain.BulletBarrelOffset
 

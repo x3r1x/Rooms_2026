@@ -1,6 +1,7 @@
-package application
+package lobby
 
 import (
+	"gamedevRooms/internal/application/game"
 	"gamedevRooms/internal/domain"
 	"gamedevRooms/internal/ports"
 	"log"
@@ -13,13 +14,13 @@ type LobbyService struct {
 	state        string
 	players      map[string]*domain.LobbyPlayer
 	playersReady int
-	gameService  *GameService
+	gameService  *game.GameService
 
 	addChan            chan lobbyAddEvent
 	readyChan          chan *domain.LobbyPlayer
 	removeChan         chan string
 	getStateChan       chan chan string
-	getGameServiceChan chan chan *GameService
+	getGameServiceChan chan chan *game.GameService
 
 	gameStateProvider ports.GameStateProvider
 	mapManager        ports.MapManager
@@ -31,7 +32,7 @@ type lobbyAddEvent struct {
 	conn   *websocket.Conn
 }
 
-func NewLobby(
+func NewLobbyService(
 	gameStateProvider ports.GameStateProvider,
 	mapManager ports.MapManager,
 	broadcastService ports.BroadcastService,
@@ -46,7 +47,7 @@ func NewLobby(
 		readyChan:          make(chan *domain.LobbyPlayer),
 		removeChan:         make(chan string),
 		getStateChan:       make(chan chan string),
-		getGameServiceChan: make(chan chan *GameService),
+		getGameServiceChan: make(chan chan *game.GameService),
 	}
 	go l.run()
 	return l
@@ -75,8 +76,8 @@ func (l *LobbyService) GetState() string {
 	return <-responseChan
 }
 
-func (l *LobbyService) GetGameService() *GameService {
-	responseChan := make(chan *GameService)
+func (l *LobbyService) GetGameService() *game.GameService {
+	responseChan := make(chan *game.GameService)
 	l.getGameServiceChan <- responseChan
 	return <-responseChan
 }
@@ -190,7 +191,7 @@ func (l *LobbyService) StartGame() {
 		return
 	}
 
-	l.mapManager.LoadMapObjects()
+	l.mapManager.LoadMapObjects(l.gameStateProvider)
 
 	for _, player := range l.players {
 		if player.Ready {

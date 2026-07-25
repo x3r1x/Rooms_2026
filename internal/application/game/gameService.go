@@ -1,4 +1,4 @@
-package application
+package game
 
 import (
 	"gamedevRooms/internal/domain"
