@@ -11,6 +11,7 @@ type GameStateProvider interface {
 	GetAllPlayers() map[string]*domain.PlayerGameState
 	GetPlayer(id string) (*domain.PlayerGameState, bool)
 	AddPlayer(player *domain.PlayerGameState)
+	UpdatePlayer(upd domain.ClientGameMessage)
 	RemovePlayer(playerId string)
 
 	GetAllBullets() []domain.Bullet
@@ -25,4 +26,5 @@ type GameStateProvider interface {
 	GetPlayerRoom(id string) string
 	SetPlayerRoom(id, roomId string)
 	GetRoomManager() interface{}
+	GetCountOfPlayers() int
 }

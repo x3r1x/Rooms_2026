@@ -17,7 +17,6 @@ type GameService struct {
 	updateChan       chan domain.ClientGameMessage
 	deleteChan       chan string
 	finishChan       chan bool
-	stopChan         chan struct{}
 }
 
 func NewGameService(
@@ -36,7 +35,6 @@ func NewGameService(
 		updateChan:       make(chan domain.ClientGameMessage),
 		deleteChan:       make(chan string),
 		finishChan:       make(chan bool, 1),
-		stopChan:         make(chan struct{}),
 	}
 }
 
@@ -86,7 +84,6 @@ func (gs *GameService) update() {
 
 	remaining := gs.gameState.GetRemainingSeconds()
 	if remaining <= 0 {
-		gs.stopChan <- struct{}{}
 		return
 	}
 
@@ -104,35 +101,55 @@ func (gs *GameService) handleDelete(id string) {
 	if gs.gameState.IsGameActive() && len(gs.gameState.GetAllPlayers()) <= 1 {
 		log.Println("Игрок вышел, игра завершена досрочно")
 		gs.endGame()
-		select {
-		case gs.stopChan <- true:
-			log.Println("GameLoop: отправлен сигнал остановки")
-		default:
-			log.Println("GameLoop: stopChan уже содержит сигнал")
-		}
 	}
 }
 
-func (gl *GameLoop) startGame() {
-	if gl.game.IsGameActive() {
+func (gs *GameService) startGame() {
+	if gs.gameState.IsGameActive() {
 		return
 	}
-	gl.game.SetGameActive(true)
+	gs.gameState.SetGameActive(true)
 }
 
-func (gl *GameLoop) endGame() {
-	if !gl.game.IsGameActive() {
+func (gs *GameService) endGame() {
+	if !gs.gameState.IsGameActive() {
 		return
 	}
-	gl.game.SetGameActive(false)
-	stats := gl.getStatistics()
+	gs.gameState.SetGameActive(false)
+	stats := gs.getStatistics()
 	log.Println(stats)
-	if gl.game.GetCountOfPlayers() > 0 {
-		gl.broadcastFinal(domain.ServerEndMessage{
+	if gs.gameState.GetCountOfPlayers() > 0 {
+		gs.broadcastFinal(domain.ServerEndMessage{
 			State:  domain.FinalGameState,
 			Result: stats,
 		})
 	}
+}
+
+func (gs *GameService) getStatistics() []domain.PlayerFinalState {
+	stats := make([]domain.PlayerFinalState, 0, len(gs.gameState.GetAllPlayers()))
+	for _, player := range gs.gameState.GetAllPlayers() {
+		stats = append(stats, domain.PlayerFinalState{
+			Nickname: player.Nickname,
+			Id:       player.Id,
+			Deaths:   player.DeathCount,
+			Kills:    player.BodyCount,
+		})
+	}
+	return stats
+}
+
+func (gs *GameService) broadcast() {
+	gs.broadcastService.BroadcastToAll(domain.ServerGameMessage{
+		State:   domain.OngoingGameState,
+		Type:    "a",
+		Players: gs.createSnapshot(),
+		Bullets: gs.gameState.GetAllBullets(),
+	})
+}
+
+func (gs *GameService) broadcastFinal(message domain.ServerEndMessage) {
+	gs.broadcastService.BroadcastToAll(message)
 }
 
 func (gs *GameService) createSnapshot() []domain.PlayerGameState {
