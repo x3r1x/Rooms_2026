@@ -2,7 +2,6 @@ package application
 
 import (
 	"gamedevRooms/internal/domain"
-	"gamedevRooms/internal/game"
 	"gamedevRooms/internal/ports"
 	"log"
 	"time"
@@ -14,7 +13,7 @@ type LobbyService struct {
 	state        string
 	players      map[string]*domain.LobbyPlayer
 	playersReady int
-	gameLoop     *game.GameLoop
+	gameService  *GameService
 
 	addChan            chan lobbyAddEvent
 	readyChan          chan *domain.LobbyPlayer
@@ -121,8 +120,6 @@ func (l *LobbyService) run() {
 			l.removeUser(delPlayer)
 		case responseChan := <-l.getStateChan:
 			responseChan <- l.state
-		case responseChan := <-l.getGameLoopChan:
-			responseChan <- l.gameLoop
 		}
 	}
 }
@@ -183,9 +180,42 @@ func (l *LobbyService) doCountdown() {
 			State:     domain.CountdownLobbyState,
 			Countdown: i,
 		}
-		for _, p := range l.players {
-			l.broadcastService.BroadcastToPlayer(p.Id, msg)
-		}
+		l.broadcastService.BroadcastToAll(msg)
 		time.Sleep(1 * time.Second)
 	}
+}
+
+func (l *LobbyService) StartGame() {
+	if l.state == domain.OngoingGameState || len(l.players) == 0 {
+		return
+	}
+
+	l.mapManager.LoadMapObjects()
+
+	for _, player := range l.players {
+		if player.Ready {
+			l.gameStateProvider.AddPlayer(&domain.PlayerGameState{
+				Id:          player.Id,
+				Nickname:    player.Nickname,
+				Health:      domain.MaxPlayerHealth,
+				X:           domain.PlayerSpawnPointX,
+				Y:           domain.PlayerSpawnPointY,
+				Angle:       domain.InitDirection,
+				MoveX:       domain.InitValue,
+				MoveY:       domain.InitValue,
+				ShootTimer:  domain.InitValue,
+				RebornTimer: domain.InitValue,
+				BodyCount:   domain.InitValue,
+				DeathCount:  domain.InitValue,
+			})
+		}
+	}
+
+	roomMessages := l.mapManager.GetRoomMessages()
+	l.sendReadyState(roomMessages)
+	l.doCountdown()
+
+	l.state = domain.OngoingGameState
+
+	l.playersReady = 0
 }

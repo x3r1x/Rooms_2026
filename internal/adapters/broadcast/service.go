@@ -57,6 +57,9 @@ func (bs *BroadcastService) run() {
 
 		case event := <-bs.broadcastChan:
 			bs.sendToAll(event.message)
+
+		case event := <-bs.toPlayerChan:
+			bs.sendToPlayer(event.playerId, event.message)
 		}
 	}
 }
@@ -94,5 +97,23 @@ func (bs *BroadcastService) sendToAll(message interface{}) {
 		if err := conn.WriteMessage(websocket.TextMessage, data); err != nil {
 			log.Printf("Ошибка отправки игроку %s: %v", id, err)
 		}
+	}
+}
+
+func (bs *BroadcastService) sendToPlayer(playerId string, message interface{}) {
+	data, err := json.Marshal(message)
+	if err != nil {
+		log.Println("Ошибка маршалинга:", err)
+		return
+	}
+
+	conn, exists := bs.connections[playerId]
+	if !exists {
+		log.Printf("Соединение для игрока %s не найдено", playerId)
+		return
+	}
+
+	if err := conn.WriteMessage(websocket.TextMessage, data); err != nil {
+		log.Printf("Ошибка отправки игроку %s: %v", playerId, err)
 	}
 }
