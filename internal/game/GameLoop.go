@@ -5,8 +5,6 @@ import (
 	"gamedevRooms/internal/domain"
 	"gamedevRooms/internal/model"
 	"log"
-	"math"
-	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -29,56 +27,6 @@ func NewGameLoop(game *GameState, finishChan chan bool) *GameLoop {
 		stopChan:         make(chan bool)}
 }
 
-func (gl *GameLoop) UpdatePlayer(msg domain.ClientGameMessage) {
-	if _, exists := gl.game.GetPlayer(msg.Id); !exists {
-		return
-	}
-	gl.updateChan <- msg
-}
-
-func (gl *GameLoop) DeletePlayer(id string) {
-	gl.deleteChan <- id
-}
-
-func (gl *GameLoop) Run() {
-	ticker := time.NewTicker(domain.TickTime * time.Millisecond)
-	defer ticker.Stop()
-	defer gl.cleanup()
-	gl.startGame()
-
-	for {
-		select {
-		case del := <-gl.deleteChan:
-			gl.handleDelete(del)
-			if gl.shouldStop() {
-				log.Println("GameLoop: остановка после удаления игрока")
-				return
-			}
-		case upload := <-gl.updateChan:
-			gl.game.UpdatePlayer(upload)
-		case <-ticker.C:
-			if !gl.game.IsGameActive() {
-				continue
-			}
-			gl.game.IncrementTick()
-			gl.updateShooterTimers()
-			gl.updateBullets()
-			gl.updatePlayers()
-			remaining := gl.game.GetRemainingSeconds()
-			if remaining <= 0 {
-				gl.endGame()
-				return
-			}
-			gl.broadcast(domain.ServerGameMessage{
-				State:   domain.OngoingGameState,
-				Type:    "a",
-				Players: gl.createSnapshot(),
-				Bullets: gl.game.GetAllBullets(),
-			})
-		}
-	}
-}
-
 func (gl *GameLoop) shouldStop() bool {
 	return !gl.game.IsGameActive() || len(gl.game.GetAllPlayers()) == 0
 }
@@ -98,43 +46,6 @@ func (gl *GameLoop) cleanup() {
 	}
 }
 
-func (gl *GameLoop) handleDelete(id string) {
-	gl.game.RemovePlayer(id)
-	log.Printf("Игрок %s удален. Осталось: %d", id, len(gl.game.GetAllPlayers()))
-	if gl.game.IsGameActive() && len(gl.game.GetAllPlayers()) <= 1 {
-		log.Println("Игрок вышел, игра завершена досрочно")
-		gl.endGame()
-		select {
-		case gl.stopChan <- true:
-			log.Println("GameLoop: отправлен сигнал остановки")
-		default:
-			log.Println("GameLoop: stopChan уже содержит сигнал")
-		}
-	}
-}
-
-func (gl *GameLoop) startGame() {
-	if gl.game.IsGameActive() {
-		return
-	}
-	gl.game.SetGameActive(true)
-}
-
-func (gl *GameLoop) endGame() {
-	if !gl.game.IsGameActive() {
-		return
-	}
-	gl.game.SetGameActive(false)
-	stats := gl.getStatistics()
-	log.Println(stats)
-	if gl.game.GetCountOfPlayers() > 0 {
-		gl.broadcastFinal(domain.ServerEndMessage{
-			State:  domain.FinalGameState,
-			Result: stats,
-		})
-	}
-}
-
 func (gl *GameLoop) getStatistics() []model.PlayerFinalState {
 	stats := make([]model.PlayerFinalState, 0, len(gl.game.GetAllPlayers()))
 	for _, player := range gl.game.GetAllPlayers() {
@@ -146,103 +57,6 @@ func (gl *GameLoop) getStatistics() []model.PlayerFinalState {
 		})
 	}
 	return stats
-}
-
-func (gl *GameLoop) updateShooterTimers() {
-	for _, player := range gl.game.GetAllPlayers() {
-		if player.ShootTimer > 0 {
-			player.ShootTimer--
-		}
-	}
-}
-
-func (gl *GameLoop) updateBullets() {
-	activeBullets := make([]model.Bullet, 0)
-	for _, bullet := range gl.game.GetAllBullets() {
-		if bullet.Life > 0 {
-			hit, player, obj := gl.collisionService.CheckBulletCollision(bullet)
-			if hit {
-				if player != nil && player.Health > 0 {
-					gl.collisionService.HandlePlayerHit(player, bullet)
-				} else if obj != nil {
-					log.Printf("Пуля попала в стену ID: %s", obj.Id)
-				}
-				continue
-			}
-			activeBullets = append(activeBullets, bullet)
-		}
-	}
-	gl.game.SetBullets(activeBullets)
-}
-
-func (gl *GameLoop) updatePlayers() {
-	for _, player := range gl.game.GetAllPlayers() {
-		if player.Health <= 0 {
-			if player.RebornTimer > 0 {
-				player.RebornTimer--
-			} else if player.RebornTimer == 0 {
-				player.Health = domain.MaxPlayerHealth
-				player.RebornTimer = domain.PlayerRebornTimer
-			}
-			continue
-		}
-
-		vectorLength := math.Sqrt(player.MoveX*player.MoveX + player.MoveY*player.MoveY)
-		var moveX, moveY float64
-		if vectorLength != 0 {
-			moveX = player.MoveX / vectorLength
-			moveY = player.MoveY / vectorLength
-		}
-
-		deltaX := moveX * domain.TickTime * domain.PlayerSpeed
-		deltaY := moveY * domain.TickTime * domain.PlayerSpeed
-
-		nextX := player.X + deltaX
-		player.X = nextX
-		if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
-			player.X -= deltaX
-		}
-
-		nextY := player.Y + deltaY
-		player.Y = nextY
-		if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
-			player.Y -= deltaY
-		}
-
-		if hit, _ := gl.collisionService.CheckPlayerObjectCollision(player); hit {
-			gl.collisionService.ResolvePlayerCollisionSmooth(player)
-		}
-
-		if hit, direction, targetRoomId := gl.collisionService.CheckPlayerExitCollision(player); hit {
-			gl.handleRoomTransition(player, direction, targetRoomId)
-		}
-	}
-}
-
-func (gl *GameLoop) handleRoomTransition(player *model.PlayerGameState, direction, targetRoomId string) {
-	roomPixelWidth := float64(domain.RoomWidth * int(domain.TileSize))
-	roomPixelHeight := float64(domain.RoomHeight * int(domain.TileSize))
-	halfSize := domain.PlayerHalfSize
-
-	switch direction {
-	case domain.TopMarker:
-		player.Y = roomPixelHeight - halfSize - 1
-	case domain.BottomMarker:
-		player.Y = halfSize + 1
-	case domain.LeftMarker:
-		player.X = roomPixelWidth - halfSize - 1
-	case domain.RightMarker:
-		player.X = halfSize + 1
-	}
-	gl.game.SetPlayerRoom(player.Id, targetRoomId)
-}
-
-func (gl *GameLoop) createSnapshot() []model.PlayerGameState {
-	snapshot := make([]model.PlayerGameState, 0, len(gl.game.GetAllPlayers()))
-	for _, player := range gl.game.GetAllPlayers() {
-		snapshot = append(snapshot, *player)
-	}
-	return snapshot
 }
 
 func (gl *GameLoop) broadcast(message domain.ServerGameMessage) {

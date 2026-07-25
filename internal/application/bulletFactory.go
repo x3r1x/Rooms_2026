@@ -5,7 +5,13 @@ import (
 	"math"
 )
 
-func BulletFactory(player *domain.PlayerGameState) domain.Bullet {
+type BulletFactory struct{}
+
+func NewBulletFactory() *BulletFactory {
+	return &BulletFactory{}
+}
+
+func (bf *BulletFactory) BulletFactory(player *domain.PlayerGameState) domain.Bullet {
 
 	barrelLength := domain.PlayerHalfSize + domain.BulletBarrelOffset
 

@@ -5,36 +5,28 @@ import (
 	"gamedevRooms/internal/adapters/map"
 	"gamedevRooms/internal/domain"
 	"gamedevRooms/internal/game"
-	"gamedevRooms/internal/model"
+	"gamedevRooms/internal/ports"
 	"log"
 	"time"
 
 	"github.com/gorilla/websocket"
 )
 
-type Lobby struct {
-	state           string
-	players         map[string]*domain.LobbyPlayer
-	playersReady    int
-	gameLoop        *game.GameLoop
-	addChan         chan *domain.LobbyPlayer
-	readyChan       chan *domain.LobbyPlayer
-	removeChan      chan string
-	getStateChan    chan chan string
-	getGameLoopChan chan chan *game.GameLoop
-	gameFinishChan  chan bool
-}
-
-func NewLobby() *Lobby {
+func NewLobby(
+	gameStateProvider ports.GameStateProvider,
+	mapManager ports.MapManager,
+) *Lobby {
 	l := &Lobby{
-		state:           domain.WaitingLobbyState,
-		players:         make(map[string]*domain.LobbyPlayer),
-		addChan:         make(chan *domain.LobbyPlayer),
-		readyChan:       make(chan *domain.LobbyPlayer),
-		removeChan:      make(chan string),
-		getStateChan:    make(chan chan string),
-		getGameLoopChan: make(chan chan *game.GameLoop),
-		gameFinishChan:  make(chan bool, 1),
+		state:             domain.WaitingLobbyState,
+		players:           make(map[string]*domain.LobbyPlayer),
+		gameStateProvider: gameStateProvider,
+		mapManager:        mapManager,
+		addChan:           make(chan *domain.LobbyPlayer),
+		readyChan:         make(chan *domain.LobbyPlayer),
+		removeChan:        make(chan string),
+		getStateChan:      make(chan chan string),
+		getGameLoopChan:   make(chan chan *game.GameLoop),
+		gameFinishChan:    make(chan bool, 1),
 	}
 	go l.Run()
 	return l

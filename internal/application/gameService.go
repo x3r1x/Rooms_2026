@@ -1,1 +1,233 @@
 package application
+
+import (
+	"gamedevRooms/internal/domain"
+	"gamedevRooms/internal/ports"
+	"log"
+	"math"
+	"time"
+)
+
+type GameService struct {
+	gameState        ports.GameStateProvider
+	collisionService ports.CollisionService
+	mapManager       ports.MapManager
+	broadcastService ports.BroadcastService
+	bulletFactory    ports.BulletFactory
+	updateChan       chan domain.ClientGameMessage
+	deleteChan       chan string
+	finishChan       chan bool
+	stopChan         chan struct{}
+}
+
+func NewGameService(
+	gameState ports.GameStateProvider,
+	collisionService ports.CollisionService,
+	mapManager ports.MapManager,
+	broadcastService ports.BroadcastService,
+	bulletFactory ports.BulletFactory,
+) *GameService {
+	return &GameService{
+		gameState:        gameState,
+		collisionService: collisionService,
+		mapManager:       mapManager,
+		broadcastService: broadcastService,
+		bulletFactory:    bulletFactory,
+		updateChan:       make(chan domain.ClientGameMessage),
+		deleteChan:       make(chan string),
+		finishChan:       make(chan bool, 1),
+		stopChan:         make(chan struct{}),
+	}
+}
+
+func (gs *GameService) UpdatePlayer(msg domain.ClientGameMessage) {
+	if _, exists := gs.gameState.GetPlayer(msg.Id); !exists {
+		return
+	}
+	gs.updateChan <- msg
+}
+
+func (gs *GameService) DeletePlayer(id string) {
+	gs.deleteChan <- id
+}
+
+func (gs *GameService) Run() {
+	ticker := time.NewTicker(domain.TickTime * time.Millisecond)
+	defer ticker.Stop()
+
+	gs.startGame()
+
+	for {
+		select {
+		case del := <-gs.deleteChan:
+			gs.handleDelete(del)
+		case upload := <-gs.updateChan:
+			gs.gameState.UpdatePlayer(upload)
+		case <-ticker.C:
+			gs.gameState.IncrementTick()
+			gs.updateShooterTimers()
+			gs.updateBullets()
+			gs.updatePlayers()
+			remaining := gs.gameState.GetRemainingSeconds()
+			if remaining <= 0 {
+				gs.endGame()
+				return
+			}
+			gs.broadcast()
+		}
+	}
+}
+
+func (gs *GameService) update() {
+	gs.gameState.IncrementTick()
+	gs.updateBullets()
+	gs.updatePlayers()
+	gs.updateShooterTimers()
+
+	remaining := gs.gameState.GetRemainingSeconds()
+	if remaining <= 0 {
+		gs.stopChan <- struct{}{}
+		return
+	}
+
+	gs.broadcastService.BroadcastToAll(domain.ServerGameMessage{
+		State:   domain.OngoingGameState,
+		Type:    "a",
+		Players: gs.createSnapshot(),
+		Bullets: gs.gameState.GetAllBullets(),
+	})
+}
+
+func (gs *GameService) handleDelete(id string) {
+	gs.gameState.RemovePlayer(id)
+	log.Printf("Игрок %s удален. Осталось: %d", id, len(gs.gameState.GetAllPlayers()))
+	if gs.gameState.IsGameActive() && len(gs.gameState.GetAllPlayers()) <= 1 {
+		log.Println("Игрок вышел, игра завершена досрочно")
+		gs.endGame()
+		select {
+		case gs.stopChan <- true:
+			log.Println("GameLoop: отправлен сигнал остановки")
+		default:
+			log.Println("GameLoop: stopChan уже содержит сигнал")
+		}
+	}
+}
+
+func (gl *GameLoop) startGame() {
+	if gl.game.IsGameActive() {
+		return
+	}
+	gl.game.SetGameActive(true)
+}
+
+func (gl *GameLoop) endGame() {
+	if !gl.game.IsGameActive() {
+		return
+	}
+	gl.game.SetGameActive(false)
+	stats := gl.getStatistics()
+	log.Println(stats)
+	if gl.game.GetCountOfPlayers() > 0 {
+		gl.broadcastFinal(domain.ServerEndMessage{
+			State:  domain.FinalGameState,
+			Result: stats,
+		})
+	}
+}
+
+func (gs *GameService) createSnapshot() []domain.PlayerGameState {
+	snapshot := make([]domain.PlayerGameState, 0, len(gs.gameState.GetAllPlayers()))
+	for _, player := range gs.gameState.GetAllPlayers() {
+		snapshot = append(snapshot, *player)
+	}
+	return snapshot
+}
+
+func (gs *GameService) updateShooterTimers() {
+	for _, player := range gs.gameState.GetAllPlayers() {
+		if player.ShootTimer > 0 {
+			player.ShootTimer--
+		}
+	}
+}
+
+func (gs *GameService) updateBullets() {
+	activeBullets := make([]domain.Bullet, 0)
+	for _, bullet := range gs.gameState.GetAllBullets() {
+		if bullet.Life > 0 {
+			hit, player, obj := gs.collisionService.CheckBulletCollision(bullet)
+			if hit {
+				if player != nil && player.Health > 0 {
+					gs.collisionService.HandlePlayerHit(player, bullet)
+				} else if obj != nil {
+					log.Printf("Пуля попала в стену ID: %s", obj.Id)
+				}
+				continue
+			}
+			activeBullets = append(activeBullets, bullet)
+		}
+	}
+	gs.gameState.SetBullets(activeBullets)
+}
+
+func (gs *GameService) updatePlayers() {
+	for _, player := range gs.gameState.GetAllPlayers() {
+		if player.Health <= 0 {
+			if player.RebornTimer > 0 {
+				player.RebornTimer--
+			} else if player.RebornTimer == 0 {
+				player.Health = domain.MaxPlayerHealth
+				player.RebornTimer = domain.PlayerRebornTimer
+			}
+			continue
+		}
+
+		vectorLength := math.Sqrt(player.MoveX*player.MoveX + player.MoveY*player.MoveY)
+		var moveX, moveY float64
+		if vectorLength != 0 {
+			moveX = player.MoveX / vectorLength
+			moveY = player.MoveY / vectorLength
+		}
+
+		deltaX := moveX * domain.TickTime * domain.PlayerSpeed
+		deltaY := moveY * domain.TickTime * domain.PlayerSpeed
+
+		nextX := player.X + deltaX
+		player.X = nextX
+		if hit, _ := gs.collisionService.CheckPlayerObjectCollision(player); hit {
+			player.X -= deltaX
+		}
+
+		nextY := player.Y + deltaY
+		player.Y = nextY
+		if hit, _ := gs.collisionService.CheckPlayerObjectCollision(player); hit {
+			player.Y -= deltaY
+		}
+
+		if hit, _ := gs.collisionService.CheckPlayerObjectCollision(player); hit {
+			gs.collisionService.ResolvePlayerCollisionSmooth(player)
+		}
+
+		//if hit, direction, targetRoomId := gs.collisionService.CheckPlayerExitCollision(player); hit {
+		//	gs.handleRoomTransition(player, direction, targetRoomId)
+		//}
+	}
+}
+
+//func (gs *GameService) handleRoomTransition(player *model.PlayerGameState, direction, targetRoomId string) {
+//	roomPixelWidth := float64(domain.RoomWidth * int(domain.TileSize))
+//	roomPixelHeight := float64(domain.RoomHeight * int(domain.TileSize))
+//	halfSize := domain.PlayerHalfSize
+//
+//	switch direction {
+//	case domain.TopMarker:
+//		player.Y = roomPixelHeight - halfSize - 1
+//	case domain.BottomMarker:
+//		player.Y = halfSize + 1
+//	case domain.LeftMarker:
+//		player.X = roomPixelWidth - halfSize - 1
+//	case domain.RightMarker:
+//		player.X = halfSize + 1
+//	}
+//	gl.game.SetPlayerRoom(player.Id, targetRoomId)
+//}

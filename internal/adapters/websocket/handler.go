@@ -12,7 +12,8 @@ import (
 )
 
 type WebsocketHandler struct {
-	lobby *lobby.Lobby
+	lobby          *lobby.Lobby
+	gameController ports
 }
 
 var upgrader = websocket.Upgrader{
