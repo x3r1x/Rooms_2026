@@ -2,6 +2,7 @@ package game
 
 import (
 	"encoding/json"
+	"gamedevRooms/internal/adapters/collision"
 	"gamedevRooms/internal/domain"
 	"gamedevRooms/internal/model"
 	"log"
@@ -11,7 +12,7 @@ import (
 
 type GameLoop struct {
 	game             *GameState
-	collisionService *CollisionService
+	collisionService *collision.CollisionService
 	updateChan       chan domain.ClientGameMessage
 	deleteChan       chan string
 	finishChan       chan bool
@@ -20,7 +21,7 @@ type GameLoop struct {
 
 func NewGameLoop(game *GameState, finishChan chan bool) *GameLoop {
 	return &GameLoop{game: game,
-		collisionService: NewCollisionService(game),
+		collisionService: collision.NewCollisionService(game),
 		updateChan:       make(chan domain.ClientGameMessage),
 		deleteChan:       make(chan string),
 		finishChan:       finishChan,

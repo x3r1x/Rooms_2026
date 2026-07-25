@@ -6,6 +6,7 @@ type Point struct {
 	X, Y float64
 }
 
+// Todo: убрать отюда
 func GetPlayerPoints(centerX, centerY, angle float64) []Point {
 	cosAngle := math.Cos(angle)
 	sinAngle := math.Sin(angle)
