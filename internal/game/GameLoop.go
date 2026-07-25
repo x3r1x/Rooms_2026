@@ -68,12 +68,7 @@ func (gl *GameLoop) Run() {
 				gl.endGame()
 				return
 			}
-			gl.broadcast(model.ServerGameMessage{
-				State:   model.OngoingGameState,
-				Type:    "a",
-				Players: gl.createSnapshot(),
-				Bullets: gl.game.GetAllBullets(),
-			})
+			gl.broadcastOptimized()
 		}
 	}
 }
@@ -241,27 +236,60 @@ func (gl *GameLoop) handleRoomTransition(player *model.PlayerGameState, directio
 	gl.game.SetPlayerRoom(player.Id, targetRoomId)
 }
 
-func (gl *GameLoop) createSnapshot() []model.PlayerGameState {
-	snapshot := make([]model.PlayerGameState, 0, len(gl.game.GetAllPlayers()))
+func (gl *GameLoop) createRoomSnapshot(roomId string) ([]model.PlayerGameState, []model.Bullet) {
+	players := make([]model.PlayerGameState, 0)
+	bullets := make([]model.Bullet, 0)
+
 	for _, player := range gl.game.GetAllPlayers() {
-		snapshot = append(snapshot, *player)
+		if gl.game.GetPlayerRoom(player.Id) == roomId {
+			players = append(players, *player)
+		}
 	}
-	return snapshot
+	for _, bullet := range gl.game.GetAllBullets() {
+		owner, exists := gl.game.GetPlayer(bullet.OwnerId)
+		if exists && gl.game.GetPlayerRoom(owner.Id) == roomId {
+			bullets = append(bullets, bullet)
+		}
+	}
+
+	return players, bullets
 }
 
-func (gl *GameLoop) broadcast(message model.ServerGameMessage) {
-	data, err := json.Marshal(message)
-	if err != nil {
-		log.Println(err)
-		return
-	}
+func (gl *GameLoop) broadcastOptimized() {
+	roomCache := make(map[string][]byte)
+
 	for id, p := range gl.game.GetAllPlayers() {
 		if p.Connection == nil {
 			continue
 		}
+		roomId := gl.game.GetPlayerRoom(id)
+		if roomId == "" {
+			continue
+		}
+		data, cached := roomCache[roomId]
+		if !cached {
+			players, bullets := gl.createRoomSnapshot(roomId)
+
+			msg := model.ServerGameMessage{
+				State:   model.OngoingGameState,
+				Type:    "a",
+				Players: players,
+				Bullets: bullets,
+			}
+
+			var err error
+			data, err = json.Marshal(msg)
+			if err != nil {
+				log.Println("Ошибка сериализации:", err)
+				continue
+			}
+			// Сохраняем в кеш
+			roomCache[roomId] = data
+		}
+
 		err := p.Connection.WriteMessage(websocket.TextMessage, data)
 		if err != nil {
-			log.Println("Ошибка отправки: ", err)
+			log.Println("Ошибка отправки:", err)
 			gl.deleteChan <- id
 		}
 	}

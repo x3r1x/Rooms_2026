@@ -17,7 +17,7 @@ type MapManager struct {
 
 func NewMapManager(gameState *GameState) *MapManager {
 	//gameMap := mapModel.NewMap(gameState.GetCountOfPlayers()/3 + 1)
-	gameMap := mapModel.NewMap(30)
+	gameMap := mapModel.NewMap(5)
 	mm := &MapManager{
 		gameMap:   gameMap,
 		gameState: gameState,

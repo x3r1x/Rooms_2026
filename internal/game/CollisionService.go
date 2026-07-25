@@ -18,11 +18,20 @@ func NewCollisionService(state *GameState) *CollisionService {
 func (cs *CollisionService) CheckBulletCollision(bullet model.Bullet) (bool, *model.PlayerGameState, *model.Object) {
 	bulletSAT := cs.buildBulletSAT(bullet)
 
+	_, exists := cs.state.GetPlayer(bullet.OwnerId)
+	bulletRoomId := ""
+	if exists {
+		bulletRoomId = cs.state.GetPlayerRoom(bullet.OwnerId)
+	}
+
 	for _, player := range cs.state.GetAllPlayers() {
 		if player.Id == bullet.OwnerId {
 			continue
 		}
 		if player.Health <= 0 {
+			continue
+		}
+		if cs.state.GetPlayerRoom(player.Id) != bulletRoomId {
 			continue
 		}
 		playerSAT := cs.buildPlayerSAT(player, true)
@@ -33,6 +42,9 @@ func (cs *CollisionService) CheckBulletCollision(bullet model.Bullet) (bool, *mo
 
 	for _, object := range cs.state.GetObjects() {
 		if !object.IsSolid {
+			continue
+		}
+		if object.RoomId != "" && object.RoomId == bulletRoomId {
 			continue
 		}
 		objectSAT := cs.buildObjectSAT(object)
