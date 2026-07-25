@@ -44,7 +44,9 @@ func (gs *GameState) SetPlayerRoom(id, roomId string) {
 	if oldRoom, exists := gs.playerRooms[id]; exists {
 		gs.removePlayerFromRoom(oldRoom, id)
 	}
-
+	if player, exists := gs.players[id]; exists {
+		player.RoomId = roomId
+	}
 	gs.playerRooms[id] = roomId
 	gs.addPlayerToRoom(roomId, id)
 }

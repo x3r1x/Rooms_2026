@@ -2,6 +2,7 @@ package lobby
 
 import (
 	"encoding/json"
+	"fmt"
 	"gamedevRooms/internal/game"
 	"gamedevRooms/internal/model"
 	"log"
@@ -188,7 +189,21 @@ func (l *Lobby) StartGame() {
 	}
 
 	mapManager := game.NewMapManager(gameState)
+	gameState.SetRoomManager(mapManager)
 	roomMessages := mapManager.GetRoomMessages()
+
+	fmt.Println(len(roomMessages))
+	if len(roomMessages) > 0 {
+		var firstRoomId string
+		for roomId := range roomMessages {
+			firstRoomId = roomId
+			break
+		}
+		for _, player := range gameState.GetAllPlayers() {
+			gameState.SetPlayerRoom(player.Id, firstRoomId)
+		}
+	}
+
 	l.sendReadyState(roomMessages)
 	l.doCountdown()
 
