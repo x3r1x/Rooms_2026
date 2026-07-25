@@ -7,7 +7,6 @@ export let finalStatistics = null;
 export function initGameState(playerId) {
     gameState = {
         lastTime: null,
-
         player: {
             x: GAME_CONSTANTS.PLAYER_START_X,
             y: GAME_CONSTANTS.PLAYER_START_Y,
@@ -22,6 +21,7 @@ export function initGameState(playerId) {
             },
             didShoot: false,
             id: playerId,
+            roomId: null,
             spriteIndex: 0,
             hpSpriteIndex: 0,
             hp: null,
@@ -29,10 +29,6 @@ export function initGameState(playerId) {
         },
         enemies: [],
         bullets: [],
-
-        map: [],
-        mapWall: [],
-        mapObject: [],
     }
 }
 
@@ -43,6 +39,8 @@ export function startGameState(dateNow) {
     gameState.player.mousePosition.y = 0;
 
     gameState.player.direction = 0;
+    gameState.player.roomId = 0;
+
     gameState.previousVisualDirection = 0;
 }
 

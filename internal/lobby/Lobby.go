@@ -187,10 +187,23 @@ func (l *Lobby) StartGame() {
 		}
 	}
 
-	mapManager := game.NewMapManager(gameState)
-	roomMessages := mapManager.GetRoomMessages()
-	l.sendReadyState(roomMessages)
-	l.doCountdown()
+    mapManager := game.NewMapManager(gameState)
+    gameState.SetRoomManager(mapManager)
+
+    roomMessages := mapManager.GetRoomMessages()
+    if len(roomMessages) > 0 {
+       var firstRoomId string
+       for roomId := range roomMessages {
+          firstRoomId = roomId
+          break
+       }
+       for _, player := range gameState.GetAllPlayers() {
+          gameState.SetPlayerRoom(player.Id, firstRoomId)
+       }
+    }
+
+    l.sendReadyState(roomMessages)
+    l.doCountdown()
 
 	l.gameLoop = game.NewGameLoop(gameState, l.gameFinishChan)
 	l.state = model.OngoingGameState
