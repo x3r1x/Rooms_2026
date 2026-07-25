@@ -21,22 +21,24 @@ func main() {
 	collisionService := collision.NewCollisionService(gameState)
 	bulletFactory := factory.NewBulletFactory()
 
-	gameService := game.NewGameService(
-		gameState,
-		collisionService,
-		mapManager,
-		broadcastService,
-		bulletFactory,
-	)
-
 	lobbyService := lobby.NewLobbyService(
 		gameState,
 		mapManager,
 		broadcastService,
 	)
 
-	go gameService.Run()
+	gameService := game.NewGameService(
+		gameState,
+		collisionService,
+		mapManager,
+		broadcastService,
+		bulletFactory,
+		func() {
+			lobbyService.HandleGameEnd()
+		},
+	)
 
+	lobbyService.SetGameService(gameService)
 	wsHandler := websocket.NewWebsocketHandler(lobbyService)
 
 	http.HandleFunc("/ws", wsHandler.InitWebsocket)

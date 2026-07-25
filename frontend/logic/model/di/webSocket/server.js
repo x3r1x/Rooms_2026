@@ -17,6 +17,7 @@ import {
 
 export function getSocket(nickname) {
     const socket = new WebSocket("ws://84.201.159.214:8080/ws");
+    // const socket = new WebSocket("ws://localhost:8080/ws");
 
     socket.onopen = function (event) {
         console.log(`Открыто соединение - ${event.type}!`);

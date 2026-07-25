@@ -191,8 +191,13 @@ func (l *LobbyService) StartGame() {
 		return
 	}
 
-	l.mapManager.LoadMapObjects(l.gameStateProvider)
+	if l.gameService == nil {
+		log.Println("ERROR: GameService is nil! Cannot start game.")
+		return
+	}
 
+	l.mapManager.LoadMapObjects(l.gameStateProvider)
+	log.Println("IsWorkLobby/GameStart")
 	for _, player := range l.players {
 		if player.Ready {
 			l.gameStateProvider.AddPlayer(&domain.PlayerGameState{
@@ -218,5 +223,25 @@ func (l *LobbyService) StartGame() {
 
 	l.state = domain.OngoingGameState
 
+	go l.gameService.Run()
 	l.playersReady = 0
+	for _, player := range l.players {
+		delete(l.players, player.Id)
+	}
+}
+
+func (l *LobbyService) SetGameService(gs *game.GameService) {
+	l.gameService = gs
+}
+
+func (l *LobbyService) HandleGameEnd() {
+	log.Println("Игра закончилась, возвращаемся в лобби")
+	l.state = domain.WaitingLobbyState
+	l.playersReady = 0
+
+	for _, player := range l.gameStateProvider.GetAllPlayers() {
+		l.gameStateProvider.RemovePlayer(player.Id)
+	}
+
+	l.broadcastLobbyState()
 }

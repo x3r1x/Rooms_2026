@@ -17,6 +17,7 @@ type GameService struct {
 	updateChan       chan domain.ClientGameMessage
 	deleteChan       chan string
 	finishChan       chan bool
+	onGameEnd        func()
 }
 
 func NewGameService(
@@ -25,6 +26,7 @@ func NewGameService(
 	mapManager ports.MapManager,
 	broadcastService ports.BroadcastService,
 	bulletFactory ports.BulletFactory,
+	onGameEnd func(),
 ) *GameService {
 	return &GameService{
 		gameState:        gameState,
@@ -35,6 +37,7 @@ func NewGameService(
 		updateChan:       make(chan domain.ClientGameMessage),
 		deleteChan:       make(chan string),
 		finishChan:       make(chan bool, 1),
+		onGameEnd:        onGameEnd,
 	}
 }
 
@@ -49,6 +52,10 @@ func (gs *GameService) DeletePlayer(id string) {
 	gs.deleteChan <- id
 }
 
+func (gs *GameService) Stop() {
+	gs.finishChan <- true
+}
+
 func (gs *GameService) Run() {
 	ticker := time.NewTicker(domain.TickTime * time.Millisecond)
 	defer ticker.Stop()
@@ -57,6 +64,9 @@ func (gs *GameService) Run() {
 
 	for {
 		select {
+		case <-gs.finishChan:
+			gs.endGame()
+			return
 		case del := <-gs.deleteChan:
 			gs.handleDelete(del)
 		case upload := <-gs.updateChan:
@@ -68,8 +78,7 @@ func (gs *GameService) Run() {
 			gs.updatePlayers()
 			remaining := gs.gameState.GetRemainingSeconds()
 			if remaining <= 0 {
-				gs.endGame()
-				return
+				gs.Stop()
 			}
 			gs.broadcast()
 		}
@@ -100,7 +109,8 @@ func (gs *GameService) handleDelete(id string) {
 	log.Printf("Игрок %s удален. Осталось: %d", id, len(gs.gameState.GetAllPlayers()))
 	if gs.gameState.IsGameActive() && len(gs.gameState.GetAllPlayers()) <= 1 {
 		log.Println("Игрок вышел, игра завершена досрочно")
-		gs.endGame()
+		gs.Stop()
+		return
 	}
 }
 
@@ -123,6 +133,9 @@ func (gs *GameService) endGame() {
 			State:  domain.FinalGameState,
 			Result: stats,
 		})
+	}
+	if gs.onGameEnd != nil {
+		gs.onGameEnd()
 	}
 }
 
@@ -172,6 +185,8 @@ func (gs *GameService) updateBullets() {
 	activeBullets := make([]domain.Bullet, 0)
 	for _, bullet := range gs.gameState.GetAllBullets() {
 		if bullet.Life > 0 {
+			bullet.Move()
+			bullet.Life--
 			hit, player, obj := gs.collisionService.CheckBulletCollision(bullet)
 			if hit {
 				if player != nil && player.Health > 0 {
@@ -195,7 +210,13 @@ func (gs *GameService) updatePlayers() {
 			} else if player.RebornTimer == 0 {
 				player.Health = domain.MaxPlayerHealth
 				player.RebornTimer = domain.PlayerRebornTimer
+				player.X = domain.PlayerSpawnPointX
+				player.Y = domain.PlayerSpawnPointY
 			}
+			continue
+		}
+
+		if player.MoveX == 0 && player.MoveY == 0 {
 			continue
 		}
 
@@ -209,14 +230,12 @@ func (gs *GameService) updatePlayers() {
 		deltaX := moveX * domain.TickTime * domain.PlayerSpeed
 		deltaY := moveY * domain.TickTime * domain.PlayerSpeed
 
-		nextX := player.X + deltaX
-		player.X = nextX
+		player.X += deltaX
 		if hit, _ := gs.collisionService.CheckPlayerObjectCollision(player); hit {
 			player.X -= deltaX
 		}
 
-		nextY := player.Y + deltaY
-		player.Y = nextY
+		player.Y += deltaY
 		if hit, _ := gs.collisionService.CheckPlayerObjectCollision(player); hit {
 			player.Y -= deltaY
 		}
