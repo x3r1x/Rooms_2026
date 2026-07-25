@@ -193,6 +193,9 @@ func (l *Lobby) StartGame() {
 	roomMessages := mapManager.GetRoomMessages()
 
 	fmt.Println(len(roomMessages))
+	for _, msg := range roomMessages {
+		log.Println(msg.Id, "/", msg.ExitBottom, "/", msg.ExitLeft, "/", msg.ExitTop, "/", msg.ExitRight)
+	}
 	if len(roomMessages) > 0 {
 		var firstRoomId string
 		for roomId := range roomMessages {

@@ -51,6 +51,9 @@ func (cs *CollisionService) CheckPlayerObjectCollision(player *model.PlayerGameS
 		if !object.IsSolid {
 			continue
 		}
+		if player.RoomId != object.RoomId {
+			continue
+		}
 		objectSAT := cs.buildObjectSAT(object)
 		if collision.CheckCollisionSAT(playerSAT, objectSAT) {
 			return true, object

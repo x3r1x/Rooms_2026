@@ -226,7 +226,8 @@ func (gl *GameLoop) handleRoomTransition(player *model.PlayerGameState, directio
 	roomPixelWidth := float64(model.RoomWidth * int(model.TileSize))
 	roomPixelHeight := float64(model.RoomHeight * int(model.TileSize))
 	halfSize := model.PlayerHalfSize
-
+	log.Println("width:", roomPixelWidth, "height:", roomPixelHeight)
+	log.Println("direction:", direction, "target room:", targetRoomId)
 	switch direction {
 	case model.TopMarker:
 		player.Y = roomPixelHeight - halfSize - 1

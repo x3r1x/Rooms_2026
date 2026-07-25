@@ -17,7 +17,7 @@ type MapManager struct {
 
 func NewMapManager(gameState *GameState) *MapManager {
 	//gameMap := mapModel.NewMap(gameState.GetCountOfPlayers()/3 + 1)
-	gameMap := mapModel.NewMap(2)
+	gameMap := mapModel.NewMap(30)
 	mm := &MapManager{
 		gameMap:   gameMap,
 		gameState: gameState,
@@ -31,7 +31,7 @@ func (mm *MapManager) loadMapObjects() {
 	objects := make(map[string]*model.Object)
 	solidCount := 0
 
-	for _, room := range mm.gameMap.GetGameMap() {
+	for roomId, room := range mm.gameMap.GetGameMap() {
 		matrix := room.GetMatrix()
 		for i, tile := range matrix {
 			if tile == nil {
@@ -59,6 +59,7 @@ func (mm *MapManager) loadMapObjects() {
 					Height:  mm.tileSize,
 					IsSolid: true,
 					Type:    "wall",
+					RoomId:  roomId,
 				}
 				objects[obj.Id] = obj
 				solidCount++

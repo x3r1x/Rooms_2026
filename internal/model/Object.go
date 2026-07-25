@@ -8,6 +8,7 @@ type Object struct {
 	Height  float64 `json:"height"`
 	Type    string  `json:"type"`
 	IsSolid bool    `json:"isSolid"`
+	RoomId  string  `json:"roomId"`
 	//IsDestroyable bool    `json:"isDestroyable"`
 	//Health        float64 `json:"health"`
 }
