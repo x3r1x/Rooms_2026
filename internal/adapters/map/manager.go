@@ -1,50 +1,30 @@
-package
+package _map
 
 import (
 	"gamedevRooms/internal/adapters/map/generator"
 	"gamedevRooms/internal/domain"
-	"gamedevRooms/internal/game"
-	"log"
+	"gamedevRooms/internal/ports"
 	"strconv"
 
 	"github.com/google/uuid"
-)
-map
-
-import (
-	"gamedevRooms/internal/adapters/map/generator"
-	"gamedevRooms/internal/domain"
-	"gamedevRooms/internal/game"
-	"log"
-	"strconv"
-
-	"github.com/google/uuid"
-)
-
-import (
-	"gamedevRooms/internal/model"
 )
 
 type MapManager struct {
-	gameMap   *generator.Map
-	gameState *game.GameState
-	tileSize  float64
+	gameMap  *generator.Map
+	tileSize float64
 }
 
-func NewMapManager(gameState *game.GameState) *MapManager {
+func NewMapManager() *MapManager {
 	//gameMap := mapModel.NewMap(gameState.GetCountOfPlayers()/3 + 1)
 	gameMap := generator.NewMap(1)
-	mm := &MapManager{
-		gameMap:   gameMap,
-		gameState: gameState,
-		tileSize:  domain.TileSize,
+	return &MapManager{
+		gameMap:  gameMap,
+		tileSize: domain.TileSize,
 	}
-	mm.loadMapObjects()
-	return mm
 }
 
-func (mm *MapManager) loadMapObjects() {
-	objects := make(map[string]*model.Object)
+func (mm *MapManager) LoadMapObjects(gameState ports.GameStateProvider) {
+	objects := make(map[string]*domain.Object)
 	solidCount := 0
 
 	for _, room := range mm.gameMap.GetGameMap() {
@@ -67,7 +47,7 @@ func (mm *MapManager) loadMapObjects() {
 			if isSolid {
 				row := i / domain.RoomWidth
 				col := i % domain.RoomWidth
-				obj := &model.Object{
+				obj := &domain.Object{
 					Id:      uuid.New().String(),
 					X:       float64(col) * mm.tileSize,
 					Y:       float64(row) * mm.tileSize,
@@ -81,9 +61,7 @@ func (mm *MapManager) loadMapObjects() {
 			}
 		}
 	}
-
-	log.Printf("Загружено %d твердых объектов (стен) из карты", solidCount)
-	mm.gameState.SetObjects(objects)
+	gameState.SetObjects(objects)
 }
 
 func (mm *MapManager) GetRoomMessages() map[string]domain.RoomMessage {

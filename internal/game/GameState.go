@@ -11,23 +11,22 @@ import (
 )
 
 type GameState struct {
-	players       map[string]*model.PlayerGameState
-	objects       map[string]*model.Object
-	bullets       []model.Bullet
+	players       map[string]*domain.PlayerGameState
+	objects       map[string]*domain.Object
+	bullets       []domain.Bullet
 	tickCount     uint64
 	isGameActive  bool
 	gameStartTime time.Time
 	gameDuration  time.Duration
-	roomManager   *_map.MapManager
 	playerRooms   map[string]string
 	roomPlayers   map[string][]string
 }
 
 func NewGameState() *GameState {
 	return &GameState{
-		players:      make(map[string]*model.PlayerGameState),
-		objects:      make(map[string]*model.Object),
-		bullets:      make([]model.Bullet, 0),
+		players:      make(map[string]*domain.PlayerGameState),
+		objects:      make(map[string]*domain.Object),
+		bullets:      make([]domain.Bullet, 0),
 		gameDuration: domain.GameDuration * time.Second,
 		playerRooms:  make(map[string]string),
 		roomPlayers:  make(map[string][]string),

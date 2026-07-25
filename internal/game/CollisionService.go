@@ -4,15 +4,16 @@ import (
 	"gamedevRooms/internal/collision"
 	"gamedevRooms/internal/domain"
 	"gamedevRooms/internal/model"
+	"gamedevRooms/internal/ports"
 	"log"
 	"math"
 )
 
 type CollisionService struct {
-	state *GameState
+	state ports.GameStateProvider
 }
 
-func NewCollisionService(state *GameState) *CollisionService {
+func NewCollisionService(state ports.GameStateProvider) *CollisionService {
 	return &CollisionService{state: state}
 }
 
