@@ -44,7 +44,7 @@ func (cs *CollisionService) CheckBulletCollision(bullet domain.Bullet) (bool, *d
 		if !object.IsSolid {
 			continue
 		}
-		if object.RoomId != "" && object.RoomId == bulletRoomId {
+		if object.RoomId != "" && object.RoomId != bulletRoomId {
 			continue
 		}
 		objectSAT := cs.buildObjectSAT(object)
@@ -144,38 +144,43 @@ func (cs *CollisionService) calculateDamage(bullet domain.Bullet) float64 {
 //	return model.KnockbackForce * (bullet.Life/model.BulletLife*model.BulletDamageMulti + 1)
 //}
 
-//func (cs *CollisionService) CheckPlayerExitCollision(player *domain.PlayerGameState) (bool, string, string) {
-//	currentRoomId := cs.state.GetPlayerRoom(player.Id)
-//	if currentRoomId == "" {
-//		return false, "", ""
-//	}
-//
-//	roomInfo := cs.state.GetRoomManager().GetRoomInfo(currentRoomId)
-//	if roomInfo == nil {
-//		return false, "", ""
-//	}
-//
-//	roomPixelWidth := float64(domain.RoomWidth * int(domain.TileSize))
-//	roomPixelHeight := float64(domain.RoomHeight * int(domain.TileSize))
-//	halfSize := domain.PlayerHalfSize
-//
-//	exitChecks := map[string]func() bool{
-//		domain.TopMarker:    func() bool { return player.Y-halfSize < 0 },
-//		domain.BottomMarker: func() bool { return player.Y+halfSize > roomPixelHeight },
-//		domain.LeftMarker:   func() bool { return player.X-halfSize < 0 },
-//		domain.RightMarker:  func() bool { return player.X+halfSize > roomPixelWidth },
-//	}
-//
-//	for direction, check := range exitChecks {
-//		if check() {
-//			targetRoomId := roomInfo.GetExit(direction)
-//			if targetRoomId != "" {
-//				return true, direction, targetRoomId
-//			}
-//		}
-//	}
-//	return false, "", ""
-//}
+func (cs *CollisionService) CheckPlayerExitCollision(player *domain.PlayerGameState) (bool, string, string) {
+	currentRoomId := cs.state.GetPlayerRoom(player.Id)
+	if currentRoomId == "" {
+		return false, "", ""
+	}
+
+	mapManager, ok := cs.state.GetRoomManager().(ports.MapManager)
+	if !ok || mapManager == nil {
+		log.Printf("RoomManager is not MapManager or is nil")
+		return false, "", ""
+	}
+	roomInfo := mapManager.GetRoomInfo(currentRoomId)
+	if roomInfo == nil {
+		return false, "", ""
+	}
+
+	roomPixelWidth := float64(domain.RoomWidth * int(domain.TileSize))
+	roomPixelHeight := float64(domain.RoomHeight * int(domain.TileSize))
+	halfSize := domain.PlayerHalfSize
+
+	exitChecks := map[string]func() bool{
+		domain.TopMarker:    func() bool { return player.Y-halfSize < 0 },
+		domain.BottomMarker: func() bool { return player.Y+halfSize > roomPixelHeight },
+		domain.LeftMarker:   func() bool { return player.X-halfSize < 0 },
+		domain.RightMarker:  func() bool { return player.X+halfSize > roomPixelWidth },
+	}
+
+	for direction, check := range exitChecks {
+		if check() {
+			targetRoomId := roomInfo.GetExit(direction)
+			if targetRoomId != "" {
+				return true, direction, targetRoomId
+			}
+		}
+	}
+	return false, "", ""
+}
 
 func (cs *CollisionService) getRoomPixelSize() float64 {
 	return float64(domain.RoomWidth * int(domain.TileSize))

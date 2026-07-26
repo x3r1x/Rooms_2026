@@ -197,7 +197,7 @@ func (l *LobbyService) StartGame() {
 		log.Println("ERROR: GameService is nil! Cannot start game.")
 		return
 	}
-
+	l.gameStateProvider.SetRoomManager(l.mapManager)
 	l.mapManager.LoadMapObjects(l.gameStateProvider)
 
 	for _, player := range l.players {

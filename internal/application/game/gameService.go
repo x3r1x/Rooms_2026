@@ -248,26 +248,26 @@ func (gs *GameService) updatePlayers() {
 			gs.collisionService.ResolvePlayerCollisionSmooth(player)
 		}
 
-		//if hit, direction, targetRoomId := gs.collisionService.CheckPlayerExitCollision(player); hit {
-		//	gs.handleRoomTransition(player, direction, targetRoomId)
-		//}
+		if hit, direction, targetRoomId := gs.collisionService.CheckPlayerExitCollision(player); hit {
+			gs.handleRoomTransition(player, direction, targetRoomId)
+		}
 	}
 }
 
-//func (gs *GameService) handleRoomTransition(player *model.PlayerGameState, direction, targetRoomId string) {
-//	roomPixelWidth := float64(domain.RoomWidth * int(domain.TileSize))
-//	roomPixelHeight := float64(domain.RoomHeight * int(domain.TileSize))
-//	halfSize := domain.PlayerHalfSize
-//
-//	switch direction {
-//	case domain.TopMarker:
-//		player.Y = roomPixelHeight - halfSize - 1
-//	case domain.BottomMarker:
-//		player.Y = halfSize + 1
-//	case domain.LeftMarker:
-//		player.X = roomPixelWidth - halfSize - 1
-//	case domain.RightMarker:
-//		player.X = halfSize + 1
-//	}
-//	gl.game.SetPlayerRoom(player.Id, targetRoomId)
-//}
+func (gs *GameService) handleRoomTransition(player *domain.PlayerGameState, direction, targetRoomId string) {
+	roomPixelWidth := float64(domain.RoomWidth * int(domain.TileSize))
+	roomPixelHeight := float64(domain.RoomHeight * int(domain.TileSize))
+	halfSize := domain.PlayerHalfSize
+
+	switch direction {
+	case domain.TopMarker:
+		player.Y = roomPixelHeight - halfSize - 1
+	case domain.BottomMarker:
+		player.Y = halfSize + 1
+	case domain.LeftMarker:
+		player.X = roomPixelWidth - halfSize - 1
+	case domain.RightMarker:
+		player.X = halfSize + 1
+	}
+	gs.gameState.SetPlayerRoom(player.Id, targetRoomId)
+}

@@ -16,7 +16,7 @@ type MapManager struct {
 
 func NewMapManager() *MapManager {
 	//gameMap := mapModel.NewMap(gameState.GetCountOfPlayers()/3 + 1)
-	gameMap := generator.NewMap(1)
+	gameMap := generator.NewMap(4)
 	return &MapManager{
 		gameMap:  gameMap,
 		tileSize: domain.TileSize,
