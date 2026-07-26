@@ -5,22 +5,22 @@ import (
 	"gamedevRooms/internal/domain"
 	"gamedevRooms/internal/ports"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
 )
 
 type LobbyService struct {
+	mu           sync.RWMutex
 	state        string
 	players      map[string]*domain.LobbyPlayer
 	playersReady int
 	gameService  *game.GameService
 
-	addChan            chan lobbyAddEvent
-	readyChan          chan *domain.LobbyPlayer
-	removeChan         chan string
-	getStateChan       chan chan string
-	getGameServiceChan chan chan *game.GameService
+	addChan    chan lobbyAddEvent
+	readyChan  chan *domain.LobbyPlayer
+	removeChan chan string
 
 	gameStateProvider ports.GameStateProvider
 	mapManager        ports.MapManager
@@ -38,16 +38,14 @@ func NewLobbyService(
 	broadcastService ports.BroadcastService,
 ) *LobbyService {
 	l := &LobbyService{
-		state:              domain.WaitingLobbyState,
-		players:            make(map[string]*domain.LobbyPlayer),
-		gameStateProvider:  gameStateProvider,
-		mapManager:         mapManager,
-		broadcastService:   broadcastService,
-		addChan:            make(chan lobbyAddEvent),
-		readyChan:          make(chan *domain.LobbyPlayer),
-		removeChan:         make(chan string),
-		getStateChan:       make(chan chan string),
-		getGameServiceChan: make(chan chan *game.GameService),
+		state:             domain.WaitingLobbyState,
+		players:           make(map[string]*domain.LobbyPlayer),
+		gameStateProvider: gameStateProvider,
+		mapManager:        mapManager,
+		broadcastService:  broadcastService,
+		addChan:           make(chan lobbyAddEvent),
+		readyChan:         make(chan *domain.LobbyPlayer),
+		removeChan:        make(chan string),
 	}
 	go l.run()
 	return l
@@ -71,15 +69,15 @@ func (l *LobbyService) RemovePlayerFromLobby(id string) {
 }
 
 func (l *LobbyService) GetState() string {
-	responseChan := make(chan string)
-	l.getStateChan <- responseChan
-	return <-responseChan
+	l.mu.RLock()
+	defer l.mu.RUnlock()
+	return l.state
 }
 
 func (l *LobbyService) GetGameService() *game.GameService {
-	responseChan := make(chan *game.GameService)
-	l.getGameServiceChan <- responseChan
-	return <-responseChan
+	l.mu.RLock()
+	defer l.mu.RUnlock()
+	return l.gameService
 }
 
 func (l *LobbyService) run() {
@@ -119,8 +117,6 @@ func (l *LobbyService) run() {
 			}
 		case delPlayer := <-l.removeChan:
 			l.removeUser(delPlayer)
-		case responseChan := <-l.getStateChan:
-			responseChan <- l.state
 		}
 	}
 }
