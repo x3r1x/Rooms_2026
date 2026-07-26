@@ -56,12 +56,23 @@ function getExit(exitList) {
 }
 
 export function assemblyObject(object1, object2) {
-    const resultData = [...object1.data];
+    const data1 = object1 && Array.isArray(object1.data) ? object1.data : [];
+    const data2 = object2 && Array.isArray(object2.data) ? object2.data : [];
 
-    for (let i = 0; i < resultData.length; i++) {
-        if (object2.data[i] !== 0) {
-            resultData[i] = object2.data[i];
-        }
+    if (data1.length === 0 && data2.length === 0) {
+        return {
+            name: "assembly",
+            data: []
+        };
+    }
+
+    const maxLength = Math.max(data1.length, data2.length);
+    const resultData = [];
+
+    for (let i = 0; i < maxLength; i++) {
+        const val1 = data1[i] !== undefined ? data1[i] : 0;
+        const val2 = data2[i] !== undefined ? data2[i] : 0;
+        resultData.push(val2 !== 0 ? val2 : val1);
     }
 
     return {
