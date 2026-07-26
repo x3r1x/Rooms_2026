@@ -6,10 +6,11 @@ export function registerClient(socket, nickname) {
     socket.send(JSON.stringify(message))
 }
 
-export function sendReadyState(socket,  ready, clientId) {
+export function sendReadyState(socket, playerClass, ready, clientId) {
     const message = {
         "id": clientId,
-        "r": ready
+        "r": ready,
+        "pc": playerClass,
     }
 
     socket.send(JSON.stringify(message))
