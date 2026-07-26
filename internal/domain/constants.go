@@ -2,12 +2,19 @@ package domain
 
 const (
 	// константы для пуль
-	MaxBulletSpeed     = 25.0
-	BulletLife         = 60.0
+	BulletSpeedGun    = 25.0
+	BulletSpeedRifle  = 30.0
+	BulletSpeedSom    = 10.0
+	BulletLifeGun     = 60.0
+	BulletLifeRifle   = 20.0
+	BulletLifeSom     = 600
+	BulletDamageGun   = 20.0
+	BulletDamageRifle = 30.0
+	BulletDamageSom   = 100.0
+
 	ShootCooldown      = 15
 	BulletLength       = 25.0
 	BulletWidth        = 5.0
-	BulletDamage       = 10.0
 	BulletDamageMulti  = 1.2
 	BulletBarrelOffset = 24.0
 	RecoilDistance     = 8.0
@@ -56,8 +63,8 @@ const (
 	OngoingGameState    = "o"
 	FinalGameState      = "f"
 
-	PlayerPistolet = "p"
-	PlayerShotgun  = "s"
-	PlayerSom      = "b"
-	EmptyPlayer    = "e"
+	PlayerGun   = "g"
+	PlayerRifle = "r"
+	PlayerSom   = "s"
+	EmptyPlayer = "e"
 )

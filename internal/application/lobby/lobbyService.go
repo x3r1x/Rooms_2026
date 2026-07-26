@@ -203,21 +203,11 @@ func (l *LobbyService) StartGame() {
 
 	for _, player := range l.players {
 		if player.Ready {
-			l.gameStateProvider.AddPlayer(&domain.PlayerGameState{
-				Id:          player.Id,
-				Nickname:    player.Nickname,
-				Health:      domain.MaxPlayerHealth,
-				X:           domain.PlayerSpawnPointX,
-				Y:           domain.PlayerSpawnPointY,
-				Angle:       domain.InitDirection,
-				MoveX:       domain.InitValue,
-				MoveY:       domain.InitValue,
-				ShootTimer:  domain.InitValue,
-				RebornTimer: domain.InitValue,
-				BodyCount:   domain.InitValue,
-				DeathCount:  domain.InitValue,
-				PlayerClass: player.PlayerClass,
-			})
+			l.gameStateProvider.AddPlayer(domain.NewPlayerGameState(
+				player.Id,
+				player.Nickname,
+				player.PlayerClass,
+			))
 		}
 	}
 

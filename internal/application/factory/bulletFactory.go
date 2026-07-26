@@ -5,7 +5,10 @@ import (
 	"math"
 )
 
-type BulletFactory struct{}
+type BulletFactory struct {
+	BulletDamage int
+	BulletLife   int
+}
 
 func NewBulletFactory() *BulletFactory {
 	return &BulletFactory{}
@@ -25,7 +28,9 @@ func (bf *BulletFactory) CreateBullet(player *domain.PlayerGameState) domain.Bul
 		X:         sideX,
 		Y:         sideY,
 		Direction: player.Angle,
-		Life:      domain.BulletLife,
+		Life:      player.BulletLife,
+		Damage:    player.BulletDamage,
+		Speed:     player.BulletSpeed,
 		OwnerId:   player.Id,
 	}
 	//recoilX := -math.Cos(player.Angle) * model.RecoilDistance

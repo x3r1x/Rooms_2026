@@ -9,27 +9,13 @@ type Bullet struct {
 	Direction float64 `json:"a"`
 	Life      float64 `json:"life"`
 	OwnerId   string  `json:"oId"`
-}
-
-func (b *Bullet) IsActive() bool {
-	return b.Life > 0
-}
-
-func (b *Bullet) Update() {
-	if b.Life > 0 {
-		b.Life--
-		b.Move()
-	}
+	Speed     float64 `json:"-"`
+	Damage    float64 `json:"-"`
 }
 
 func (b *Bullet) Move() {
-	b.X += math.Cos(b.Direction) * MaxBulletSpeed
-	b.Y += math.Sin(b.Direction) * MaxBulletSpeed
-}
-
-func (b *Bullet) CalculateDamage() float64 {
-	lifeRatio := b.Life / BulletLife
-	return BulletDamage * (lifeRatio*BulletDamageMulti + 1)
+	b.X += math.Cos(b.Direction) * b.Speed
+	b.Y += math.Sin(b.Direction) * b.Speed
 }
 
 func (b *Bullet) GetPoints() []Point {
