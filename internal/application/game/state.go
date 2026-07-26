@@ -45,6 +45,9 @@ func (gs *GameState) SetPlayerRoom(id, roomId string) {
 		gs.removePlayerFromRoom(oldRoom, id)
 	}
 
+	if player, exists := gs.players[id]; exists {
+		player.RoomId = roomId
+	}
 	gs.playerRooms[id] = roomId
 	gs.addPlayerToRoom(roomId, id)
 }
@@ -179,4 +182,14 @@ func (gs *GameState) AddBullet(player *domain.PlayerGameState) {
 
 func (gs *GameState) GetCountOfPlayers() int {
 	return len(gs.players)
+}
+
+func (gs *GameState) GetPlayersByRoom() map[string][]*domain.PlayerGameState {
+	rooms := make(map[string][]*domain.PlayerGameState)
+	for id, roomId := range gs.playerRooms {
+		if player, exists := gs.players[id]; exists {
+			rooms[roomId] = append(rooms[roomId], player)
+		}
+	}
+	return rooms
 }

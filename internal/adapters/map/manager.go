@@ -27,7 +27,7 @@ func (mm *MapManager) LoadMapObjects(gameState ports.GameStateProvider) {
 	objects := make(map[string]*domain.Object)
 	solidCount := 0
 
-	for _, room := range mm.gameMap.GetGameMap() {
+	for roomId, room := range mm.gameMap.GetGameMap() {
 		matrix := room.GetMatrix()
 		for i, tile := range matrix {
 			if tile == nil {
@@ -55,6 +55,7 @@ func (mm *MapManager) LoadMapObjects(gameState ports.GameStateProvider) {
 					Height:  mm.tileSize,
 					IsSolid: true,
 					Type:    "wall",
+					RoomId:  roomId,
 				}
 				objects[obj.Id] = obj
 				solidCount++

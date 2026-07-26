@@ -15,6 +15,7 @@ type PlayerGameState struct {
 	RebornTimer int     `json:"rt"`
 	BodyCount   int     `json:"-"`
 	DeathCount  int     `json:"-"`
+	RoomId      string  `json:"room_id"`
 }
 
 type PlayerFinalState struct {

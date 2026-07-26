@@ -27,4 +27,5 @@ type GameStateProvider interface {
 	SetPlayerRoom(id, roomId string)
 	GetRoomManager() interface{}
 	GetCountOfPlayers() int
+	GetPlayersByRoom() map[string][]*domain.PlayerGameState
 }

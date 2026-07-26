@@ -1,6 +1,7 @@
 package game
 
 import (
+	"encoding/json"
 	"gamedevRooms/internal/domain"
 	"gamedevRooms/internal/ports"
 	"log"
@@ -85,25 +86,6 @@ func (gs *GameService) Run() {
 	}
 }
 
-func (gs *GameService) update() {
-	gs.gameState.IncrementTick()
-	gs.updateBullets()
-	gs.updatePlayers()
-	gs.updateShooterTimers()
-
-	remaining := gs.gameState.GetRemainingSeconds()
-	if remaining <= 0 {
-		return
-	}
-
-	gs.broadcastService.BroadcastToAll(domain.ServerGameMessage{
-		State:   domain.OngoingGameState,
-		Type:    "a",
-		Players: gs.createSnapshot(),
-		Bullets: gs.gameState.GetAllBullets(),
-	})
-}
-
 func (gs *GameService) handleDelete(id string) {
 	gs.gameState.RemovePlayer(id)
 	log.Printf("Игрок %s удален. Осталось: %d", id, len(gs.gameState.GetAllPlayers()))
@@ -153,24 +135,46 @@ func (gs *GameService) getStatistics() []domain.PlayerFinalState {
 }
 
 func (gs *GameService) broadcast() {
-	gs.broadcastService.BroadcastToAll(domain.ServerGameMessage{
-		State:   domain.OngoingGameState,
-		Type:    "a",
-		Players: gs.createSnapshot(),
-		Bullets: gs.gameState.GetAllBullets(),
-	})
+	playersByRoom := gs.gameState.GetPlayersByRoom()
+	bullets := gs.gameState.GetAllBullets()
+	for _, playersInRoom := range playersByRoom {
+		msg := domain.ServerGameMessage{
+			State:   domain.OngoingGameState,
+			Type:    "a",
+			Players: playersInRoom,
+			Bullets: bullets,
+		}
+
+		data, err := json.Marshal(msg)
+		if err != nil {
+			continue
+		}
+
+		for _, p := range playersInRoom {
+			gs.broadcastService.BroadcastToPlayer(p.Id, data)
+		}
+	}
 }
 
 func (gs *GameService) broadcastFinal(message domain.ServerEndMessage) {
 	gs.broadcastService.BroadcastToAll(message)
 }
 
-func (gs *GameService) createSnapshot() []domain.PlayerGameState {
-	snapshot := make([]domain.PlayerGameState, 0, len(gs.gameState.GetAllPlayers()))
+func (gs *GameService) createRoomSnapshot(roomId string) ([]domain.PlayerGameState, []domain.Bullet) {
+	players := make([]domain.PlayerGameState, 0)
+	bullets := make([]domain.Bullet, 0)
 	for _, player := range gs.gameState.GetAllPlayers() {
-		snapshot = append(snapshot, *player)
+		if gs.gameState.GetPlayerRoom(player.Id) == roomId {
+			players = append(players, *player)
+		}
 	}
-	return snapshot
+	for _, bullet := range gs.gameState.GetAllBullets() {
+		owner, exists := gs.gameState.GetPlayer(bullet.OwnerId)
+		if exists && gs.gameState.GetPlayerRoom(owner.Id) == roomId {
+			bullets = append(bullets, bullet)
+		}
+	}
+	return players, bullets
 }
 
 func (gs *GameService) updateShooterTimers() {

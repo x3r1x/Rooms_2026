@@ -44,10 +44,10 @@ type ServerReadyMessage struct {
 }
 
 type ServerGameMessage struct {
-	State   string            `json:"s"`
-	Type    string            `json:"type"`
-	Players []PlayerGameState `json:"p"`
-	Bullets []Bullet          `json:"b"`
+	State   string             `json:"s"`
+	Type    string             `json:"type"`
+	Players []*PlayerGameState `json:"p"`
+	Bullets []Bullet           `json:"b"`
 }
 
 type ServerCountdownMessage struct {

@@ -199,6 +199,7 @@ func (l *LobbyService) StartGame() {
 	}
 
 	l.mapManager.LoadMapObjects(l.gameStateProvider)
+
 	for _, player := range l.players {
 		if player.Ready {
 			l.gameStateProvider.AddPlayer(&domain.PlayerGameState{
@@ -223,6 +224,16 @@ func (l *LobbyService) StartGame() {
 	l.doCountdown()
 
 	l.state = domain.OngoingGameState
+	if len(roomMessages) > 0 {
+		var firstRoomId string
+		for roomId := range roomMessages {
+			firstRoomId = roomId
+			break
+		}
+		for _, player := range l.gameStateProvider.GetAllPlayers() {
+			l.gameStateProvider.SetPlayerRoom(player.Id, firstRoomId)
+		}
+	}
 
 	go l.gameService.Run()
 	l.playersReady = 0

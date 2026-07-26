@@ -71,7 +71,7 @@ func generateRandomRoomsGrid(newMap map[string]*Room, grid map[mapPoint]*Room, r
 				newRoom := rg.CreateRoomWithRandomBarrier()
 
 				parentRoom.SetExit(direction.name, newRoom.GetId())
-				newRoom.SetExit(direction.opposite, newRoom.GetId())
+				newRoom.SetExit(direction.opposite, parentRoom.GetId())
 
 				grid[newMapPoint] = newRoom
 				newMap[newRoom.id] = newRoom
