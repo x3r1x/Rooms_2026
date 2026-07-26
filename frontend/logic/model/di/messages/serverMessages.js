@@ -3,6 +3,7 @@ import {updateStatisticView} from "../../../view/app/statisticsView.js";
 import {updateLobbyView} from "../../../view/app/lobbyView.js";
 import {changeCountdownTimer} from "../../../view/app/countdownView.js";
 import {parseMap} from "../preloadingResources/mapHandler.js";
+import {getSnapshotsAmount, saveSnapshot} from "../../game/storage/interpolation.js";
 
 export function processWaitingMessage(parsedMessage, lobbyState) {
     if (!parsedMessage.oId || !parsedMessage.p) {
@@ -12,7 +13,6 @@ export function processWaitingMessage(parsedMessage, lobbyState) {
 
     lobbyState.clientId = parsedMessage.oId;
     lobbyState.players = parsedMessage.p;
-    lobbyState.players.sort((player1, player2) => player1.n.localeCompare(player2.n))
 
     updateLobbyView(lobbyState.clientId, lobbyState.players);
 }
@@ -43,12 +43,10 @@ export function processCountdownMessage(parsedMessage, lobbyState) {
 }
 
 export function processGameAssignment(parsedMessage, gameState, gameNicknames) {
-    gameState.enemies = [];
     parsedMessage.p.forEach((player) => processPlayer(player, gameState));
-
-    gameState.bullets = [];
     parsedMessage.b.forEach((bullet) => processBullet(bullet, gameState));
 
+    saveSnapshot(parsedMessage);
     updateStatisticView(gameState, gameNicknames);
     gameState.didShoot = false;
 }
@@ -71,16 +69,19 @@ function processPlayer(player, state) {
     if (newPlayerInModel.id === state.player.id) {
         newPlayerInModel.mousePosition = state.player.mousePosition;
         state.player = newPlayerInModel;
-    } else {
-        state.enemies.push(newPlayerInModel);
+    } else if (getSnapshotsAmount() < 2) {
+        state.enemies[newPlayerInModel.id] = newPlayerInModel;
     }
 }
 
 function processBullet(bullet, state) {
-    state.bullets.push({
-        x: bullet.x,
-        y: bullet.y,
-        direction: bullet.a,
-        ownerId: bullet.oId
-    })
+    if (!(bullet.id in state.bullets)) {
+        state.bullets[bullet.id] = {
+            x: bullet.x,
+            y: bullet.y,
+            direction: bullet.a,
+            ownerId: bullet.oId,
+            id: bullet.id
+        }
+    }
 }

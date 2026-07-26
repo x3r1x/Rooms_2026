@@ -4,7 +4,9 @@ import {gameNicknames} from "../../../model/game/storage/gameState.js";
 export function drawPlayers(context, mainPlayer, enemies) {
     drawMainPlayer(context, mainPlayer);
 
-    enemies.forEach((enemy) => drawEnemy(context, enemy));
+    for (const enemy of Object.values(enemies)) {
+        drawEnemy(context, enemy)
+    }
 }
 
 function drawMainPlayer(context, player) {

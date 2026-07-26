@@ -1,20 +1,16 @@
-import {GAME_CONSTANTS} from "../storage/gameConstants.js";
-import {canvas} from "../loadGame.js";
+import {lerp} from "../storage/interpolation.js";
 
-export function getUpdatedBullets(elapsedTime, bullets) {
-    return bullets.filter(bullet => {
-        bullet.x += Math.cos(bullet.direction) * elapsedTime * GAME_CONSTANTS.BULLET_SPEED;
-        bullet.y += Math.sin(bullet.direction) * elapsedTime * GAME_CONSTANTS.BULLET_SPEED;
+export function updateBullets(dt, bullets, snaps) {
+    snaps.stateA.b.forEach((bulletStart) => {
+        if (bulletStart.id in bullets) {
+            if (!(snaps.stateB.b.find((bulletEnd) => bulletEnd.id === bulletStart.id))) {
+                delete bullets[bulletStart.id];
+            } else {
+                const bulletEnd = snaps.stateB.b.find((bulletEnd) => bulletEnd.id === bulletStart.id);
 
-        return !isBulletOutOfBounds(bullet);
-    });
-}
-
-function isBulletOutOfBounds(bullet) {
-    const didPassLeft = bullet.x + GAME_CONSTANTS.BULLET_WIDTH < 0;
-    const didPassRight = bullet.x > canvas.width;
-    const didPassTop = bullet.y + GAME_CONSTANTS.BULLET_HEIGHT < 0;
-    const didPassBottom = bullet.y > canvas.height;
-
-    return didPassLeft || didPassRight || didPassTop || didPassBottom;
+                bullets[bulletStart.id].x = lerp(bulletStart.x, bulletEnd.x, dt);
+                bullets[bulletStart.id].y = lerp(bulletStart.y, bulletEnd.y, dt);
+            }
+        }
+    })
 }

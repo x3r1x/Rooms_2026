@@ -1,12 +1,21 @@
 import {keys} from '../../../controller/gameListeners.js';
 import {updateEnemies, updatePlayer} from "./players.js";
-import {getUpdatedBullets} from "./bullet.js";
+import {updateBullets} from "./bullet.js";
+import {getNeighbouringSnapshots, getClientTime} from "../storage/interpolation.js";
+import {GAME_CONSTANTS} from "../storage/gameConstants.js";
 
 export function updateGame(elapsedTime, state) {
     updateMovementDirection(state.player.movementDirection);
     updatePlayer(state.player.movementDirection, elapsedTime, state.player);
-    updateEnemies(elapsedTime, state.enemies);
-    state.bullets = getUpdatedBullets(elapsedTime, state.bullets);
+
+    const renderTime = getClientTime() - GAME_CONSTANTS.INTERPOLATION_DELAY;
+    const neighbouredSnapshots = getNeighbouringSnapshots(renderTime);
+
+    if (!neighbouredSnapshots.stateA || !neighbouredSnapshots.stateB) return
+
+    const dt = (renderTime - neighbouredSnapshots.stateA.t) / (neighbouredSnapshots.stateB.t - neighbouredSnapshots.stateA.t);
+    updateEnemies(dt, state.enemies, neighbouredSnapshots);
+    updateBullets(dt, state.bullets, neighbouredSnapshots);
 }
 
 function updateMovementDirection(direction) {

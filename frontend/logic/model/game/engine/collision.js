@@ -19,7 +19,6 @@ export function canMoveTo(nextPosition, player) {
               const tilePoints = getTileWorldPoints(tile.x, tile.y, hitbox);
               const tileSAT = {points: tilePoints, normals: TILE_NORMALS};
               if (checkCollisionSAT(personSAT, tileSAT)) {
-                  console.log('COLLISIONS:', tileSAT);
                   return false;
               }
           }

@@ -1,11 +1,12 @@
 import {initGameListeners, resizeCanvas} from "../../controller/gameListeners.js";
-import {assemblyRoom, parseMapData, parseTileInfo} from "./storage/layers.js";
+import {parseMapData, parseTileInfo} from "./storage/layers.js";
 import {initMap} from "../../view/game/maps.js";
 import {initSprites} from "../../view/game/sprites.js";
 import {gameState} from "./storage/gameState.js";
 import {updateGame} from "./engine/updateGame.js";
 import {drawGame} from "../../view/game/painters/drawGame.js";
 import {socket} from "../app/appState.js";
+import {addToClientTime} from "./storage/interpolation.js";
 
 export const canvas = document.getElementById("canvas");
 const context = canvas.getContext('2d');
@@ -38,6 +39,7 @@ export function startGameLoop() {
     updateGame(elapsedTime, gameState, socket);
     drawGame(canvas, context, gameState);
 
+    addToClientTime(elapsedTime);
     gameState.lastTime = currentTime;
     requestAnimationFrame(startGameLoop);
 }

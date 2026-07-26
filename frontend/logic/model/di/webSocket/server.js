@@ -16,8 +16,8 @@ import {
 } from "../../app/appState.js";
 
 export function getSocket(nickname) {
-    // const socket = new WebSocket("ws://84.201.159.214:8080/ws");
-    const socket = new WebSocket("ws://localhost:8080/ws");
+    const socket = new WebSocket("ws://84.201.159.214:8080/ws");
+    // const socket = new WebSocket("ws://localhost:8080/ws");
 
     socket.onopen = function (event) {
         console.log(`Открыто соединение - ${event.type}!`);
@@ -37,7 +37,6 @@ export function getSocket(nickname) {
 
 export function parseMessage(socket, message) {
     let parsedMessage = JSON.parse(message);
-    console.log(parsedMessage);
 
     switch (parsedMessage.s) {
         case APP_STATES.WAITING:

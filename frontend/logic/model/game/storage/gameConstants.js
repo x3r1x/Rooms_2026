@@ -28,7 +28,10 @@ export const GAME_CONSTANTS = {
     ENEMY_SPRITE_LIST_PATH: 'assets/images/enemy.png',
     ENEMY_BULLET_SKIN_PATH: 'assets/images/enemy_bullet_classic.png',
 
-    TILE_IMG_PATH: 'assets/tile/tileset x1.png'
+    TILE_IMG_PATH: 'assets/tile/tileset x1.png',
+
+    SNAPSHOTS_AMOUNT: 100,
+    INTERPOLATION_DELAY: 100
 }
 
 export const PLAYER_LOCAL_POINTS = [
