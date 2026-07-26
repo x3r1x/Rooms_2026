@@ -8,4 +8,5 @@ type CollisionService interface {
 	HandlePlayerHit(player *domain.PlayerGameState, bullet domain.Bullet)
 	ResolvePlayerCollisionSmooth(player *domain.PlayerGameState) bool
 	CheckPlayerExitCollision(player *domain.PlayerGameState) (bool, string, string)
+	TriggerExplosion(bullet domain.Bullet)
 }

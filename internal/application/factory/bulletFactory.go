@@ -43,6 +43,7 @@ func (bf *BulletFactory) createSingleBullet(player *domain.PlayerGameState) doma
 		Damage:    player.BulletDamage,
 		Speed:     player.BulletSpeed,
 		OwnerId:   player.Id,
+		Type:      player.PlayerClass,
 	}
 	//recoilX := -math.Cos(player.Angle) * model.RecoilDistance
 	//recoilY := -math.Sin(player.Angle) * model.RecoilDistance
@@ -72,6 +73,7 @@ func (bf *BulletFactory) createShotgunBullets(player *domain.PlayerGameState) []
 			OwnerId:   player.Id,
 			Speed:     player.BulletSpeed,
 			Damage:    domain.BulletDamageRifle,
+			Type:      player.PlayerClass,
 		})
 	}
 

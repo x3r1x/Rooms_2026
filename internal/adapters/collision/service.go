@@ -115,6 +115,10 @@ func (cs *CollisionService) HandlePlayerHit(player *domain.PlayerGameState, bull
 	if player == nil {
 		return
 	}
+	if bullet.Type == domain.PlayerSom {
+		cs.handleExplosion(bullet)
+		return
+	}
 	player.Health -= cs.calculateDamage(bullet)
 	log.Printf("HIT! Player %s took damage. Health: %.2f", player.Id, player.Health)
 
@@ -133,6 +137,38 @@ func (cs *CollisionService) HandlePlayerHit(player *domain.PlayerGameState, bull
 		}
 		player.DeathCount++
 		player.RebornTimer = domain.PlayerRebornTimer
+	}
+}
+
+func (cs *CollisionService) TriggerExplosion(bullet domain.Bullet) {
+	cs.handleExplosion(bullet)
+}
+
+func (cs *CollisionService) handleExplosion(bullet domain.Bullet) {
+	bulletRoomId := ""
+	if owner, exists := cs.state.GetPlayer(bullet.OwnerId); exists {
+		bulletRoomId = cs.state.GetPlayerRoom(owner.Id)
+	}
+	for _, target := range cs.state.GetAllPlayers() {
+		if target.Health <= 0 {
+			continue
+		}
+		if cs.state.GetPlayerRoom(target.Id) != bulletRoomId {
+			continue
+		}
+
+		dx := target.X - bullet.X
+		dy := target.Y - bullet.Y
+		distance := math.Sqrt(dx*dx + dy*dy)
+
+		if distance < domain.ExplosionRadius {
+			damageMultiplayer := (1 - distance/domain.ExplosionRadius) * domain.BulletDamageMulti
+			target.Health -= damageMultiplayer * domain.BulletDamageSom
+			if target.Health < 0 {
+				target.DeathCount++
+				target.RebornTimer = domain.PlayerRebornTimer
+			}
+		}
 	}
 }
 

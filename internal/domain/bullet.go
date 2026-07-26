@@ -11,6 +11,7 @@ type Bullet struct {
 	OwnerId   string  `json:"oId"`
 	Speed     float64 `json:"-"`
 	Damage    float64 `json:"-"`
+	Type      string  `json:"-"`
 }
 
 func (b *Bullet) Move() {

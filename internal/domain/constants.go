@@ -4,7 +4,7 @@ const (
 	// константы для пуль
 	BulletSpeedGun    = 25.0
 	BulletSpeedRifle  = 15.0
-	BulletSpeedSom    = 6.0
+	BulletSpeedSom    = 3.0
 	BulletLifeGun     = 60.0
 	BulletLifeRifle   = 30.0
 	BulletLifeSom     = 600
@@ -19,6 +19,7 @@ const (
 	BulletWidth        = 5.0
 	BulletDamageMulti  = 1.2
 	BulletBarrelOffset = 24.0
+	ExplosionRadius    = 250
 	RecoilDistance     = 8.0
 	KnockbackForce     = 12.0
 	// константы для игроков

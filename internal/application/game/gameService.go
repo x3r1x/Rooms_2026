@@ -195,7 +195,10 @@ func (gs *GameService) updateBullets() {
 			if hit {
 				if player != nil && player.Health > 0 {
 					gs.collisionService.HandlePlayerHit(player, bullet)
-				} else if obj != nil {
+				} else if obj != nil || bullet.Type == domain.PlayerSom {
+					if bullet.Type == domain.PlayerSom {
+						gs.collisionService.TriggerExplosion(bullet)
+					}
 					log.Printf("Пуля попала в стену ID: %s", obj.Id)
 				}
 				continue
