@@ -59,3 +59,8 @@ type ServerEndMessage struct {
 	State  string             `json:"s"`
 	Result []PlayerFinalState `json:"r"`
 }
+
+type PlayerClassesMessage struct {
+	State         string            `json:"s"`
+	PlayerClasses map[string]string `json:"pc"`
+}
