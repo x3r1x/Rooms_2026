@@ -102,6 +102,7 @@ func (l *LobbyService) run() {
 
 			if updPlayer.Ready && !wasReady {
 				l.playersReady++
+				l.players[player.Id].PlayerClass = updPlayer.PlayerClass
 			} else if !updPlayer.Ready && wasReady {
 				l.playersReady--
 			}
@@ -215,6 +216,7 @@ func (l *LobbyService) StartGame() {
 				RebornTimer: domain.InitValue,
 				BodyCount:   domain.InitValue,
 				DeathCount:  domain.InitValue,
+				PlayerClass: player.PlayerClass,
 			})
 		}
 	}

@@ -55,4 +55,9 @@ const (
 	CountdownLobbyState = "c"
 	OngoingGameState    = "o"
 	FinalGameState      = "f"
+
+	PlayerPistolet = "p"
+	PlayerShotgun  = "s"
+	PlayerSom      = "b"
+	EmptyPlayer    = "e"
 )

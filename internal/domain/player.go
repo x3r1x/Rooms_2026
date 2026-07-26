@@ -16,6 +16,7 @@ type PlayerGameState struct {
 	BodyCount   int     `json:"-"`
 	DeathCount  int     `json:"-"`
 	RoomId      string  `json:"room_id"`
+	PlayerClass string  `json:"pc"`
 }
 
 type PlayerFinalState struct {

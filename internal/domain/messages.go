@@ -5,7 +5,8 @@ type ClientRegisterMessage struct {
 }
 
 type ClientReadyStateMessage struct {
-	Ready bool `json:"r"`
+	Ready       bool   `json:"r"`
+	PlayerClass string `json:"pc"`
 }
 
 type ClientGameMessage struct {
@@ -58,9 +59,4 @@ type ServerCountdownMessage struct {
 type ServerEndMessage struct {
 	State  string             `json:"s"`
 	Result []PlayerFinalState `json:"r"`
-}
-
-type PlayerClassesMessage struct {
-	State         string            `json:"s"`
-	PlayerClasses map[string]string `json:"pc"`
 }
