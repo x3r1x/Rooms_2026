@@ -3,14 +3,16 @@ package domain
 const (
 	// константы для пуль
 	BulletSpeedGun    = 25.0
-	BulletSpeedRifle  = 30.0
-	BulletSpeedSom    = 10.0
+	BulletSpeedRifle  = 15.0
+	BulletSpeedSom    = 6.0
 	BulletLifeGun     = 60.0
-	BulletLifeRifle   = 20.0
+	BulletLifeRifle   = 30.0
 	BulletLifeSom     = 600
 	BulletDamageGun   = 20.0
-	BulletDamageRifle = 30.0
+	BulletDamageRifle = 6.0
 	BulletDamageSom   = 100.0
+	PelletCount       = 5
+	SpreadAngle       = 0.4
 
 	ShootCooldown      = 15
 	BulletLength       = 25.0

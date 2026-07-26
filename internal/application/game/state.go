@@ -176,8 +176,8 @@ func (gs *GameState) UpdatePlayer(upd domain.ClientGameMessage) {
 }
 
 func (gs *GameState) AddBullet(player *domain.PlayerGameState) {
-	bullet := factory.NewBulletFactory().CreateBullet(player)
-	gs.bullets = append(gs.bullets, bullet)
+	bullets := factory.NewBulletFactory().CreateBullet(player)
+	gs.bullets = append(gs.bullets, bullets...)
 }
 
 func (gs *GameState) GetCountOfPlayers() int {
