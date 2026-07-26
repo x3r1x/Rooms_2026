@@ -10,7 +10,7 @@ export function canMoveTo(nextPosition, player) {
       const personPoints = getPlayerPoints(nextPosition, player.direction);
       const personNormals = getPlayerNormals(personPoints);
       const personSAT = {points: personPoints, normals: personNormals};
-      const nearby = getNearbyTiles(nextPosition.x, nextPosition.y, gameMap[0]);
+      const nearby = getNearbyTiles(nextPosition.x, nextPosition.y, gameMap[player.roomId]);
       for (const tile of nearby) {
           const tileInfo = layersForRoom.tilesInfo[tile.tileId];
           if (!tileInfo.blocksPlayer) continue;

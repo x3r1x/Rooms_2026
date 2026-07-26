@@ -64,7 +64,8 @@ function processPlayer(player, state) {
         },
         id: player.id,
         hp: player.h,
-        rebornTime: player.rt
+        rebornTime: player.rt,
+        roomId: player.room_id,
     }
 
     if (newPlayerInModel.id === state.player.id) {
