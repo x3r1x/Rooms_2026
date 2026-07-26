@@ -96,6 +96,7 @@ func (bs *BroadcastService) sendToAll(message interface{}) {
 	for id, conn := range bs.connections {
 		if err := conn.WriteMessage(websocket.TextMessage, data); err != nil {
 			log.Printf("Ошибка отправки игроку %s: %v", id, err)
+			bs.RemoveConnection(id)
 		}
 	}
 }
@@ -115,5 +116,6 @@ func (bs *BroadcastService) sendToPlayer(playerId string, message interface{}) {
 
 	if err := conn.WriteMessage(websocket.TextMessage, data); err != nil {
 		log.Printf("Ошибка отправки игроку %s: %v", playerId, err)
+		bs.RemoveConnection(playerId)
 	}
 }

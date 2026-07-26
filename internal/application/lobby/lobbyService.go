@@ -156,6 +156,10 @@ func (l *LobbyService) sendReadyState(roomMessages map[string]domain.RoomMessage
 func (l *LobbyService) removeUser(id string) {
 	player, exists := l.players[id]
 	if !exists {
+		l.broadcastService.RemoveConnection(id)
+		if l.state == domain.OngoingGameState && l.gameService != nil {
+			l.gameService.DeletePlayer(id)
+		}
 		return
 	}
 
@@ -195,7 +199,6 @@ func (l *LobbyService) StartGame() {
 	}
 
 	l.mapManager.LoadMapObjects(l.gameStateProvider)
-	log.Println("IsWorkLobby/GameStart")
 	for _, player := range l.players {
 		if player.Ready {
 			l.gameStateProvider.AddPlayer(&domain.PlayerGameState{

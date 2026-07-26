@@ -33,11 +33,6 @@ func (wsh *WebsocketHandler) InitWebsocket(w http.ResponseWriter, r *http.Reques
 		log.Println(err)
 		return
 	}
-	defer func() {
-		if err := conn.Close(); err != nil {
-			log.Println("Ошибка закрытия связи: ", err)
-		}
-	}()
 	fmt.Println("New connection established.")
 	wsh.HandleWebsocket(conn)
 }
@@ -94,15 +89,11 @@ func (wsh *WebsocketHandler) handleWaitingLobbyState(p []byte, id string, conn *
 }
 
 func (wsh *WebsocketHandler) handleOngoingGameState(p []byte, currentId string) {
-	log.Printf("handleOngoingGameState вызван, currentId=%s, длина сообщения=%d", currentId, len(p))
-
 	var msg domain.ClientGameMessage
 	if err := json.Unmarshal(p, &msg); err != nil {
 		log.Println("Ошибка сериализации во время игры: ", err)
 		return
 	}
-
-	log.Printf("Получено сообщение: Id=%s, MX=%f, MY=%f", msg.Id, msg.MX, msg.MY)
 
 	if currentId == "" {
 		log.Println("ОШИБКА: currentId пустой!")
@@ -120,7 +111,6 @@ func (wsh *WebsocketHandler) handleOngoingGameState(p []byte, currentId string) 
 		return
 	}
 
-	log.Printf("Отправляем обновление в GameService для игрока %s", msg.Id)
 	gameService.UpdatePlayer(domain.ClientGameMessage{
 		Id:      msg.Id,
 		MX:      msg.MX,
