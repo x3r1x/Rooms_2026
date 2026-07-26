@@ -137,7 +137,7 @@ func (cs *CollisionService) HandlePlayerHit(player *domain.PlayerGameState, bull
 }
 
 func (cs *CollisionService) calculateDamage(bullet domain.Bullet) float64 {
-	return math.Round(domain.BulletDamage * (bullet.Life/domain.BulletLife*domain.BulletDamageMulti + 1))
+	return math.Round(bullet.Damage * domain.BulletDamageMulti)
 }
 
 //func (cs *CollisionService) calculateKnockbackKoef(bullet model.Bullet) float64 {
