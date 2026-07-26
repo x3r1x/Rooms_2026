@@ -1,6 +1,4 @@
-import {createBullet} from "../model/game/factory/createBullet.js";
 import {gameState} from "../model/game/storage/gameState.js";
-import {GAME_CONSTANTS} from "../model/game/storage/gameConstants.js";
 
 export const keys = {};
 
@@ -32,21 +30,7 @@ export function resizeCanvas(canvas) {
 }
 
 function initCanvasListeners(canvas) {
-    canvas.addEventListener('click', function (event) {
-        const {x, y} = getMousePos(canvas, event);
-        const direction = Math.atan2(y - gameState.player.y, x - gameState.player.x);
-
-        const localX = GAME_CONSTANTS.PLAYER_VISUAL_WIDTH / 2;
-        const localY = GAME_CONSTANTS.PLAYER_VISUAL_HEIGHT / 2;
-
-        const rotatedX = localX * Math.cos(direction) - localY * Math.sin(direction);
-        const rotatedY = localX * Math.sin(direction) + localY * Math.cos(direction);
-
-        const bulletStartX = gameState.player.x + rotatedX;
-        const bulletStartY = gameState.player.y + rotatedY;
-
-        createBullet(gameState, direction, bulletStartX, bulletStartY);
-    });
+    canvas.addEventListener('click', () => gameState.player.didShoot = true);
 
     canvas.addEventListener('mousemove', function (event) {
         const {x, y} = getMousePos(canvas, event);

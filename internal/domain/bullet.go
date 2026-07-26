@@ -3,7 +3,7 @@ package domain
 import "math"
 
 type Bullet struct {
-	Id        string  `json:"-"`
+	Id        string  `json:"id"`
 	X         float64 `json:"x"`
 	Y         float64 `json:"y"`
 	Direction float64 `json:"a"`

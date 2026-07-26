@@ -47,6 +47,7 @@ type ServerReadyMessage struct {
 type ServerGameMessage struct {
 	State   string             `json:"s"`
 	Type    string             `json:"type"`
+	Time    float64            `json:"t"`
 	Players []*PlayerGameState `json:"p"`
 	Bullets []Bullet           `json:"b"`
 }

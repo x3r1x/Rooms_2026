@@ -52,6 +52,10 @@ func (gs *GameState) SetPlayerRoom(id, roomId string) {
 	gs.addPlayerToRoom(roomId, id)
 }
 
+func (gs *GameState) GetGameStartTime() time.Time {
+	return gs.gameStartTime
+}
+
 func (gs *GameState) GetRoomManager() interface{} {
 	return gs.roomManager
 }

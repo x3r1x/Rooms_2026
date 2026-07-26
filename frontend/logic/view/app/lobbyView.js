@@ -15,7 +15,8 @@ export function updateReadyText(isReady) {
 
 export function updateLobbyView(ownId, playersInLobby) {
     playersConnected.textContent = playersInLobby.length;
-    const readyStyle = `style="background-color: rgba(33, 255, 25, 0.5)"`
+    const readyStyle = `style="background-color: rgba(33, 255, 25, 0.5)"`;
+    playersInLobby.sort((player1, player2) => player1.id.localeCompare(player2.id));
 
     lobbyList.innerHTML = playersInLobby.map(player => {
         const isPlayer = player.id === ownId;
