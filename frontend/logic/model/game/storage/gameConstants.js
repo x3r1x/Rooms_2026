@@ -25,21 +25,29 @@ export const GAME_CONSTANTS = {
 
     BULLET_SKIN_PATH: 'assets/images/bullet_classic.png',
 
-    ENEMY_SPRITE_LIST_PATH: 'assets/images/enemy.png',
-    ENEMY_BULLET_SKIN_PATH: 'assets/images/enemy_bullet_classic.png',
+    BULLET: {
+        PLAYER: {},
+        ENEMY: {},
+    },
+    ENEMY_PATH: {
+        g: 'assets/images/enemy_g.png',
+        r: 'assets/images/enemy_r.png',
+        s: 'assets/images/enemy_s.png',
+        bg: 'assets/images/bullet_e_g.png',
+        br: 'assets/images/bullet_e_r.png',
+        bs: 'assets/images/bullet_e_s.png',
+    },
+    PLAYER_PATH: {
+        g: 'assets/images/player_g.png',
+        r: 'assets/images/player_r.png',
+        s: 'assets/images/player_s.png',
+        bg: 'assets/images/bullet_p_g.png',
+        br: 'assets/images/bullet_p_r.png',
+        bs: 'assets/images/bullet_p_s.png',
+    },
 
     SNAPSHOTS_AMOUNT: 100,
     INTERPOLATION_DELAY: 100,
-    ENEMY_PATH: {
-        g: 'frontend/assets/images/enemy_g.png',
-        r: 'frontend/assets/images/enemy_r.png',
-        s: 'frontend/assets/images/enemy_s.png',
-    },
-    PLAYER_PATH: {
-        g: 'frontend/assets/images/player_g.png',
-        r: 'frontend/assets/images/player_r.png',
-        s: 'frontend/assets/images/player_s.png',
-    },
 
     TILE_IMG_PATH: 'assets/tile/tileset x1.png'
 }
@@ -52,7 +60,6 @@ export const PLAYER_LOCAL_POINTS = [
 ];
 
 export const GAME_SPRITES = {
-    PLAYER_GOES: new Image(),
     PLAYER_DIE: new Image(),
 
     HEALTH_BAR: new Image(),
@@ -60,7 +67,49 @@ export const GAME_SPRITES = {
     BULLET_HIT: new Image(),
     BULLET_FLIES: new Image(),
 
-    ENEMY_GOES: new Image(),
+    ENEMY: {
+        g: new Image(),
+        r: new Image(),
+        s: new Image(),
+        bg: {
+            img: new Image(),
+            w: 11,
+            h: 3
+        },
+        br: {
+            img: new Image(),
+            w: 3,
+            h: 3
+        },
+        bs: {
+            img: new Image(),
+            w: 16,
+            h: 7
+        },
+    },
+    PLAYER: {
+        g: new Image(),
+        r: new Image(),
+        s: new Image(),
+        bg: {
+            img: new Image(),
+            w: 11,
+            h: 3
+        },
+        br: {
+            img: new Image(),
+            w: 3,
+            h: 3
+        },
+        bs: {
+            img: new Image(),
+            w: 16,
+            h: 7
+        },
+    },
+
+
+
     ENEMY_BULLET_FLIES: new Image()
 }
 

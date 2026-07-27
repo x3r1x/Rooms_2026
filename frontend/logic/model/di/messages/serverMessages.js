@@ -64,8 +64,8 @@ function processPlayer(player, state) {
         hp: player.h,
         rebornTime: player.rt,
         roomId: player.room_id,
-    }
-
+        pc: player.pc,
+    };
     if (newPlayerInModel.id === state.player.id) {
         newPlayerInModel.mousePosition = state.player.mousePosition;
         state.player = newPlayerInModel;

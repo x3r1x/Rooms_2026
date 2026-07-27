@@ -12,7 +12,7 @@ export function drawPlayers(context, mainPlayer, enemies) {
 function drawMainPlayer(context, player) {
     const deathScreen = document.getElementById("death-screen");
     const respawnTimer = document.getElementById("respawn-timer");
-    const spriteSheet = GAME_SPRITES.PLAYER.player.pc;
+    const spriteSheet = GAME_SPRITES.PLAYER[player.pc];
     const frameWidth = spriteSheet.width / 6;
     const frameHeight = spriteSheet.height;
 
@@ -44,7 +44,7 @@ function drawMainPlayer(context, player) {
 }
 
 function drawEnemy(context, enemy) {
-    const spriteSheet = GAME_SPRITES.ENEMY_GOES;
+    const spriteSheet = GAME_SPRITES.ENEMY[enemy.pc];
     const frameWidth = spriteSheet.width / 6;
     const frameHeight = spriteSheet.height;
     if (enemy.hp > 0) {

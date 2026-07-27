@@ -26,6 +26,7 @@ export function initGameState(playerId) {
             hpSpriteIndex: 0,
             hp: null,
             rebornTime: null,
+            pc: null,
         },
         enemies: {},
         bullets: {},
