@@ -24,9 +24,20 @@ function initWindowListeners() {
 export function resizeCanvas(canvas) {
     canvas.width = 900;
     canvas.height = 756;
-    
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
+
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    const targetAspect = 900 / 756;
+    let cssWidth = windowWidth;
+    let cssHeight = windowWidth / targetAspect;
+
+    if (cssHeight > windowHeight) {
+        cssHeight = windowHeight;
+        cssWidth = windowHeight * targetAspect;
+    }
+    canvas.style.width = `${cssWidth}px`;
+    canvas.style.height = `${cssHeight}px`;
 }
 
 function initCanvasListeners(canvas) {
@@ -41,10 +52,15 @@ function initCanvasListeners(canvas) {
 }
 function getMousePos(canvas, event) {
     const rect = canvas.getBoundingClientRect();
+
+    const clientX = event.clientX - rect.left;
+    const clientY = event.clientY - rect.top;
+
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
+
     return {
-        x: (event.clientX - rect.left) * scaleX,
-        y: (event.clientY - rect.top) * scaleY
+        x: clientX * scaleX,
+        y: clientY * scaleY
     };
 }

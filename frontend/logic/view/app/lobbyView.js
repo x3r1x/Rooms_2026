@@ -1,15 +1,16 @@
 const readyButton = document.getElementById("readyButton");
 const playersConnected = document.getElementById("playersConnected");
 const lobbyList = document.getElementById("lobbyList")
-
+const btn = document.getElementById('changeWeaponBtn');
 export let selectedWeaponClass = "g";
 export function updateReadyText(isReady) {
     if (isReady) {
         readyButton.textContent = "NOT READY";
+        btn.disabled = true;
     }
-
     if (!isReady) {
         readyButton.textContent = "READY";
+        btn.disabled = false;
     }
 }
 
@@ -29,12 +30,12 @@ export function updatePlayerClass(){
     const weapons = [
         { name: "ПИСТОЛЕТ", img: "/frontend/assets/images/g.png", code: "g"},
         { name: "ДРОБОВИК", img: "/frontend/assets/images/r.png", code: "r" },
-        { name: "СОМ", img: "/frontend/assets/images/s.png", code: "s"},
+        { name: "СООООООМ", img: "/frontend/assets/images/s.png", code: "s"},
     ];
 
     let currentIndex = 0;
 
-    const btn = document.getElementById('changeWeaponBtn');
+
     const nameSpan = document.getElementById('weaponName');
     const imageImg = document.getElementById('weaponImage');
 
