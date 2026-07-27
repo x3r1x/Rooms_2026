@@ -15,6 +15,7 @@ export const GAME_CONSTANTS = {
 
     PLAYER_START_X: 500,
     PLAYER_START_Y: 400,
+    MUZZLE_FLASH_PATH: 'assets/images/muzzleFlash.png',
     PLAYER_SKIN_BLUE_PATH: 'assets/images/person.png',
 
     HEALTH_BAR_PATH: 'assets/images/health-bar_sheet.png',
@@ -101,10 +102,9 @@ export const GAME_SPRITES = {
             h: 7
         },
     },
-
-
-
-    ENEMY_BULLET_FLIES: new Image()
+    EFFECTS: {
+        MUZZLE_FLASH: new Image(),
+    },
 }
 
 export const TILE_IMG = {
