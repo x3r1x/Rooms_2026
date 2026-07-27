@@ -2,7 +2,7 @@ import {GAME_SPRITES} from "../../../model/game/storage/gameConstants.js";
 
 const effects = [];
 
-export function spawnEffect(x, y, type, direction = 0) {
+function spawnEffect(x, y, type, direction = 0) {
     console.log("Spawn effect direction:", direction);
     effects.push({
         x: x,
@@ -52,5 +52,54 @@ export function updateAndDrawEffects(context) {
             continue;
         }
         drawEffect(context, fx);
+    }
+}
+
+export function checkAndSpawnNewBulletEffects(stateA, stateB) {
+    if (!stateA || !stateB || !stateA.b || !stateB.b) return;
+
+    for (let i = 0; i < stateB.b.length; i++) {
+        const bulletB = stateB.b[i];
+        let existedBefore = false;
+
+        for (let j = 0; j < stateA.b.length; j++) {
+            if (stateA.b[j].id === bulletB.id) {
+                existedBefore = true;
+                break;
+            }
+        }
+        if (!existedBefore) {
+            spawnEffect(
+                bulletB.x,
+                bulletB.y,
+                "MUZZLE_FLASH",
+                bulletB.a
+            );
+        }
+    }
+}
+
+export function checkAndSpawnExplosions(stateA, stateB) {
+    if (!stateA || !stateB || !stateA.b || !stateB.b) return;
+
+    for (let i = 0; i < stateA.b.length; i++) {
+        const oldBullet = stateA.b[i];
+        let isAliveInNewState = false;
+
+        for (let j = 0; j < stateB.b.length; j++) {
+            if (stateB.b[j].id === oldBullet.id) {
+                isAliveInNewState = true;
+                break;
+            }
+        }
+
+        if (!isAliveInNewState) {
+            spawnEffect(
+                oldBullet.x,
+                oldBullet.y,
+                "EXPLOSION",
+                oldBullet.a
+            );
+        }
     }
 }
