@@ -15,8 +15,9 @@ export function updateGame(elapsedTime, state) {
     if (!neighbouredSnapshots.snapA) return;
     const lerpCoefficient = (renderTime - neighbouredSnapshots.snapA.t) / (neighbouredSnapshots.snapB.t - neighbouredSnapshots.snapA.t);
     const extrapolationTime = renderTime - neighbouredSnapshots.snapA.t;
-    checkAndSpawnNewBulletEffects(neighbouredSnapshots.stateA, neighbouredSnapshots.stateB, state);
-    checkAndSpawnExplosions(neighbouredSnapshots.stateA, neighbouredSnapshots.stateB);
+
+    checkAndSpawnNewBulletEffects(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB, state);
+    checkAndSpawnExplosions(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB);
 
     handleEnemies(state.enemies, neighbouredSnapshots, extrapolationTime, lerpCoefficient);
     handleBullets(state.bullets, neighbouredSnapshots, extrapolationTime, lerpCoefficient);
