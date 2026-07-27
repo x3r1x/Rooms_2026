@@ -22,8 +22,19 @@ func (b *Bullet) Move() {
 func (b *Bullet) GetPoints() []Point {
 	cosAngle := math.Cos(b.Direction)
 	sinAngle := math.Sin(b.Direction)
-	halfW := BulletWidth / 2.0
-	halfH := BulletLength / 2.0
+	var halfW, halfH float64
+
+	switch b.Type {
+	case PlayerGun:
+		halfW = BulletWidthGun / 2.0
+		halfH = BulletLengthGun / 2.0
+	case PlayerRifle:
+		halfW = BulletWidthRifle / 2.0
+		halfH = BulletLengthRifle / 2.0
+	case PlayerSom:
+		halfW = BulletWidthSom / 2.0
+		halfH = BulletLengthSom / 2.0
+	}
 
 	localPoints := []Point{
 		{-halfW, -halfH},
