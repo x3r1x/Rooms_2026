@@ -1,8 +1,6 @@
 import {GAME_CONSTANTS, GAME_SPRITES} from "../../model/game/storage/gameConstants.js";
 
 export function initSprites() {
-    GAME_SPRITES.BULLET_FLIES.src = GAME_CONSTANTS.BULLET_SKIN_PATH;
-
     GAME_SPRITES.ENEMY.g.src = GAME_CONSTANTS.ENEMY_PATH.g;
     GAME_SPRITES.ENEMY.r.src = GAME_CONSTANTS.ENEMY_PATH.r;
     GAME_SPRITES.ENEMY.s.src = GAME_CONSTANTS.ENEMY_PATH.s;

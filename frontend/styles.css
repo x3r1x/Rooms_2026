@@ -1,7 +1,6 @@
 body {
     margin: 0;
     padding: 0;
-
     background-color: #1f2535;
 }
 
@@ -22,11 +21,37 @@ body {
     justify-content: space-around;
 }
 
+.screen-game {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.wrapper-canvas {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.main__canvas {
+    max-width: 100%;
+    max-height: 100%;
+    image-rendering: pixelated;
+    display: block;
+    object-fit: contain;
+}
+
+
 .countdown-wrapper {
-    background-color: rgba(0, 0, 0, 30%);
+    background-color: rgba(0, 0, 0, 0.3);
     position: absolute;
     height: 100vh;
     width: 100vw;
+    display: flex;
     align-items: center;
     justify-content: space-around;
 }
@@ -38,27 +63,17 @@ body {
     user-select: none;
 }
 
-.wrapper-canvas {
-    width: 100%;
-    height: 100%;
-    position: relative;
+.weapon-switcher, .weapon-display {
     display: flex;
-    justify-content: center;
+    align-items: center;
 }
 
-.weapon-switcher {
-    display: flex;
-    align-items: center;
-}
-.weapon-display{
-    display: flex;
-    align-items: center;
-}
-.weapon-description{
+.weapon-description {
     color: white;
     font-size: 3vh;
 }
-.weapon-btn{
+
+.weapon-btn {
     height: 50%;
     font-size: 4vh;
     color: white;
@@ -79,22 +94,6 @@ body {
     letter-spacing: 3px;
 }
 
-.screen-game {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.main__canvas {
-    max-width: 100%;
-    max-height: 100%;
-
-    image-rendering: pixelated;
-    display: block;
-    object-fit: contain;
-}
 
 .game-info, .lobby-info, .result-info {
     width: 40%;
@@ -120,7 +119,18 @@ body {
     flex-direction: column;
     align-items: center;
     overflow: hidden;
-    box-sizing: border-box
+    box-sizing: border-box;
+}
+
+.statistic h2, .lobby-status h2, .result-status h2 {
+    color: #ffffff;
+    font-size: 3vh;
+    display: inline-block;
+    border-bottom: 5px solid #ffffff;
+    width: 100%;
+    text-align: center;
+    margin: 0;
+    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #1900ff, 0 0 30px #0084ff;
 }
 
 .wrapper-start-game, .wrapper-game-over-message {
@@ -136,85 +146,32 @@ body {
     gap: 5vh;
 }
 
-.statistic h2, .lobby-status h2, .result-status h2 {
-    color: #ffffff;
-    font-size: 3vh;
-    display: inline-block;
-    border-bottom: 5px solid #ffffff;
-    width: 100%;
-    text-align: center;
-    margin: 0;
-    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #1900ff, 0 0 30px #0084ff;
-}
-
+.players-list, .result-list,
 .lobby-list {
     display: flex;
     flex-direction: column;
-    width: 98%;
-    margin-top: 5px;
-    gap: 5px;
-}
-
-.lobby-list-element, .result-list-element {
-    display: inline-block;
-    padding: 15px;
-    border: 5px solid #fff;
-    margin: 0;
-    font-size: 3vh;
-    color: #fff;
-    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #1900ff, 0 0 30px #0084ff;
-    border-radius: 20px;
-}
-
-.result-list-element {
-    display: inline-block;
-    padding: 15px;
-    border: 5px solid #fff;
-    margin: 10px;
-    font-size: 3vh;
-    color: #fff;
-    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #1900ff, 0 0 30px #0084ff;
-    border-radius: 20px;
-}
-
-.players-list, .result-list {
     width: 100%;
     padding: 0;
     margin: 0;
-    display: flex;
-    flex-direction: column;
     gap: 10px;
     overflow-y: auto;
     overflow-x: hidden;
-    box-sizing: border-box
+    box-sizing: border-box;
 }
 
-.players-list::-webkit-scrollbar {
-    width: 10px;
-}
 
-.players-list::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-.players-list::-webkit-scrollbar-thumb {
-    background: #f1f1f1;
-    border-radius: 15px;
-}
-
-.players-list::-webkit-scrollbar-thumb:hover {
-    background: #3e4f74;
-}
-
-.player-stat-item {
+.player-stat-item, .lobby-list-element, .result-list-element{
+    width: 100%;
+    margin: 0;
+    font-size: 3vh;
+    text-shadow: 0 0 5px rgba(100, 144, 255, 0.5), 0 0 10px rgba(25, 0, 255, 0.32), 0 0 20px rgba(25, 0, 255, 0.4), 0 0 30px #0084ff;
+    border-radius: 20px;
     display: flex;
     justify-content: space-around;
     align-items: center;
     color: #ffffff;
-    font-size: 3vh;
-    width: 100%;
-    margin: 0;
-    padding: 0;
+    padding-top: 12px;
+    padding-bottom: 12px;
     background-color: #27206615;
     border: 2px solid #141420;
 }
@@ -226,6 +183,23 @@ body {
     font-weight: bold;
 }
 
+
+.players-list::-webkit-scrollbar, .result-list::-webkit-scrollbar, .lobby-list::-webkit-scrollbar {
+    width: 10px;
+}
+
+.players-list::-webkit-scrollbar-track, .result-list::-webkit-scrollbar-track, .lobby-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.players-list::-webkit-scrollbar-thumb, .result-list::-webkit-scrollbar-thumb, .lobby-list::-webkit-scrollbar-thumb {
+    background: #f1f1f1;
+    border-radius: 15px;
+}
+
+.players-list::-webkit-scrollbar-thumb:hover, .result-list::-webkit-scrollbar-thumb:hover,.lobby-list::-webkit-scrollbar-thumb:hover {
+    background: #3e4f74;
+}
 
 .death-screen {
     position: absolute;
@@ -259,17 +233,14 @@ body {
     color: #ffffff;
 }
 
-
 .nickname-field {
     width: 70%;
     height: 50%;
-    border: 15px;
     display: flex;
     justify-content: center;
     flex-direction: column;
     align-content: center;
     background-color: #0d1f3c;
-
     border: 10px solid #ffffff;
     border-radius: 15px;
     margin: 0;
@@ -282,14 +253,11 @@ body {
     color: #ffffff;
     font-size: 10vw;
     letter-spacing: 2px;
-    margin-bottom: 30px;
     font-weight: normal;
     margin: 0;
     padding: 0;
     width: auto;
     height: auto;
-    margin-top: 1vh;
-
 }
 
 .nickname-field h2 {
@@ -305,18 +273,15 @@ body {
 .get-nickname {
     display: flex;
     flex-direction: column;
-    gap: 5vh;
     margin: 0;
     padding: 0;
     gap: 3vh;
     flex-wrap: wrap;
     align-content: center;
-    margin-bottom: 1vh;
 }
 
 .input-nickname {
     background-color: #183768;
-    border: 5px;
     width: 60%;
     font-size: 4vw;
     border: 5px solid #ffffff;
@@ -326,7 +291,6 @@ body {
 
 .button-send-nickname {
     background-color: #001a2e;
-    border: 5px;
     width: 60%;
     font-size: 4vw;
     color: #ffffff;
