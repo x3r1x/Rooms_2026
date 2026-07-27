@@ -27,23 +27,23 @@ export function updateLobbyView(ownId, playersInLobby) {
 
 export function updatePlayerClass(){
     const weapons = [
-        { name: "ПИСТОЛЕТ", img: "images/gun.png", code: "g"},
-        { name: "ДРОБОВИК", img: "images/rifle.png", code: "r" },
-        { name: "СОМ", img: "images/shotgun.png", code: "s"},
+        { name: "ПИСТОЛЕТ", img: "/frontend/assets/images/g.png", code: "g"},
+        { name: "ДРОБОВИК", img: "/frontend/assets/images/r.png", code: "r" },
+        { name: "СОМ", img: "/frontend/assets/images/s.png", code: "s"},
     ];
 
     let currentIndex = 0;
 
     const btn = document.getElementById('changeWeaponBtn');
     const nameSpan = document.getElementById('weaponName');
-    //const imageImg = document.getElementById('weaponImage');
+    const imageImg = document.getElementById('weaponImage');
 
     btn.addEventListener('click', () => {
         currentIndex = (currentIndex + 1) % weapons.length;
         const currentWeapon = weapons[currentIndex];
         nameSpan.textContent = currentWeapon.name;
         selectedWeaponClass = currentWeapon.code;
-        //imageImg.src = currentWeapon.img;
+        imageImg.src = currentWeapon.img;
     });
 }
 

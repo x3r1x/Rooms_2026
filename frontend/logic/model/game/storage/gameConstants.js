@@ -28,10 +28,20 @@ export const GAME_CONSTANTS = {
     ENEMY_SPRITE_LIST_PATH: 'assets/images/enemy.png',
     ENEMY_BULLET_SKIN_PATH: 'assets/images/enemy_bullet_classic.png',
 
-    TILE_IMG_PATH: 'assets/tile/tileset x1.png',
-
     SNAPSHOTS_AMOUNT: 100,
-    INTERPOLATION_DELAY: 100
+    INTERPOLATION_DELAY: 100,
+    ENEMY_PATH: {
+        g: 'frontend/assets/images/enemy_g.png',
+        r: 'frontend/assets/images/enemy_r.png',
+        s: 'frontend/assets/images/enemy_s.png',
+    },
+    PLAYER_PATH: {
+        g: 'frontend/assets/images/player_g.png',
+        r: 'frontend/assets/images/player_r.png',
+        s: 'frontend/assets/images/player_s.png',
+    },
+
+    TILE_IMG_PATH: 'assets/tile/tileset x1.png'
 }
 
 export const PLAYER_LOCAL_POINTS = [
