@@ -37,6 +37,13 @@ export function addToClientTime(time) {
     clientTime += time;
 }
 
+export function resetInterpolationModule() {
+    clientTime = 0;
+    snapshotsAmount = 0;
+    snapshots = new Array(GAME_CONSTANTS.SNAPSHOTS_AMOUNT);
+    head = 0;
+}
+
 export function getClientTime() {
     return clientTime;
 }

@@ -1,5 +1,6 @@
 import {GAME_CONSTANTS, GAME_SPRITES} from "../../../model/game/storage/gameConstants.js";
 import {gameState} from "../../../model/game/storage/gameState.js";
+
 export function drawBullets(context, playerId, bullets) {
     for (const bullet of Object.values(bullets)) {
         if (bullet.ownerId === playerId) {
@@ -11,7 +12,6 @@ export function drawBullets(context, playerId, bullets) {
 }
 
 function drawPlayerBullet(context, bullet) {
-    console.log(gameState.enemies);
     const sprite = GAME_SPRITES.PLAYER[`b${gameState.player.pc}`].img;
 
     context.save();

@@ -43,6 +43,7 @@ export function processCountdownMessage(parsedMessage, lobbyState) {
 }
 
 export function processGameAssignment(parsedMessage, gameState, gameNicknames) {
+    console.log(parsedMessage.p);
     parsedMessage.p.forEach((player) => processPlayer(player, gameState));
     parsedMessage.b.forEach((bullet) => processBullet(bullet, gameState));
 

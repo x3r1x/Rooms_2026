@@ -14,6 +14,7 @@ import {
 } from "../game/storage/gameState.js";
 import {initGameEndListeners} from "../../controller/gameEndListeners.js";
 import {fillResultWindow} from "../../view/app/gameEndView.js";import {initRegistrationListeners} from "../../controller/registrationListeners.js";
+import {resetInterpolationModule} from "../game/storage/interpolation.js";
 
 export let appState = null
 export let socket = null
@@ -69,6 +70,7 @@ export function switchToEndedGameState(socket, clientId, result) {
     appState = APP_STATES.GAME_END;
     socket.close();
     initGameEndListeners();
+    cancelAnimationFrame(startGameLoop);
     fillResultWindow(clientId, result);
     switchWindowToGameEnd();
 }
@@ -79,5 +81,6 @@ export function resetStates() {
     lobbyState.clientId = null;
     lobbyState.players = {};
     lobbyState.countdown = null;
+    resetInterpolationModule();
     resetGameStateStorage();
 }

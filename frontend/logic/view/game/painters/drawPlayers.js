@@ -37,7 +37,6 @@ function drawMainPlayer(context, player) {
     } else {
         if (player.hp != null) {
             deathScreen.style.display = "flex";
-            console.log(player.rebornTime);
             respawnTimer.textContent = Math.floor(player.rebornTime / 50);
         }
     }

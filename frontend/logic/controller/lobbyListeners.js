@@ -1,9 +1,9 @@
 import {sendReadyState} from "../model/di/messages/clientMessages.js";
 import {updateReadyText, selectedWeaponClass, updatePlayerClass} from "../view/app/lobbyView.js";
 
-let isReady = false;
-
 export function initLobbyListeners(socket, clientId) {
+    let isReady = false;
+    updateReadyText(isReady);
     updatePlayerClass();
     document.getElementById("readyButton").onclick = () => {
         isReady = !isReady;

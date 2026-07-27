@@ -44,5 +44,4 @@ function updateMap() {
     for (const uuid in gameMap) {
         assemblyRoom(gameMap[uuid]);
     }
-    console.log(gameMap);
 }

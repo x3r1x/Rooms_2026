@@ -14,7 +14,6 @@ import (
 )
 
 func main() {
-
 	broadcastService := broadcast.NewBroadcastService()
 	gameState := game.NewGameState()
 	mapManager := _map.NewMapManager()
