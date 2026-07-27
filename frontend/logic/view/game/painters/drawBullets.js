@@ -10,6 +10,7 @@ export function drawBullets(context, playerId, bullets) {
 }
 
 function drawPlayerBullet(context, bullet) {
+    const type = `b${bullet.type}`;
     const sprite = GAME_SPRITES.PLAYER[`b${bullet.type}`].img;
 
     context.save();
