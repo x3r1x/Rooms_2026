@@ -82,7 +82,8 @@ function processBullet(bullet, state) {
             y: bullet.y,
             direction: bullet.a,
             ownerId: bullet.oId,
-            id: bullet.id
+            id: bullet.id,
+            type: bullet.t
         }
     }
 }

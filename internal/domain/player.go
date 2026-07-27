@@ -2,19 +2,19 @@ package domain
 
 type PlayerGameState struct {
 	Id           string  `json:"id"`
-	Nickname     string  `json:"-"`
 	Health       float64 `json:"h"`
 	X            float64 `json:"x"`
 	Y            float64 `json:"y"`
 	Angle        float64 `json:"a"`
 	MoveX        float64 `json:"mx"`
 	MoveY        float64 `json:"my"`
-	ShootTimer   int     `json:"-"`
 	RebornTimer  int     `json:"rt"`
-	BodyCount    int     `json:"-"`
-	DeathCount   int     `json:"-"`
 	RoomId       string  `json:"room_id"`
 	PlayerClass  string  `json:"pc"`
+	Nickname     string  `json:"-"`
+	ShootTimer   int     `json:"-"`
+	BodyCount    int     `json:"-"`
+	DeathCount   int     `json:"-"`
 	BulletSpeed  float64 `json:"-"`
 	BulletLife   float64 `json:"-"`
 	BulletDamage float64 `json:"-"`
