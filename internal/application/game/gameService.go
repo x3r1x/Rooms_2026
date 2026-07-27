@@ -14,7 +14,6 @@ type GameService struct {
 	collisionService ports.CollisionService
 	mapManager       ports.MapManager
 	broadcastService ports.BroadcastService
-	bulletFactory    ports.BulletFactory
 	updateChan       chan domain.ClientGameMessage
 	deleteChan       chan string
 	finishChan       chan bool
@@ -26,7 +25,6 @@ func NewGameService(
 	collisionService ports.CollisionService,
 	mapManager ports.MapManager,
 	broadcastService ports.BroadcastService,
-	bulletFactory ports.BulletFactory,
 	onGameEnd func(),
 ) *GameService {
 	return &GameService{
@@ -34,7 +32,6 @@ func NewGameService(
 		collisionService: collisionService,
 		mapManager:       mapManager,
 		broadcastService: broadcastService,
-		bulletFactory:    bulletFactory,
 		updateChan:       make(chan domain.ClientGameMessage),
 		deleteChan:       make(chan string),
 		finishChan:       make(chan bool, 1),
@@ -194,8 +191,8 @@ func (gs *GameService) createRoomSnapshot(roomId string) ([]domain.PlayerGameSta
 
 func (gs *GameService) updateShooterTimers() {
 	for _, player := range gs.gameState.GetAllPlayers() {
-		if player.ShootTimer > 0 {
-			player.ShootTimer--
+		if player.CooldownTimer > 0 {
+			player.CooldownTimer--
 		}
 	}
 }

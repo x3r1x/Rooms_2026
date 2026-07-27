@@ -6,7 +6,6 @@ import (
 	"gamedevRooms/internal/adapters/collision"
 	"gamedevRooms/internal/adapters/map"
 	"gamedevRooms/internal/adapters/websocket"
-	"gamedevRooms/internal/application/factory"
 	"gamedevRooms/internal/application/game"
 	"gamedevRooms/internal/application/lobby"
 	"log"
@@ -18,7 +17,6 @@ func main() {
 	gameState := game.NewGameState()
 	mapManager := _map.NewMapManager()
 	collisionService := collision.NewCollisionService(gameState)
-	bulletFactory := factory.NewBulletFactory()
 
 	lobbyService := lobby.NewLobbyService(
 		gameState,
@@ -31,7 +29,6 @@ func main() {
 		collisionService,
 		mapManager,
 		broadcastService,
-		bulletFactory,
 		func() {
 			lobbyService.HandleGameEnd()
 		},

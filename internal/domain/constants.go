@@ -15,8 +15,12 @@ const (
 	SpreadAngle       = 0.4
 
 	ShootCooldown      = 15
-	BulletLength       = 25.0
-	BulletWidth        = 5.0
+	BulletLengthGun    = 16.0
+	BulletWidthGun     = 7.0
+	BulletLengthRifle  = 3.0
+	BulletWidthRifle   = 3.0
+	BulletLengthSom    = 11.0
+	BulletWidthSom     = 3.0
 	BulletDamageMulti  = 1.2
 	BulletBarrelOffset = 24.0
 	ExplosionRadius    = 250
@@ -59,6 +63,8 @@ const (
 	TileSize                     = 36
 	PlayerHalfSize               = PlayerVisualSize / 2.0
 	Epsilon                      = 0.001
+	RoomPixelWidth               = float64(RoomWidth * int(TileSize))
+	RoomPixelHeight              = float64(RoomHeight * int(TileSize))
 	// константы для лобби
 	WaitingLobbyState   = "w"
 	ReadyLobbyState     = "r"

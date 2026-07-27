@@ -15,15 +15,14 @@ type MapManager struct {
 }
 
 func NewMapManager() *MapManager {
-	//gameMap := mapModel.NewMap(gameState.GetCountOfPlayers()/3 + 1)
-	gameMap := generator.NewMap(4)
 	return &MapManager{
-		gameMap:  gameMap,
+		gameMap:  nil,
 		tileSize: domain.TileSize,
 	}
 }
 
 func (mm *MapManager) LoadMapObjects(gameState ports.GameStateProvider) {
+	mm.gameMap = generator.NewMap(gameState.GetCountOfPlayers()/2 + 1)
 	objects := make(map[string]*domain.Object)
 	solidCount := 0
 
