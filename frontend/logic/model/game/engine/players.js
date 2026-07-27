@@ -8,7 +8,7 @@ export function updatePlayer(direction, elapsedTime, player) {
     const nextX = player.x + direction.x * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;
     const nextY = player.y + direction.y * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;
 
-    if (canMoveTo({x: nextX, y: nextY}, player)){
+    if (canMoveTo({x: nextX, y: nextY}, player)) {
         player.x = nextX;
         player.y = nextY;
     }
@@ -18,28 +18,43 @@ export function updateVisualDirection(player) {
     player.direction = Math.atan2(player.mousePosition.y - player.y, player.mousePosition.x - player.x);
 }
 
-export function lerpEnemies(dt, enemies, snaps) {
+export function handleEnemies(enemies, snaps, extrapolationTime, lerpCoefficient) {
+    clearEnemies(enemies, snaps);
+
     snaps.snapA.p.forEach((playerStart) => {
         if (playerStart.id in enemies) {
-            if (!(snaps.snapB.p.find((playerEnd) => playerEnd.id === playerStart.id))) {
-                delete enemies[playerStart.id];
-            } else {
-                const playerEnd = snaps.snapB.p.find((playerEnd) => playerEnd.id === playerStart.id);
+            const playerEnd = snaps.snapB.p.find((playerEnd) => playerEnd.id === playerStart.id);
 
-                enemies[playerStart.id].x = lerp(playerStart.x, playerEnd.x, dt);
-                enemies[playerStart.id].y = lerp(playerStart.y, playerEnd.y, dt);
-                enemies[playerStart.id].direction = lerpDirection(playerStart.a, playerEnd.a, dt);
-                enemies[playerStart.id].hp = playerStart.h;
+            if (playerEnd) {
+                lerpEnemy(enemies[playerStart.id], playerStart, playerEnd, lerpCoefficient);
+            }
+
+            if (!playerEnd && extrapolationTime < GAME_CONSTANTS.MAX_EXTRAPOLATION_TIME) {
+                extrapolateEnemy(enemies[playerStart.id], extrapolationTime, playerStart);
             }
         }
     })
 }
 
-export function extrapolateEnemies(extrapolationTime, enemies, closestSnap) {
-    closestSnap.p.forEach((player) => {
-        if (player.id in enemies) {
-            enemies[player.id].x = player.x + extrapolationTime * player.movementDirection.x * GAME_CONSTANTS.PLAYER_SPEED;
-            enemies[player.id].y = player.y + extrapolationTime * player.movementDirection.y * GAME_CONSTANTS.PLAYER_SPEED;
+function clearEnemies(enemies, snaps) {
+    for (const id in enemies) {
+        const inSnapA = snaps.snapA.p.some((enemy) => enemy.id === id);
+        const inSnapB = snaps.snapB.p.some((enemy) => enemy.id === id);
+
+        if (!inSnapA && !inSnapB) {
+            delete enemies[id];
         }
-    })
+    }
+}
+
+function lerpEnemy(modelEnemy, enemyStart, enemyEnd, lerpCoefficient) {
+    modelEnemy.x = lerp(enemyStart.x, enemyEnd.x, lerpCoefficient);
+    modelEnemy.y = lerp(enemyStart.y, enemyEnd.y, lerpCoefficient);
+    modelEnemy.direction = lerpDirection(enemyStart.a, enemyEnd.a, lerpCoefficient);
+    modelEnemy.hp = lerp(enemyStart.h, enemyEnd.h, lerpCoefficient);
+}
+
+function extrapolateEnemy(modelEnemy, extrapolationTime, startEnemy) {
+    modelEnemy.x = startEnemy.x + extrapolationTime * startEnemy.mx * GAME_CONSTANTS.PLAYER_SPEED;
+    modelEnemy.y = startEnemy.y + extrapolationTime * startEnemy.my * GAME_CONSTANTS.PLAYER_SPEED;
 }
