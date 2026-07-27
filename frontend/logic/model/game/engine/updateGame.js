@@ -1,6 +1,6 @@
 import {keys} from '../../../controller/gameListeners.js';
-import {updateEnemies, updatePlayer} from "./players.js";
-import {getNewBulletsMap} from "./bullet.js";
+import {extrapolateEnemies, lerpEnemies, updatePlayer} from "./players.js";
+import {extrapolateNewBulletsMap, lerpNewBulletsMap} from "./bullet.js";
 import {getNeighbouringSnapshots, getClientTime} from "../storage/interpolation.js";
 import {GAME_CONSTANTS} from "../storage/gameConstants.js";
 
@@ -11,11 +11,19 @@ export function updateGame(elapsedTime, state) {
     const renderTime = getClientTime() - GAME_CONSTANTS.INTERPOLATION_DELAY;
     const neighbouredSnapshots = getNeighbouringSnapshots(renderTime);
 
-    if (!neighbouredSnapshots.stateA || !neighbouredSnapshots.stateB) return
-
-    const dt = (renderTime - neighbouredSnapshots.stateA.t) / (neighbouredSnapshots.stateB.t - neighbouredSnapshots.stateA.t);
-    updateEnemies(dt, state.enemies, neighbouredSnapshots);
-    state.bullets = getNewBulletsMap(dt, state.bullets, neighbouredSnapshots);
+    if (neighbouredSnapshots.snapA && neighbouredSnapshots.snapB) {
+        const lerpCoefficient = (renderTime - neighbouredSnapshots.snapA.t) / (neighbouredSnapshots.snapB.t - neighbouredSnapshots.snapA.t);
+        lerpEnemies(lerpCoefficient, state.enemies, neighbouredSnapshots);
+        state.bullets = lerpNewBulletsMap(lerpCoefficient, state.bullets, neighbouredSnapshots);
+    } else if (neighbouredSnapshots.snapA && !neighbouredSnapshots.snapB
+                && renderTime - neighbouredSnapshots.snapA.t <= GAME_CONSTANTS.MAX_EXTRAPOLATION_TIME)
+    {
+        const extrapolationTime = renderTime - neighbouredSnapshots.snapA.t;
+        extrapolateEnemies(extrapolationTime, state.enemies, neighbouredSnapshots.snapA);
+        state.bullets = extrapolateNewBulletsMap(extrapolationTime, state.bullets, neighbouredSnapshots.snapA);
+    } else {
+        console.log("Слишком огромная потеря пакетов, превышен лимит экстраполяции!");
+    }
 }
 
 function updateMovementDirection(direction) {

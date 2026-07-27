@@ -66,8 +66,8 @@ export function getNeighbouringSnapshots(targetTime) {
 
             if (stateB && stateB.t > targetTime) {
                 return {
-                    stateA: stateA,
-                    stateB: stateB
+                    snapA: stateA,
+                    snapB: stateB
                 }
             }
         }
@@ -76,7 +76,7 @@ export function getNeighbouringSnapshots(targetTime) {
     }
 
     return {
-        stateA: null,
-        stateB: null
+        snapA: null,
+        snapB: null
     }
 }

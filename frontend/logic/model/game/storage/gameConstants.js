@@ -48,6 +48,7 @@ export const GAME_CONSTANTS = {
 
     SNAPSHOTS_AMOUNT: 100,
     INTERPOLATION_DELAY: 100,
+    MAX_EXTRAPOLATION_TIME: 300,
 
     TILE_IMG_PATH: 'assets/tile/tileset x1.png'
 }

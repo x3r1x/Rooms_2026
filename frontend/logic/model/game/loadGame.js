@@ -43,7 +43,6 @@ export function startGameLoop() {
     addToClientTime(elapsedTime);
     gameState.lastTime = currentTime;
 
-    // console.log(gameState.enemies);
     if (appState === APP_STATES.GAME_ONGOING) {
         requestAnimationFrame(startGameLoop);
     }

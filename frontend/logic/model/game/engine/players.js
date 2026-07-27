@@ -18,19 +18,28 @@ export function updateVisualDirection(player) {
     player.direction = Math.atan2(player.mousePosition.y - player.y, player.mousePosition.x - player.x);
 }
 
-export function updateEnemies(dt, enemies, snaps) {
-    snaps.stateA.p.forEach((playerStart) => {
+export function lerpEnemies(dt, enemies, snaps) {
+    snaps.snapA.p.forEach((playerStart) => {
         if (playerStart.id in enemies) {
-            if (!(snaps.stateB.p.find((playerEnd) => playerEnd.id === playerStart.id))) {
+            if (!(snaps.snapB.p.find((playerEnd) => playerEnd.id === playerStart.id))) {
                 delete enemies[playerStart.id];
             } else {
-                const playerEnd = snaps.stateB.p.find((playerEnd) => playerEnd.id === playerStart.id);
+                const playerEnd = snaps.snapB.p.find((playerEnd) => playerEnd.id === playerStart.id);
 
                 enemies[playerStart.id].x = lerp(playerStart.x, playerEnd.x, dt);
                 enemies[playerStart.id].y = lerp(playerStart.y, playerEnd.y, dt);
                 enemies[playerStart.id].direction = lerpDirection(playerStart.a, playerEnd.a, dt);
                 enemies[playerStart.id].hp = playerStart.h;
             }
+        }
+    })
+}
+
+export function extrapolateEnemies(extrapolationTime, enemies, closestSnap) {
+    closestSnap.p.forEach((player) => {
+        if (player.id in enemies) {
+            enemies[player.id].x = player.x + extrapolationTime * player.movementDirection.x * GAME_CONSTANTS.PLAYER_SPEED;
+            enemies[player.id].y = player.y + extrapolationTime * player.movementDirection.y * GAME_CONSTANTS.PLAYER_SPEED;
         }
     })
 }
