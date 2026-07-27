@@ -63,6 +63,8 @@ const (
 	TileSize                     = 36
 	PlayerHalfSize               = PlayerVisualSize / 2.0
 	Epsilon                      = 0.001
+	RoomPixelWidth               = float64(RoomWidth * int(TileSize))
+	RoomPixelHeight              = float64(RoomHeight * int(TileSize))
 	// константы для лобби
 	WaitingLobbyState   = "w"
 	ReadyLobbyState     = "r"

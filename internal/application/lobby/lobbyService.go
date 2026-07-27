@@ -199,7 +199,6 @@ func (l *LobbyService) StartGame() {
 		return
 	}
 	l.gameStateProvider.SetRoomManager(l.mapManager)
-	l.mapManager.LoadMapObjects(l.gameStateProvider)
 
 	for _, player := range l.players {
 		if player.Ready {
@@ -211,21 +210,43 @@ func (l *LobbyService) StartGame() {
 		}
 	}
 
+	l.mapManager.LoadMapObjects(l.gameStateProvider)
 	roomMessages := l.mapManager.GetRoomMessages()
-	l.sendReadyState(roomMessages)
-	l.doCountdown()
-
+	roomIDs := make([]string, 0, len(roomMessages))
+	for roomId := range roomMessages {
+		roomIDs = append(roomIDs, roomId)
+	}
 	l.state = domain.OngoingGameState
+
 	if len(roomMessages) > 0 {
-		var firstRoomId string
-		for roomId := range roomMessages {
-			firstRoomId = roomId
-			break
-		}
+		i, k := 1, 0
+		var spawnX, spawnY float64
 		for _, player := range l.gameStateProvider.GetAllPlayers() {
-			l.gameStateProvider.SetPlayerRoom(player.Id, firstRoomId)
+			position := i % 3
+			switch position {
+			case 0:
+				spawnX = domain.RoomPixelWidth - domain.PlayerHalfSize - 50
+				spawnY = domain.RoomPixelHeight / 2
+			case 1:
+				spawnX = domain.RoomPixelWidth / 2
+				spawnY = domain.RoomPixelHeight - domain.PlayerHalfSize - 50
+			case 2:
+				spawnX = domain.PlayerHalfSize + 50
+				spawnY = domain.RoomPixelHeight / 2
+			}
+			player.X = spawnX
+			player.Y = spawnY
+			l.gameStateProvider.SetPlayerRoom(player.Id, roomIDs[k])
+			if i < 3 {
+				i++
+			} else {
+				i = 1
+				k++
+			}
 		}
 	}
+	l.sendReadyState(roomMessages)
+	l.doCountdown()
 
 	go l.gameService.Run()
 	l.playersReady = 0

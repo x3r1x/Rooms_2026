@@ -34,9 +34,10 @@ func BenchmarkBroadcastRealWS(b *testing.B) {
 	wsURL := "ws" + server.URL[4:]
 
 	service := NewBroadcastService()
-	conns := make([]*websocket.Conn, 500)
+	const numConn = 10
+	conns := make([]*websocket.Conn, numConn)
 
-	for i := 0; i < 1; i++ {
+	for i := 0; i < numConn; i++ {
 		conn, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
 		if err != nil {
 			b.Fatalf("Failed to dial: %v", err)
@@ -54,7 +55,7 @@ func BenchmarkBroadcastRealWS(b *testing.B) {
 	b.RunParallel(func(pb *testing.PB) {
 		i := 0
 		for pb.Next() {
-			playerId := fmt.Sprintf("player_%d", i%50)
+			playerId := fmt.Sprintf("player_%d", i%numConn)
 			service.BroadcastToPlayer(playerId, msg)
 			i++
 		}
