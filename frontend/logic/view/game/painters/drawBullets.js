@@ -23,12 +23,15 @@ function drawPlayerBullet(context, bullet) {
 }
 
 function drawEnemyBullet(context, enemyBullet) {
-    const sprite = GAME_SPRITES.ENEMY[`b${gameState.enemies[enemyBullet.ownerId].pc}`].img;
+    //FIXME: игрок может быть вне комнаты, однако его пули всё ещё могут быть в комнате(тогда они не рисуются)
+    if (gameState.enemies[enemyBullet.ownerId]) {
+        const sprite = GAME_SPRITES.ENEMY[`b${gameState.enemies[enemyBullet.ownerId].pc}`].img;
 
-    context.save();
-    context.translate(enemyBullet.x, enemyBullet.y);
-    context.rotate(enemyBullet.direction + Math.PI / 2);
-    context.drawImage(sprite, -GAME_CONSTANTS.BULLET_WIDTH / 2, -GAME_CONSTANTS.BULLET_HEIGHT / 2,
-        GAME_CONSTANTS.BULLET_WIDTH, GAME_CONSTANTS.BULLET_HEIGHT);
-    context.restore();
+        context.save();
+        context.translate(enemyBullet.x, enemyBullet.y);
+        context.rotate(enemyBullet.direction + Math.PI / 2);
+        context.drawImage(sprite, -GAME_CONSTANTS.BULLET_WIDTH / 2, -GAME_CONSTANTS.BULLET_HEIGHT / 2,
+            GAME_CONSTANTS.BULLET_WIDTH, GAME_CONSTANTS.BULLET_HEIGHT);
+        context.restore();
+    }
 }

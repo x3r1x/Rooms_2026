@@ -1,6 +1,6 @@
 import {keys} from '../../../controller/gameListeners.js';
 import {updateEnemies, updatePlayer} from "./players.js";
-import {updateBullets} from "./bullet.js";
+import {getNewBulletsMap} from "./bullet.js";
 import {getNeighbouringSnapshots, getClientTime} from "../storage/interpolation.js";
 import {GAME_CONSTANTS} from "../storage/gameConstants.js";
 
@@ -15,7 +15,7 @@ export function updateGame(elapsedTime, state) {
 
     const dt = (renderTime - neighbouredSnapshots.stateA.t) / (neighbouredSnapshots.stateB.t - neighbouredSnapshots.stateA.t);
     updateEnemies(dt, state.enemies, neighbouredSnapshots);
-    updateBullets(dt, state.bullets, neighbouredSnapshots);
+    state.bullets = getNewBulletsMap(dt, state.bullets, neighbouredSnapshots);
 }
 
 function updateMovementDirection(direction) {

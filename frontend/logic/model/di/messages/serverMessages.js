@@ -43,7 +43,6 @@ export function processCountdownMessage(parsedMessage, lobbyState) {
 }
 
 export function processGameAssignment(parsedMessage, gameState, gameNicknames) {
-    console.log(parsedMessage.p);
     parsedMessage.p.forEach((player) => processPlayer(player, gameState));
     parsedMessage.b.forEach((bullet) => processBullet(bullet, gameState));
 
@@ -67,10 +66,11 @@ function processPlayer(player, state) {
         roomId: player.room_id,
         pc: player.pc,
     };
+
     if (newPlayerInModel.id === state.player.id) {
         newPlayerInModel.mousePosition = state.player.mousePosition;
         state.player = newPlayerInModel;
-    } else if (getSnapshotsAmount() < 2) {
+    } else if (getSnapshotsAmount() < 2 || !(newPlayerInModel.id in state.enemies)) {
         state.enemies[newPlayerInModel.id] = newPlayerInModel;
     }
 }
