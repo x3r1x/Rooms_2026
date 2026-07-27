@@ -108,7 +108,7 @@ func (gs *GameService) endGame() {
 		return
 	}
 	gs.gameState.SetGameActive(false)
-	stats := gs.getStatistics()
+	stats := gs.getFinalStatistics()
 	log.Println(stats)
 	if gs.gameState.GetCountOfPlayers() > 0 {
 		gs.broadcastFinal(domain.ServerEndMessage{
@@ -121,14 +121,26 @@ func (gs *GameService) endGame() {
 	}
 }
 
-func (gs *GameService) getStatistics() []domain.PlayerFinalState {
+func (gs *GameService) getFinalStatistics() []domain.PlayerFinalState {
 	stats := make([]domain.PlayerFinalState, 0, len(gs.gameState.GetAllPlayers()))
 	for _, player := range gs.gameState.GetAllPlayers() {
 		stats = append(stats, domain.PlayerFinalState{
-			Nickname: player.Nickname,
-			Id:       player.Id,
-			Deaths:   player.DeathCount,
-			Kills:    player.BodyCount,
+			Id:     player.Id,
+			Deaths: player.DeathCount,
+			Kills:  player.BodyCount,
+		})
+	}
+	return stats
+}
+
+func (gs *GameService) getInGameStatistics() []domain.PlayerStatistic {
+	stats := make([]domain.PlayerStatistic, 0, len(gs.gameState.GetAllPlayers()))
+	for _, player := range gs.gameState.GetAllPlayers() {
+		stats = append(stats, domain.PlayerStatistic{
+			Id:     player.Id,
+			Kills:  player.BodyCount,
+			Deaths: player.DeathCount,
+			Hp:     player.Health,
 		})
 	}
 	return stats
@@ -138,13 +150,14 @@ func (gs *GameService) broadcast() {
 	playersByRoom := gs.gameState.GetPlayersByRoom()
 	bullets := gs.gameState.GetAllBullets()
 	gameTime := float64(time.Since(gs.gameState.GetGameStartTime()).Milliseconds())
+	statistic := gs.getInGameStatistics()
 	for _, playersInRoom := range playersByRoom {
 		msg := domain.ServerGameMessage{
-			State:   domain.OngoingGameState,
-			Type:    "a",
-			Time:    gameTime,
-			Players: playersInRoom,
-			Bullets: bullets,
+			State:     domain.OngoingGameState,
+			Time:      gameTime,
+			Players:   playersInRoom,
+			Bullets:   bullets,
+			Statistic: statistic,
 		}
 
 		data, err := json.Marshal(msg)

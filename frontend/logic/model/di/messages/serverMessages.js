@@ -47,7 +47,7 @@ export function processGameAssignment(parsedMessage, gameState, gameNicknames) {
     parsedMessage.b.forEach((bullet) => processBullet(bullet, gameState));
 
     saveSnapshot(parsedMessage);
-    updateStatisticView(gameState, gameNicknames);
+    updateStatisticView(parsedMessage.stat, gameNicknames, gameState.player.id);
     gameState.didShoot = false;
 }
 

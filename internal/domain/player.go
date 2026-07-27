@@ -20,11 +20,17 @@ type PlayerGameState struct {
 	BulletDamage float64 `json:"-"`
 }
 
+type PlayerStatistic struct {
+	Id     string  `json:"id"`
+	Hp     float64 `json:"h"`
+	Kills  int     `json:"k"`
+	Deaths int     `json:"d"`
+}
+
 type PlayerFinalState struct {
-	Nickname string `json:"n"`
-	Id       string `json:"id"`
-	Kills    int    `json:"k"`
-	Deaths   int    `json:"d"`
+	Id     string `json:"id"`
+	Kills  int    `json:"k"`
+	Deaths int    `json:"d"`
 }
 
 func NewPlayerGameState(id, nickname, playerClass string) *PlayerGameState {

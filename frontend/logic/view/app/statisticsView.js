@@ -1,25 +1,34 @@
-export function updateStatisticView(gameState, gameNicknames) {
+export function updateStatisticView(statistic, gameNicknames, clientId) {
     const listElement = document.getElementById("players-list");
 
-    let allPlayers = [gameState.player];
+    statistic.sort((stat1, stat2) => statisticComparator(stat1, stat2))
 
-    for (const enemy of Object.values(gameState.enemies)) {
-        allPlayers.push(enemy);
-    }
-
-    allPlayers.sort((p1, p2) => p1.id.localeCompare(p2.id));
-
-    listElement.innerHTML = allPlayers.map(p => {
-        const isMe = p.id === gameState.player.id;
-        let hp = Math.round(p.hp);
+    listElement.innerHTML = statistic.map(stat => {
+        const isMe = stat.id === clientId;
+        let hp = Math.round(stat.h);
         if (hp <= 0){
             hp = "dead"
         }
         return `
-            <p class="player-stat-item ${isMe ? 'is-me' : ''}">
-                <span class="player-stat-name">${gameNicknames[p.id]}</span>
+            <div class="player-stat-item ${isMe ? 'is-me' : ''}">
+            <p>
+                <span class="player-stat-name">${gameNicknames[stat.id]}</span>
                 <span class="player-stat-hp">${hp.toString() === "dead" ? '' : 'HP:'} ${hp}</span>
             </p>
+            <p>Kills: ${stat.k} / Deaths: ${stat.d}</p>
+            </div>
         `;
     }).join('');
+}
+
+function statisticComparator(stat1, stat2) {
+    if (stat1.k === stat2.k) {
+        if (stat1.d === stat2.d) {
+            return stat1.id.localeCompare(stat2.id);
+        }
+
+        return stat1.d - stat2.d;
+    }
+
+    return stat2.k - stat1.k;
 }

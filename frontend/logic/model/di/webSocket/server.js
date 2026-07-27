@@ -58,11 +58,7 @@ export function parseMessage(socket, message) {
             switchToOngoingGameState();
             sendGameInfo(socket, gameState);
 
-            if (parsedMessage.type === "a") {
-                processGameAssignment(parsedMessage, gameState, gameNicknames);
-            } else {
-                console.log(`Packet loss: ${parsedMessage.type}!`);
-            }
+            processGameAssignment(parsedMessage, gameState, gameNicknames);
             break;
 
         case APP_STATES.GAME_END:

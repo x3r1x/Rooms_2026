@@ -9,6 +9,7 @@ import {
 import {initLobbyListeners} from "../../controller/lobbyListeners.js";
 import {loadGame, startGameLoop} from "../game/loadGame.js";
 import {
+    gameNicknames,
     resetGameStateStorage,
     startGameState
 } from "../game/storage/gameState.js";
@@ -71,7 +72,7 @@ export function switchToEndedGameState(socket, clientId, result) {
     socket.close();
     initGameEndListeners();
     cancelAnimationFrame(startGameLoop);
-    fillResultWindow(clientId, result);
+    fillResultWindow(clientId, gameNicknames, result);
     switchWindowToGameEnd();
 }
 

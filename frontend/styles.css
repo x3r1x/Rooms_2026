@@ -210,6 +210,7 @@ body {
     display: flex;
     justify-content: space-around;
     align-items: center;
+    flex-direction: column;
     color: #ffffff;
     font-size: 3vh;
     width: 100%;
