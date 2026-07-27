@@ -11,19 +11,13 @@ export const GAME_CONSTANTS = {
 
     PLAYER_HITBOX_HEIGHT: 35,
     PLAYER_HITBOX_WIDTH: 30,
-
     HALF: 17,
+
     PLAYER_START_X: 500,
     PLAYER_START_Y: 400,
     PLAYER_SKIN_BLUE_PATH: 'assets/images/person.png',
 
-    BULLET_WIDTH: 5,
-    BULLET_HEIGHT: 25,
-    BULLET_COLOR: "#cdcbcb",
-
     HEALTH_BAR_PATH: 'assets/images/health-bar_sheet.png',
-
-    BULLET_SKIN_PATH: 'assets/images/bullet_classic.png',
 
     BULLET: {
         PLAYER: {},

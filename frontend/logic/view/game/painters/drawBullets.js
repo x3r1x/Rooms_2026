@@ -1,4 +1,4 @@
-import {GAME_CONSTANTS, GAME_SPRITES} from "../../../model/game/storage/gameConstants.js";
+import {GAME_SPRITES} from "../../../model/game/storage/gameConstants.js";
 import {gameState} from "../../../model/game/storage/gameState.js";
 export function drawBullets(context, playerId, bullets) {
     for (const bullet of Object.values(bullets)) {
@@ -11,24 +11,25 @@ export function drawBullets(context, playerId, bullets) {
 }
 
 function drawPlayerBullet(context, bullet) {
-    console.log(gameState.enemies);
-    const sprite = GAME_SPRITES.PLAYER[`b${gameState.player.pc}`].img;
+    const type = `b${gameState.player.pc}`;
+    const sprite = GAME_SPRITES.PLAYER[type].img;
 
     context.save();
     context.translate(bullet.x, bullet.y);
-    context.rotate(bullet.direction + Math.PI / 2);
-    context.drawImage(sprite, -GAME_CONSTANTS.BULLET_WIDTH / 2, -GAME_CONSTANTS.BULLET_HEIGHT / 2,
-        GAME_CONSTANTS.BULLET_WIDTH, GAME_CONSTANTS.BULLET_HEIGHT);
+    context.rotate(bullet.direction);
+    context.drawImage(sprite, -GAME_SPRITES.PLAYER[type].w / 2, -GAME_SPRITES.PLAYER[type].h / 2,
+        GAME_SPRITES.PLAYER[type].w, GAME_SPRITES.PLAYER[type].h);
     context.restore();
 }
 
 function drawEnemyBullet(context, enemyBullet) {
-    const sprite = GAME_SPRITES.ENEMY[`b${gameState.enemies[enemyBullet.ownerId].pc}`].img;
+    const type = `b${gameState.enemies[enemyBullet.ownerId].pc}`;
+    const sprite = GAME_SPRITES.ENEMY[type].img;
 
     context.save();
     context.translate(enemyBullet.x, enemyBullet.y);
-    context.rotate(enemyBullet.direction + Math.PI / 2);
-    context.drawImage(sprite, -GAME_CONSTANTS.BULLET_WIDTH / 2, -GAME_CONSTANTS.BULLET_HEIGHT / 2,
-        GAME_CONSTANTS.BULLET_WIDTH, GAME_CONSTANTS.BULLET_HEIGHT);
+    context.rotate(enemyBullet.direction);
+    context.drawImage(sprite, -GAME_SPRITES.ENEMY[type].w/ 2, -GAME_SPRITES.ENEMY[type].h / 2,
+        GAME_SPRITES.ENEMY[type].w, GAME_SPRITES.ENEMY[type].h);
     context.restore();
 }
