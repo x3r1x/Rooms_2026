@@ -8,13 +8,14 @@ import (
 	"gamedevRooms/internal/adapters/websocket"
 	"gamedevRooms/internal/application/game"
 	"gamedevRooms/internal/application/lobby"
+	"gamedevRooms/internal/state"
 	"log"
 	"net/http"
 )
 
 func main() {
 	broadcastService := broadcast.NewBroadcastService()
-	gameState := game.NewGameState()
+	gameState := state.NewGameState()
 	mapManager := _map.NewMapManager()
 	collisionService := collision.NewCollisionService(gameState)
 
@@ -27,7 +28,6 @@ func main() {
 	gameService := game.NewGameService(
 		gameState,
 		collisionService,
-		mapManager,
 		broadcastService,
 		func() {
 			lobbyService.HandleGameEnd()

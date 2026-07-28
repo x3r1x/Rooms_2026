@@ -3,43 +3,44 @@ package game
 import (
 	"gamedevRooms/internal/adapters/collision"
 	"gamedevRooms/internal/domain"
+	"gamedevRooms/internal/state"
 	"log"
 	"math"
 )
 
 type PhysicsEngine struct {
-	state            *GameState
+	gameState        *state.GameState
 	collisionService *collision.CollisionService
 }
 
-func NewPhysicsEngine(state *GameState, collisionService *collision.CollisionService) *PhysicsEngine {
+func NewPhysicsEngine(state *state.GameState, collisionService *collision.CollisionService) *PhysicsEngine {
 	return &PhysicsEngine{
-		state:            state,
+		gameState:        state,
 		collisionService: collisionService,
 	}
 }
 
-func (gs *GameService) updateShooterTimers() {
-	for _, player := range gs.gameState.GetAllPlayers() {
+func (pe *PhysicsEngine) updateShooterTimers() {
+	for _, player := range pe.gameState.GetAllPlayers() {
 		if player.CooldownTimer > 0 {
 			player.CooldownTimer--
 		}
 	}
 }
 
-func (gs *GameService) updateBullets() {
+func (pe *PhysicsEngine) updateBullets() {
 	activeBullets := make([]domain.Bullet, 0)
-	for _, bullet := range gs.gameState.GetAllBullets() {
+	for _, bullet := range pe.gameState.GetAllBullets() {
 		if bullet.Life > 0 {
 			bullet.Move()
 			bullet.Life--
-			hit, player, obj := gs.collisionService.CheckBulletCollision(bullet)
+			hit, player, obj := pe.collisionService.CheckBulletCollision(bullet)
 			if hit {
 				if player != nil && player.Health > 0 {
-					gs.collisionService.HandlePlayerHit(player, bullet)
+					pe.collisionService.HandlePlayerHit(player, bullet)
 				} else if obj != nil || bullet.Type == domain.PlayerSom {
 					if bullet.Type == domain.PlayerSom {
-						gs.collisionService.TriggerExplosion(bullet)
+						pe.collisionService.TriggerExplosion(bullet)
 					}
 					log.Printf("Пуля попала в стену ID: %s", obj.Id)
 				}
@@ -47,14 +48,14 @@ func (gs *GameService) updateBullets() {
 			}
 			activeBullets = append(activeBullets, bullet)
 		} else if bullet.Life <= 0 && bullet.Type == domain.PlayerSom {
-			gs.collisionService.TriggerExplosion(bullet)
+			pe.collisionService.TriggerExplosion(bullet)
 		}
 	}
-	gs.gameState.SetBullets(activeBullets)
+	pe.gameState.SetBullets(activeBullets)
 }
 
-func (gs *GameService) updatePlayers() {
-	for _, player := range gs.gameState.GetAllPlayers() {
+func (pe *PhysicsEngine) updatePlayers() {
+	for _, player := range pe.gameState.GetAllPlayers() {
 		if player.Health <= 0 {
 			if player.RebornTimer > 0 {
 				player.RebornTimer--
@@ -82,26 +83,26 @@ func (gs *GameService) updatePlayers() {
 		deltaY := moveY * domain.TickTime * domain.PlayerSpeed
 
 		player.X += deltaX
-		if hit, _ := gs.collisionService.CheckPlayerObjectCollision(player); hit {
+		if hit, _ := pe.collisionService.CheckPlayerObjectCollision(player); hit {
 			player.X -= deltaX
 		}
 
 		player.Y += deltaY
-		if hit, _ := gs.collisionService.CheckPlayerObjectCollision(player); hit {
+		if hit, _ := pe.collisionService.CheckPlayerObjectCollision(player); hit {
 			player.Y -= deltaY
 		}
 
-		if hit, _ := gs.collisionService.CheckPlayerObjectCollision(player); hit {
-			gs.collisionService.ResolvePlayerCollisionSmooth(player)
+		if hit, _ := pe.collisionService.CheckPlayerObjectCollision(player); hit {
+			pe.collisionService.ResolvePlayerCollisionSmooth(player)
 		}
 
-		if hit, direction, targetRoomId := gs.collisionService.CheckPlayerExitCollision(player); hit {
-			gs.handleRoomTransition(player, direction, targetRoomId)
+		if hit, direction, targetRoomId := pe.collisionService.CheckPlayerExitCollision(player); hit {
+			pe.handleRoomTransition(player, direction, targetRoomId)
 		}
 	}
 }
 
-func (gs *GameService) handleRoomTransition(player *domain.PlayerGameState, direction, targetRoomId string) {
+func (pe *PhysicsEngine) handleRoomTransition(player *domain.PlayerGameState, direction, targetRoomId string) {
 	roomPixelWidth := float64(domain.RoomWidth * int(domain.TileSize))
 	roomPixelHeight := float64(domain.RoomHeight * int(domain.TileSize))
 	halfSize := domain.PlayerHalfSize
@@ -116,5 +117,5 @@ func (gs *GameService) handleRoomTransition(player *domain.PlayerGameState, dire
 	case domain.RightMarker:
 		player.X = halfSize + 1
 	}
-	gs.gameState.SetPlayerRoom(player.Id, targetRoomId)
+	pe.gameState.SetPlayerRoom(player.Id, targetRoomId)
 }

@@ -3,18 +3,17 @@ package game
 import (
 	"gamedevRooms/internal/adapters/broadcast"
 	"gamedevRooms/internal/adapters/collision"
-	_map "gamedevRooms/internal/adapters/map"
 	"gamedevRooms/internal/domain"
-	"gamedevRooms/internal/ports"
+	"gamedevRooms/internal/state"
 	"log"
 	"time"
 )
 
 type GameService struct {
-	gameState        ports.GameStateProvider
-	collisionService *collision.CollisionService
-	mapManager       *_map.MapManager
-	broadcastService *broadcast.BroadcastService
+	gameState        *state.GameState
+	playerManager    *PlayerManager
+	physicsEngine    *PhysicsEngine
+	broadcastManager *BroadcastManager
 	updateChan       chan domain.ClientGameMessage
 	deleteChan       chan string
 	finishChan       chan bool
@@ -22,22 +21,35 @@ type GameService struct {
 }
 
 func NewGameService(
-	gameState ports.GameStateProvider,
+	gameState *state.GameState,
 	collisionService *collision.CollisionService,
-	mapManager *_map.MapManager,
 	broadcastService *broadcast.BroadcastService,
 	onGameEnd func(),
 ) *GameService {
+	pm := NewPlayerManager(gameState)
+	pe := NewPhysicsEngine(gameState, collisionService)
+	bm := NewBroadcastManager(gameState, broadcastService)
 	return &GameService{
 		gameState:        gameState,
-		collisionService: collisionService,
-		mapManager:       mapManager,
-		broadcastService: broadcastService,
+		playerManager:    pm,
+		physicsEngine:    pe,
+		broadcastManager: bm,
 		updateChan:       make(chan domain.ClientGameMessage),
 		deleteChan:       make(chan string),
 		finishChan:       make(chan bool, 1),
 		onGameEnd:        onGameEnd,
 	}
+}
+
+func (gs *GameService) UpdatePlayer(msg domain.ClientGameMessage) {
+	if _, exists := gs.gameState.GetPlayer(msg.Id); !exists {
+		return
+	}
+	gs.updateChan <- msg
+}
+
+func (gs *GameService) DeletePlayer(id string) {
+	gs.deleteChan <- id
 }
 
 func (gs *GameService) Stop() {
@@ -58,17 +70,17 @@ func (gs *GameService) Run() {
 		case del := <-gs.deleteChan:
 			gs.handleDelete(del)
 		case upload := <-gs.updateChan:
-			gs.gameState.UpdatePlayer(upload)
+			gs.playerManager.UpdatePlayer(upload)
 		case <-ticker.C:
 			gs.gameState.IncrementTick()
-			gs.updateShooterTimers()
-			gs.updateBullets()
-			gs.updatePlayers()
+			gs.physicsEngine.updateShooterTimers()
+			gs.physicsEngine.updateBullets()
+			gs.physicsEngine.updatePlayers()
 			remaining := gs.gameState.GetRemainingSeconds()
 			if remaining <= 0 {
 				gs.Stop()
 			}
-			gs.broadcast()
+			gs.broadcastManager.broadcast()
 		}
 	}
 }
@@ -95,10 +107,9 @@ func (gs *GameService) endGame() {
 		return
 	}
 	gs.gameState.SetGameActive(false)
-	stats := gs.getFinalStatistics()
-	log.Println(stats)
+	stats := gs.broadcastManager.getFinalStatistics()
 	if gs.gameState.GetCountOfPlayers() > 0 {
-		gs.broadcastFinal(domain.ServerEndMessage{
+		gs.broadcastManager.broadcastFinal(domain.ServerEndMessage{
 			State:  domain.FinalGameState,
 			Result: stats,
 		})

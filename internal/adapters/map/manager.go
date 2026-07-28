@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"gamedevRooms/internal/adapters/map/generator"
 	"gamedevRooms/internal/domain"
-	"gamedevRooms/internal/ports"
 	"log"
 	"strconv"
 
@@ -30,8 +29,8 @@ type HitboxRect struct {
 	H float64 `json:"h"`
 }
 
-func (mm *MapManager) LoadMapObjects(gameState ports.GameStateProvider) {
-	mm.gameMap = generator.NewMap(gameState.GetCountOfPlayers()/2 + 1)
+func (mm *MapManager) LoadMapObjects(playerCount int) map[string]*domain.Object {
+	mm.gameMap = generator.NewMap(playerCount/2 + 1)
 	objects := make(map[string]*domain.Object)
 
 	for roomId, room := range mm.gameMap.GetGameMap() {
@@ -83,7 +82,7 @@ func (mm *MapManager) LoadMapObjects(gameState ports.GameStateProvider) {
 			}
 		}
 	}
-	gameState.SetObjects(objects)
+	return objects
 }
 
 func (mm *MapManager) parseHitbox(hitboxStr string) []HitboxRect {
@@ -121,7 +120,6 @@ func (mm *MapManager) createObjectsFromHitboxes(baseX, baseY float64, hitboxes [
 		}
 		objects = append(objects, obj)
 	}
-	// Если не было создано ни одного объекта с хитбоксом, создаем полный тайл
 	if len(objects) == 0 {
 		objects = append(objects, mm.createFullTileObject(baseX, baseY, roomId))
 	}
