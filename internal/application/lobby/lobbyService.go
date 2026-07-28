@@ -20,7 +20,7 @@ type LobbyService struct {
 
 	addChan    chan lobbyAddEvent
 	readyChan  chan *domain.LobbyPlayer
-	removeChan chan string
+	removeChan chan lobbyRemoveEvent
 
 	gameStateProvider ports.GameStateProvider
 	mapManager        ports.MapManager
@@ -30,6 +30,11 @@ type LobbyService struct {
 type lobbyAddEvent struct {
 	player *domain.LobbyPlayer
 	conn   *websocket.Conn
+}
+
+type lobbyRemoveEvent struct {
+	id    string
+	force bool
 }
 
 func NewLobbyService(
@@ -45,7 +50,7 @@ func NewLobbyService(
 		broadcastService:  broadcastService,
 		addChan:           make(chan lobbyAddEvent),
 		readyChan:         make(chan *domain.LobbyPlayer),
-		removeChan:        make(chan string),
+		removeChan:        make(chan lobbyRemoveEvent),
 	}
 	go l.run()
 	return l
@@ -64,8 +69,8 @@ func (l *LobbyService) UpdatePlayerInLobby(msg *domain.LobbyPlayer) {
 	l.readyChan <- msg
 }
 
-func (l *LobbyService) RemovePlayerFromLobby(id string) {
-	l.removeChan <- id
+func (l *LobbyService) RemovePlayerFromLobby(id string, force bool) {
+	l.removeChan <- lobbyRemoveEvent{id, force}
 }
 
 func (l *LobbyService) GetState() string {
@@ -154,13 +159,17 @@ func (l *LobbyService) sendReadyState(roomMessages map[string]domain.RoomMessage
 	}
 }
 
-func (l *LobbyService) removeUser(id string) {
-	player, exists := l.players[id]
+func (l *LobbyService) removeUser(event lobbyRemoveEvent) {
+	player, exists := l.players[event.id]
 	if !exists {
-		l.broadcastService.RemoveConnection(id)
+		l.broadcastService.RemoveConnection(event.id)
 		if l.state == domain.OngoingGameState && l.gameService != nil {
-			l.gameService.DeletePlayer(id)
+			l.gameService.DeletePlayer(event.id)
 		}
+		return
+	}
+
+	if player.Ready && !event.force {
 		return
 	}
 
@@ -168,14 +177,24 @@ func (l *LobbyService) removeUser(id string) {
 		l.playersReady--
 	}
 
-	l.broadcastService.RemoveConnection(id)
+	l.broadcastService.RemoveConnection(event.id)
 	if l.state == domain.OngoingGameState && l.gameService != nil {
-		l.gameService.DeletePlayer(id)
+		l.gameService.DeletePlayer(event.id)
 	}
 
-	delete(l.players, id)
-	log.Printf("Игрок %s покинул лобби. Осталось: %d", id, len(l.players))
+	delete(l.players, event.id)
+	log.Printf("Игрок %s покинул лобби. Осталось: %d", event.id, len(l.players))
 	l.broadcastLobbyState()
+	if l.state == domain.WaitingLobbyState {
+		currentTotal := len(l.players)
+		if currentTotal >= domain.MinCountOfPlayers &&
+			l.playersReady == currentTotal {
+
+			log.Println("После удаления игрока все оставшиеся готовы! Запускаем игру...")
+			l.StartGame()
+		}
+
+	}
 }
 
 func (l *LobbyService) doCountdown() {
