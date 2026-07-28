@@ -1,9 +1,11 @@
 package _map
 
 import (
+	"encoding/json"
 	"gamedevRooms/internal/adapters/map/generator"
 	"gamedevRooms/internal/domain"
 	"gamedevRooms/internal/ports"
+	"log"
 	"strconv"
 
 	"github.com/google/uuid"
@@ -21,10 +23,16 @@ func NewMapManager() *MapManager {
 	}
 }
 
+type HitboxRect struct {
+	X float64 `json:"x"`
+	Y float64 `json:"y"`
+	W float64 `json:"w"`
+	H float64 `json:"h"`
+}
+
 func (mm *MapManager) LoadMapObjects(gameState ports.GameStateProvider) {
 	mm.gameMap = generator.NewMap(gameState.GetCountOfPlayers()/2 + 1)
 	objects := make(map[string]*domain.Object)
-	solidCount := 0
 
 	for roomId, room := range mm.gameMap.GetGameMap() {
 		matrix := room.GetMatrix()
@@ -33,35 +41,104 @@ func (mm *MapManager) LoadMapObjects(gameState ports.GameStateProvider) {
 				continue
 			}
 
-			isSolid := false
+			blocksPlayer := false
+			hitboxStr := ""
 			for _, prop := range tile.Properties {
-				if prop.Name == "blocksPlayer" {
+
+				switch prop.Name {
+				case "blocksPlayer":
 					if val, ok := prop.Value.(bool); ok && val {
-						isSolid = true
-						break
+						blocksPlayer = true
+					}
+				case "hitbox":
+					if val, ok := prop.Value.(string); ok {
+						hitboxStr = val
 					}
 				}
 			}
+			if !blocksPlayer {
+				continue
+			}
 
-			if isSolid {
-				row := i / domain.RoomWidth
-				col := i % domain.RoomWidth
-				obj := &domain.Object{
-					Id:      uuid.New().String(),
-					X:       float64(col) * mm.tileSize,
-					Y:       float64(row) * mm.tileSize,
-					Width:   mm.tileSize,
-					Height:  mm.tileSize,
-					IsSolid: true,
-					Type:    "wall",
-					RoomId:  roomId,
+			row := i / domain.RoomWidth
+			col := i % domain.RoomWidth
+
+			baseX := float64(col) * mm.tileSize
+			baseY := float64(row) * mm.tileSize
+
+			var objs []*domain.Object
+			if hitboxStr != "" {
+				hitboxes := mm.parseHitbox(hitboxStr)
+				if len(hitboxes) > 0 {
+					objs = mm.createObjectsFromHitboxes(baseX, baseY, hitboxes, roomId)
 				}
+			}
+
+			if len(objs) == 0 {
+				objs = []*domain.Object{mm.createFullTileObject(baseX, baseY, roomId)}
+			}
+
+			for _, obj := range objs {
 				objects[obj.Id] = obj
-				solidCount++
 			}
 		}
 	}
 	gameState.SetObjects(objects)
+}
+
+func (mm *MapManager) parseHitbox(hitboxStr string) []HitboxRect {
+	if hitboxStr == "" {
+		return nil
+	}
+	var hitboxes []HitboxRect
+	log.Println(hitboxStr)
+	err := json.Unmarshal([]byte(hitboxStr), &hitboxes)
+	if err != nil {
+		log.Printf("Ошибка парсинга hitbox: %v", err)
+		return nil
+	}
+	return hitboxes
+}
+
+func (mm *MapManager) createObjectsFromHitboxes(baseX, baseY float64, hitboxes []HitboxRect, roomId string) []*domain.Object {
+	var objects []*domain.Object
+	for _, hb := range hitboxes {
+		if hb.W <= 0 || hb.H <= 0 {
+			continue
+		}
+		if hb.W == mm.tileSize && hb.H == mm.tileSize && hb.X == 0 && hb.Y == 0 {
+			continue
+		}
+		obj := &domain.Object{
+			Id:      uuid.New().String(),
+			X:       baseX + hb.X,
+			Y:       baseY + hb.Y,
+			Width:   hb.W,
+			Height:  hb.H,
+			IsSolid: true,
+			Type:    "wall",
+			RoomId:  roomId,
+		}
+		objects = append(objects, obj)
+	}
+	// Если не было создано ни одного объекта с хитбоксом, создаем полный тайл
+	if len(objects) == 0 {
+		objects = append(objects, mm.createFullTileObject(baseX, baseY, roomId))
+	}
+	return objects
+}
+
+func (mm *MapManager) createFullTileObject(baseX, baseY float64, roomId string) *domain.Object {
+	return &domain.Object{
+		Id:      uuid.New().String(),
+		X:       baseX,
+		Y:       baseY,
+		Width:   mm.tileSize,
+		Height:  mm.tileSize,
+		IsSolid: true,
+		Type:    "wall",
+		RoomId:  roomId,
+	}
 }
 
 func (mm *MapManager) GetRoomMessages() map[string]domain.RoomMessage {
