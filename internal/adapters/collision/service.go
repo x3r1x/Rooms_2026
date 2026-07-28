@@ -165,6 +165,9 @@ func (cs *CollisionService) handleExplosion(bullet domain.Bullet) {
 			damageMultiplayer := (1 - distance/domain.ExplosionRadius) * domain.BulletDamageMulti
 			target.Health -= damageMultiplayer * domain.BulletDamageSom
 			if target.Health < 0 {
+				if killer, exists := cs.state.GetPlayer(bullet.OwnerId); exists {
+					killer.BodyCount++
+				}
 				target.DeathCount++
 				target.RebornTimer = domain.PlayerRebornTimer
 			}

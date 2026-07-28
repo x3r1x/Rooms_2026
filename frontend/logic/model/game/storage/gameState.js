@@ -1,5 +1,3 @@
-import {GAME_CONSTANTS} from "./gameConstants.js";
-
 export let gameState = null;
 export let gameNicknames = {};
 export let finalStatistics = null;
@@ -8,8 +6,8 @@ export function initGameState(playerId) {
     gameState = {
         lastTime: null,
         player: {
-            x: GAME_CONSTANTS.PLAYER_START_X,
-            y: GAME_CONSTANTS.PLAYER_START_Y,
+            x: 0,
+            y: 0,
             mousePosition: {
                 x: 0,
                 y: 0

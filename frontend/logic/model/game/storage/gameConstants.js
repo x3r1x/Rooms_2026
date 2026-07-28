@@ -1,9 +1,8 @@
 export const GAME_CONSTANTS = {
-    PLAYER_SPEED: 0.2,
+    PLAYER_SPEED: 0.4,
     BULLET_SPEED: 1.5,
     CANVAS_START: 0,
 
-    PLAYER_VISUAL_SIZE: 40,
     PLAYER_VISUAL_HEIGHT: 50,
     PLAYER_VISUAL_WIDTH: 44,
 
@@ -13,8 +12,6 @@ export const GAME_CONSTANTS = {
     PLAYER_HITBOX_WIDTH: 30,
     HALF: 17,
 
-    PLAYER_START_X: 500,
-    PLAYER_START_Y: 400,
     MUZZLE_FLASH_PATH: 'assets/images/muzzleFlash.png',
     EXPLOSION_PATH: 'assets/images/explosion.png',
 

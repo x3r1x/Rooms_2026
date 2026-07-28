@@ -22,7 +22,7 @@ const (
 	BulletLengthSom    = 11.0
 	BulletWidthSom     = 3.0
 	BulletDamageMulti  = 1.2
-	BulletBarrelOffset = 24.0
+	BulletBarrelOffset = 5.0
 	ExplosionRadius    = 250
 	RecoilDistance     = 8.0
 	KnockbackForce     = 12.0
@@ -32,6 +32,12 @@ const (
 	InitDirection     = 0
 	InitValue         = 0
 	PlayerVisualSize  = 34.0
+	GunOffsetX        = 0.0
+	GunOffsetY        = 20.5
+	RifleOffsetX      = 12.0
+	RifleOffsetY      = 19.0
+	SomOffsetX        = 21.0
+	SomOffsetY        = 19.0
 	PlayerSpeed       = 0.4
 	MaxPlayerHealth   = 100
 	PlayerRebornTimer = 300

@@ -71,18 +71,16 @@ func (p *PlayerGameState) setupWeaponByClass() {
 }
 
 func createGunBullets(player *PlayerGameState) []Bullet {
-	barrelLength := PlayerHalfSize + BulletBarrelOffset
-	barrelX := player.X + barrelLength*math.Cos(player.Angle)
-	barrelY := player.Y + barrelLength*math.Sin(player.Angle)
+	rotatedX := GunOffsetX*math.Cos(player.Angle) - GunOffsetY*math.Sin(player.Angle)
+	rotatedY := GunOffsetX*math.Sin(player.Angle) + GunOffsetY*math.Cos(player.Angle)
 
-	sideOffset := BulletBarrelOffset
-	sideX := barrelX + math.Cos(player.Angle+math.Pi/2)*sideOffset
-	sideY := barrelY + math.Sin(player.Angle+math.Pi/2)*sideOffset
+	startX := player.X + rotatedX
+	startY := player.Y + rotatedY
 
 	return []Bullet{{
 		Id:        GenerateID(),
-		X:         sideX,
-		Y:         sideY,
+		X:         startX,
+		Y:         startY,
 		Direction: player.Angle,
 		Life:      BulletLifeGun,
 		Damage:    BulletDamageGun,
@@ -94,18 +92,19 @@ func createGunBullets(player *PlayerGameState) []Bullet {
 
 func createRifleBullets(player *PlayerGameState) []Bullet {
 	pellets := make([]Bullet, 0, PelletCount)
-	barrelLength := PlayerHalfSize + BulletBarrelOffset
+	rotatedX := RifleOffsetX*math.Cos(player.Angle) - RifleOffsetY*math.Sin(player.Angle)
+	rotatedY := RifleOffsetX*math.Sin(player.Angle) + RifleOffsetY*math.Cos(player.Angle)
 
 	for i := 0; i < PelletCount; i++ {
 		offset := (rand.Float64() - 0.5) * SpreadAngle
 		direction := player.Angle + offset
-		barrelX := player.X + barrelLength*math.Cos(direction)
-		barrelY := player.Y + barrelLength*math.Sin(direction)
+		startX := player.X + rotatedX
+		startY := player.Y + rotatedY
 
 		pellets = append(pellets, Bullet{
 			Id:        GenerateID(),
-			X:         barrelX,
-			Y:         barrelY,
+			X:         startX,
+			Y:         startY,
 			Direction: direction,
 			Life:      BulletLifeRifle,
 			Damage:    BulletDamageRifle,
@@ -119,14 +118,16 @@ func createRifleBullets(player *PlayerGameState) []Bullet {
 }
 
 func createSomBullet(player *PlayerGameState) []Bullet {
-	barrelLength := PlayerHalfSize + BulletBarrelOffset
-	barrelX := player.X + barrelLength*math.Cos(player.Angle)
-	barrelY := player.Y + barrelLength*math.Sin(player.Angle)
+	rotatedX := SomOffsetX*math.Cos(player.Angle) - SomOffsetY*math.Sin(player.Angle)
+	rotatedY := SomOffsetX*math.Sin(player.Angle) + SomOffsetY*math.Cos(player.Angle)
+
+	startX := player.X + rotatedX
+	startY := player.Y + rotatedY
 
 	return []Bullet{{
 		Id:        GenerateID(),
-		X:         barrelX,
-		Y:         barrelY,
+		X:         startX,
+		Y:         startY,
 		Direction: player.Angle,
 		Life:      math.Round(BulletLifeSom * rand.Float64()),
 		Damage:    BulletDamageSom,
