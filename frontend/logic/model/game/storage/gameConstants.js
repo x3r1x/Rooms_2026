@@ -16,8 +16,11 @@ export const GAME_CONSTANTS = {
     PLAYER_START_X: 500,
     PLAYER_START_Y: 400,
     MUZZLE_FLASH_PATH: 'assets/images/muzzleFlash.png',
+    EXPLOSION_S_PATH: 'assets/images/explosion_s.png',
     EXPLOSION_PATH: 'assets/images/explosion.png',
-
+    PLAYER_DEATH_PATH: 'assets/images/death.png',
+    PLAYER_HIT_PATH: 'assets/images/hit.png',
+    SHIELD_PATH: 'assets/images/shield.png',
     HEALTH_BAR_PATH: 'assets/images/health-bar_sheet.png',
 
     BULLET: {
@@ -74,8 +77,8 @@ export const GAME_SPRITES = {
         },
         br: {
             img: new Image(),
-            w: 3,
-            h: 3
+            w: 5,
+            h: 5
         },
         bs: {
             img: new Image(),
@@ -94,8 +97,8 @@ export const GAME_SPRITES = {
         },
         br: {
             img: new Image(),
-            w: 3,
-            h: 3
+            w: 5,
+            h: 5
         },
         bs: {
             img: new Image(),
@@ -104,8 +107,50 @@ export const GAME_SPRITES = {
         },
     },
     EFFECTS: {
-        MUZZLE_FLASH: new Image(),
-        EXPLOSION: new Image(),
+        MUZZLE_FLASH:{
+            img: new Image(),
+            scale: 1,
+            maxFrames: 3,
+        },
+        EXPLOSION_S:{
+            img: new Image(),
+            scale: 10,
+            maxFrames: 9,
+        },
+        EXPLOSION: {
+            img: new Image(),
+            scale: 0.3,
+            maxFrames: 3,
+        },
+
+        PLAYER_DEATH: {
+            img: new Image(),
+            scale: 2.5,
+            maxFrames: 12,
+        },
+
+        PLAYER_HIT: {
+            img: new Image(),
+            scale: 1.2,
+            maxFrames: 9,
+        },
+
+        PLAYER_SPAWN: {
+            img: new Image(),
+            scale: 1.2,
+            maxFrames: 5,
+        },
+
+        SOM_EXPLOSION: {
+            img: new Image(),
+            scale: 2.5,
+            maxFrames: 8,
+        },
+        SHIELD: {
+            img: new Image(),
+            scale: 1.5,
+            maxFrames: 24,
+        }
     },
 }
 

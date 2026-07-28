@@ -3,28 +3,29 @@ import {GAME_SPRITES} from "../../../model/game/storage/gameConstants.js";
 const effects = [];
 
 function spawnEffect(x, y, type, direction = 0) {
-    console.log("Spawn effect direction:", direction);
+    const spriteInfo = GAME_SPRITES.EFFECTS[type];
     effects.push({
         x: x,
         y: y,
         type: type,
         direction: direction,
         currentFrame: 0,
-        totalFrames: 3,
+        scale: spriteInfo.scale,
+        maxFrames: spriteInfo.maxFrames,
         startTime: Date.now(),
-        frameDuration: 1000 / 30
+        frameDuration: 1000 / 30,
+        img: GAME_SPRITES.EFFECTS[type].img,
     });
-    console.log(effects);
 }
 
 function drawEffect(context, fx) {
-    const spriteSheet = GAME_SPRITES.EFFECTS[fx.type];
-    const frameWidth = spriteSheet.width / fx.totalFrames;
+
+    const spriteSheet = fx.img;
+    const frameWidth = spriteSheet.width / fx.maxFrames;
     const frameHeight = spriteSheet.height;
 
-    const scale = 0.5;
-    const drawWidth = frameWidth * scale;
-    const drawHeight = frameHeight * scale;
+    const drawWidth = frameWidth * fx.scale;
+    const drawHeight = frameHeight * fx.scale;
 
     context.save();
     context.translate(fx.x, fx.y);
@@ -47,7 +48,7 @@ export function updateAndDrawEffects(context) {
         const elapsed = now - fx.startTime;
         fx.currentFrame = Math.floor(elapsed / fx.frameDuration);
 
-        if (fx.currentFrame >= fx.totalFrames) {
+        if (fx.currentFrame >= fx.maxFrames) {
             effects.splice(i, 1);
             continue;
         }
@@ -68,13 +69,35 @@ export function checkAndSpawnNewBulletEffects(stateA, stateB) {
                 break;
             }
         }
+
         if (!existedBefore) {
-            spawnEffect(
-                bulletB.x,
-                bulletB.y,
-                "MUZZLE_FLASH",
-                bulletB.a
-            );
+            switch (bulletB.t) {
+                case 'g':
+                    spawnEffect(
+                        bulletB.x,
+                        bulletB.y,
+                        "MUZZLE_FLASH",
+                        bulletB.a
+                    );
+                    break;
+                case 'r':
+                    spawnEffect(
+                        bulletB.x,
+                        bulletB.y,
+                        "MUZZLE_FLASH",
+                        bulletB.a
+                    );
+                    break;
+                case 's':
+                    spawnEffect(
+                        bulletB.x,
+                        bulletB.y,
+                        "MUZZLE_FLASH",
+                        bulletB.a
+                    );
+                    break;
+            }
+
         }
     }
 }
@@ -92,13 +115,92 @@ export function checkAndSpawnExplosions(stateA, stateB) {
                 break;
             }
         }
-
         if (!isAliveInNewState) {
+            switch (oldBullet.t) {
+                case 'g':
+                    spawnEffect(
+                        oldBullet.x,
+                        oldBullet.y,
+                        "EXPLOSION",
+                        oldBullet.a
+                    );
+                    break;
+                case 'r':
+                    spawnEffect(
+                        oldBullet.x,
+                        oldBullet.y,
+                        "EXPLOSION",
+                        oldBullet.a
+                    );
+                    break;
+                case 's':
+                    spawnEffect(
+                        oldBullet.x,
+                        oldBullet.y,
+                        "EXPLOSION_S",
+                        oldBullet.a
+                    );
+                    break;
+            }
+        }
+    }
+}
+
+export function checkAndSpawnDie(stateA, stateB){
+    if (!stateA || !stateB) return;
+
+    const oldPlayers = stateA.p;
+    const newPlayers = stateB.p;
+
+    for (let i = 0; i < newPlayers.length; i++) {
+        const newEntity = newPlayers[i];
+        const oldEntity = oldPlayers.find(e => e.id === newEntity.id);
+        if (oldEntity && oldEntity.h > 0 && newEntity.h <= 0) {
             spawnEffect(
-                oldBullet.x,
-                oldBullet.y,
-                "EXPLOSION",
-                oldBullet.a
+                newEntity.x,
+                newEntity.y,
+                "PLAYER_DEATH",
+                newEntity.a || 0
+            );
+        }
+    }
+}
+
+export function checkAndSpawnHit(stateA, stateB){
+    if (!stateA || !stateB) return;
+
+    const oldPlayers = stateA.p;
+    const newPlayers = stateB.p;
+
+    for (let i = 0; i < newPlayers.length; i++) {
+        const newPlayer = newPlayers[i];
+        const oldPlayer = oldPlayers.find(e => e.id === newPlayer.id);
+        if (oldPlayer && oldPlayer.h > newPlayer.h) {
+            spawnEffect(
+                newPlayer.x,
+                newPlayer.y,
+                "PLAYER_HIT",
+                newPlayer.a || 0
+            );
+        }
+    }
+}
+
+export function checkAndSpawnShield(stateA, stateB){
+    if (!stateA || !stateB) return;
+
+    const oldPlayers = stateA.p;
+    const newPlayers = stateB.p;
+
+    for (let i = 0; i < newPlayers.length; i++) {
+        const newPlayer = newPlayers[i];
+        const oldPlayer = oldPlayers.find(e => e.id === newPlayer.id);
+        if (oldPlayer && oldPlayer.h <= 0 && newPlayer.h > 0) {
+            spawnEffect(
+                newPlayer.x,
+                newPlayer.y,
+                "SHIELD",
+                newPlayer.a || 0
             );
         }
     }
