@@ -48,7 +48,7 @@ type ServerGameMessage struct {
 	State     string             `json:"s"`
 	Time      float64            `json:"t"`
 	Players   []*PlayerGameState `json:"p"`
-	Bullets   []Bullet           `json:"b"`
+	Bullets   []*Bullet          `json:"b"`
 	Statistic []PlayerStatistic  `json:"stat"`
 }
 

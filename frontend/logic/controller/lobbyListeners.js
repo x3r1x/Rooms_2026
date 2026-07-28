@@ -1,4 +1,4 @@
-import {sendReadyState} from "../model/di/messages/clientMessages.js";
+import {sendReadyState} from "../model/di/webSocket/messages/clientMessages.js";
 import {updateReadyText, selectedWeaponClass, updatePlayerClass} from "../view/app/lobbyView.js";
 
 export function initLobbyListeners(socket, clientId) {

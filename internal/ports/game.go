@@ -18,6 +18,7 @@ type GameStateProvider interface {
 	RemovePlayer(playerId string)
 
 	GetAllBullets() []domain.Bullet
+	GetBulletsByRoom() map[string][]*domain.Bullet
 	SetBullets(bullets []domain.Bullet)
 	AddBullet(player *domain.PlayerGameState)
 

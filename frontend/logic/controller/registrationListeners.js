@@ -5,7 +5,7 @@ export function initRegistrationListeners(socket) {
     const nicknameInput = document.getElementById("nicknameInput");
     button.onclick = () => {
         socket = getSocket(nicknameInput.value);
-        button.onclick = () => {};
+        button.onclick = null;
     }
     nicknameInput.onkeydown = (event) => {
         if (event.key === "Enter") {

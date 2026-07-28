@@ -3,7 +3,6 @@ import {GAME_SPRITES} from "../../../model/game/storage/gameConstants.js";
 const effects = [];
 
 function spawnEffect(x, y, type, direction = 0) {
-    console.log("Spawn effect direction:", direction);
     effects.push({
         x: x,
         y: y,
@@ -14,7 +13,6 @@ function spawnEffect(x, y, type, direction = 0) {
         startTime: Date.now(),
         frameDuration: 1000 / 30
     });
-    console.log(effects);
 }
 
 function drawEffect(context, fx) {

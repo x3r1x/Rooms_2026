@@ -1,11 +1,11 @@
 import {finalStatistics, gameNicknames, gameState, setFinalStatistics} from "../../game/storage/gameState.js";
-import {registerClient, sendGameInfo} from "../messages/clientMessages.js";
+import {registerClient, sendGameInfo} from "./messages/clientMessages.js";
 import {
     processCountdownMessage,
     processGameAssignment,
     processReadyMessage,
     processWaitingMessage
-} from "../messages/serverMessages.js";
+} from "./messages/serverMessages.js";
 import {APP_STATES} from "../../app/appConstants.js";
 import {
     lobbyState,
@@ -16,7 +16,7 @@ import {
 } from "../../app/appState.js";
 
 export function getSocket(nickname) {
-    // const socket = new WebSocket("ws://84.201.159.214:8080/ws");
+     // const socket = new WebSocket("ws://84.201.159.214:8080/ws");
     const socket = new WebSocket("ws://localhost:8080/ws");
 
     socket.onopen = function (event) {
@@ -30,6 +30,7 @@ export function getSocket(nickname) {
 
     socket.onerror = function (error) {
         console.log(`Ошибка сокета - ${error.message}!`);
+        socket.close();
     }
 
     return socket;

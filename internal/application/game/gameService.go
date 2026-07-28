@@ -145,15 +145,15 @@ func (gs *GameService) getInGameStatistics() []domain.PlayerStatistic {
 
 func (gs *GameService) broadcast() {
 	playersByRoom := gs.gameState.GetPlayersByRoom()
-	bullets := gs.gameState.GetAllBullets()
+	bulletsByRoom := gs.gameState.GetBulletsByRoom()
 	gameTime := float64(time.Since(gs.gameState.GetGameStartTime()).Milliseconds())
 	statistic := gs.getInGameStatistics()
-	for _, playersInRoom := range playersByRoom {
+	for roomId, playersInRoom := range playersByRoom {
 		msg := domain.ServerGameMessage{
 			State:     domain.OngoingGameState,
 			Time:      gameTime,
 			Players:   playersInRoom,
-			Bullets:   bullets,
+			Bullets:   bulletsByRoom[roomId],
 			Statistic: statistic,
 		}
 

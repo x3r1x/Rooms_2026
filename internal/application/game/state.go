@@ -196,3 +196,25 @@ func (gs *GameState) GetPlayersByRoom() map[string][]*domain.PlayerGameState {
 	}
 	return rooms
 }
+
+func (gs *GameState) GetBulletsByRoom() map[string][]*domain.Bullet {
+	rooms := make(map[string][]*domain.Bullet)
+
+	for id := range gs.roomPlayers {
+		rooms[id] = gs.getBulletsInRoom(id)
+	}
+
+	return rooms
+}
+
+func (gs *GameState) getBulletsInRoom(roomId string) []*domain.Bullet {
+	bulletsInRoom := make([]*domain.Bullet, 0)
+
+	for _, bullet := range gs.bullets {
+		if gs.players[bullet.OwnerId].RoomId == roomId {
+			bulletsInRoom = append(bulletsInRoom, &bullet)
+		}
+	}
+
+	return bulletsInRoom
+}
