@@ -4,6 +4,7 @@ import {updateLobbyView} from "../../../../view/app/lobbyView.js";
 import {changeCountdownTimer} from "../../../../view/app/countdownView.js";
 import {parseMap} from "../../preloadingResources/mapHandler.js";
 import {getSnapshotsAmount, saveSnapshot} from "../../../game/storage/interpolation.js";
+import {updateKillFeed} from "../../../../view/app/killFeedView.js";
 
 export function processWaitingMessage(parsedMessage, lobbyState) {
     if (!parsedMessage.oId || !parsedMessage.p) {
@@ -43,6 +44,7 @@ export function processCountdownMessage(parsedMessage, lobbyState) {
 }
 
 export function processGameAssignment(parsedMessage, gameState, gameNicknames) {
+    updateKillFeed(parsedMessage.k, gameNicknames, gameState.player, gameState.enemies);
     parsedMessage.p.forEach((player) => processPlayer(player, gameState));
     parsedMessage.b.forEach((bullet) => processBullet(bullet, gameState));
 

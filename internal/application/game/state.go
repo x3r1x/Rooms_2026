@@ -15,6 +15,7 @@ type GameState struct {
 	isGameActive  bool
 	gameStartTime time.Time
 	gameDuration  time.Duration
+	kills         []*domain.Kill
 	playerRooms   map[string]string
 	roomPlayers   map[string][]string
 	roomManager   interface{}
@@ -27,6 +28,7 @@ func NewGameState() *GameState {
 		bullets:      make([]domain.Bullet, 0),
 		gameDuration: domain.GameDuration * time.Second,
 		playerRooms:  make(map[string]string),
+		kills:        make([]*domain.Kill, 0),
 		roomPlayers:  make(map[string][]string),
 	}
 }
@@ -125,6 +127,18 @@ func (gs *GameState) GetRemainingSeconds() int {
 }
 
 // ==================
+
+func (gs *GameState) AddKill(killerId, victimId string) {
+	gs.kills = append(gs.kills, domain.NewKill(killerId, victimId, float64(time.Since(gs.gameStartTime).Milliseconds())))
+}
+
+func (gs *GameState) GetKills() []*domain.Kill {
+	return gs.kills
+}
+
+func (gs *GameState) ClearKills() {
+	gs.kills = gs.kills[:0]
+}
 
 func (gs *GameState) GetAllBullets() []domain.Bullet {
 	return gs.bullets

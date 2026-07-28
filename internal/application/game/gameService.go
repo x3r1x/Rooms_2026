@@ -148,6 +148,7 @@ func (gs *GameService) broadcast() {
 	bulletsByRoom := gs.gameState.GetBulletsByRoom()
 	gameTime := float64(time.Since(gs.gameState.GetGameStartTime()).Milliseconds())
 	statistic := gs.getInGameStatistics()
+	kills := gs.gameState.GetKills()
 	for roomId, playersInRoom := range playersByRoom {
 		msg := domain.ServerGameMessage{
 			State:     domain.OngoingGameState,
@@ -155,6 +156,7 @@ func (gs *GameService) broadcast() {
 			Players:   playersInRoom,
 			Bullets:   bulletsByRoom[roomId],
 			Statistic: statistic,
+			Kills:     kills,
 		}
 
 		data, err := json.Marshal(msg)
@@ -166,6 +168,8 @@ func (gs *GameService) broadcast() {
 			gs.broadcastService.BroadcastToPlayer(p.Id, data)
 		}
 	}
+
+	gs.gameState.ClearKills()
 }
 
 func (gs *GameService) broadcastFinal(message domain.ServerEndMessage) {

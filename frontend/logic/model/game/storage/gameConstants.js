@@ -17,6 +17,12 @@ export const GAME_CONSTANTS = {
 
     HEALTH_BAR_PATH: 'assets/images/health-bar_sheet.png',
 
+    PLAYER_TYPES: {
+        PISTOL: "g",
+        SHOTGUN: "r",
+        ROCKET_LAUNCHER: "s"
+    },
+
     BULLET: {
         PLAYER: {},
         ENEMY: {},
@@ -41,6 +47,8 @@ export const GAME_CONSTANTS = {
     SNAPSHOTS_AMOUNT: 100,
     INTERPOLATION_DELAY: 100,
     MAX_EXTRAPOLATION_TIME: 300,
+
+    KILL_FEED_DELETE_TIME: 5000,
 
     TILE_IMG_PATH: 'assets/tile/tileset x1.png'
 }
@@ -104,6 +112,12 @@ export const GAME_SPRITES = {
         MUZZLE_FLASH: new Image(),
         EXPLOSION: new Image(),
     },
+}
+
+export const WEAPON_SPRITES = {
+    PISTOL: "assets/images/pistol.png",
+    SHOTGUN: "assets/images/shotgun.png",
+    ROCKET_LAUNCHER: "assets/images/rocket_launcher.png"
 }
 
 export const TILE_IMG = {

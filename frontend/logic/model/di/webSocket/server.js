@@ -56,6 +56,9 @@ export function parseMessage(socket, message) {
             break;
 
         case APP_STATES.GAME_ONGOING:
+            if (parsedMessage.k.length !== 0) {
+                console.log("There!");
+            }
             switchToOngoingGameState();
             sendGameInfo(socket, gameState);
 

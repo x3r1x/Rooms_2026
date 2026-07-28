@@ -134,6 +134,7 @@ func (cs *CollisionService) HandlePlayerHit(player *domain.PlayerGameState, bull
 	if player.Health < 0 {
 		if killer, exist := cs.state.GetPlayer(bullet.OwnerId); exist {
 			killer.BodyCount++
+			cs.state.AddKill(killer.Id, player.Id)
 		}
 		player.DeathCount++
 		player.RebornTimer = domain.PlayerRebornTimer
@@ -166,7 +167,10 @@ func (cs *CollisionService) handleExplosion(bullet domain.Bullet) {
 			target.Health -= damageMultiplayer * domain.BulletDamageSom
 			if target.Health < 0 {
 				if killer, exists := cs.state.GetPlayer(bullet.OwnerId); exists {
-					killer.BodyCount++
+					if killer.Id != target.Id {
+						killer.BodyCount++
+					}
+					cs.state.AddKill(killer.Id, target.Id)
 				}
 				target.DeathCount++
 				target.RebornTimer = domain.PlayerRebornTimer

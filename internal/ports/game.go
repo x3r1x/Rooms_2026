@@ -22,6 +22,10 @@ type GameStateProvider interface {
 	SetBullets(bullets []domain.Bullet)
 	AddBullet(player *domain.PlayerGameState)
 
+	AddKill(killerId, victimId string)
+	GetKills() []*domain.Kill
+	ClearKills()
+
 	IsGameActive() bool
 	SetGameActive(active bool)
 	GetRemainingSeconds() int

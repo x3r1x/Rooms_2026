@@ -50,6 +50,7 @@ type ServerGameMessage struct {
 	Players   []*PlayerGameState `json:"p"`
 	Bullets   []*Bullet          `json:"b"`
 	Statistic []PlayerStatistic  `json:"stat"`
+	Kills     []*Kill            `json:"k"`
 }
 
 type ServerCountdownMessage struct {
