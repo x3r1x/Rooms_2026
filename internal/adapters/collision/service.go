@@ -18,12 +18,6 @@ func NewCollisionService(state ports.GameStateProvider) *CollisionService {
 func (cs *CollisionService) CheckBulletCollision(bullet domain.Bullet) (bool, *domain.PlayerGameState, *domain.Object) {
 	bulletSAT := cs.buildBulletSAT(bullet)
 
-	_, exists := cs.state.GetPlayer(bullet.OwnerId)
-	bulletRoomId := ""
-	if exists {
-		bulletRoomId = cs.state.GetPlayerRoom(bullet.OwnerId)
-	}
-
 	for _, player := range cs.state.GetAllPlayers() {
 		if player.Id == bullet.OwnerId {
 			continue
@@ -31,7 +25,7 @@ func (cs *CollisionService) CheckBulletCollision(bullet domain.Bullet) (bool, *d
 		if player.Health <= 0 {
 			continue
 		}
-		if cs.state.GetPlayerRoom(player.Id) != bulletRoomId {
+		if cs.state.GetPlayerRoom(player.Id) != bullet.RoomId {
 			continue
 		}
 		playerSAT := cs.buildPlayerSAT(player, true)
@@ -44,7 +38,7 @@ func (cs *CollisionService) CheckBulletCollision(bullet domain.Bullet) (bool, *d
 		if !object.IsSolid {
 			continue
 		}
-		if object.RoomId != "" && object.RoomId != bulletRoomId {
+		if object.RoomId != "" && object.RoomId != bullet.RoomId {
 			continue
 		}
 		objectSAT := cs.buildObjectSAT(object)
@@ -145,18 +139,17 @@ func (cs *CollisionService) TriggerExplosion(bullet domain.Bullet) {
 }
 
 func (cs *CollisionService) handleExplosion(bullet domain.Bullet) {
-	bulletRoomId := ""
-	if owner, exists := cs.state.GetPlayer(bullet.OwnerId); exists {
-		bulletRoomId = cs.state.GetPlayerRoom(owner.Id)
+	owner, ownerExists := cs.state.GetPlayer(bullet.OwnerId)
+	if !ownerExists {
+		return
 	}
 	for _, target := range cs.state.GetAllPlayers() {
 		if target.Health <= 0 {
 			continue
 		}
-		if cs.state.GetPlayerRoom(target.Id) != bulletRoomId {
+		if cs.state.GetPlayerRoom(target.Id) != bullet.RoomId {
 			continue
 		}
-
 		dx := target.X - bullet.X
 		dy := target.Y - bullet.Y
 		distance := math.Sqrt(dx*dx + dy*dy)
@@ -165,6 +158,9 @@ func (cs *CollisionService) handleExplosion(bullet domain.Bullet) {
 			damageMultiplayer := (1 - distance/domain.ExplosionRadius) * domain.BulletDamageMulti
 			target.Health -= damageMultiplayer * domain.BulletDamageSom
 			if target.Health < 0 {
+				if target.Id != owner.Id {
+					owner.BodyCount++
+				}
 				target.DeathCount++
 				target.RebornTimer = domain.PlayerRebornTimer
 			}

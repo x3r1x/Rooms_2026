@@ -216,6 +216,8 @@ func (gs *GameService) updateBullets() {
 				continue
 			}
 			activeBullets = append(activeBullets, bullet)
+		} else if bullet.Life <= 0 && bullet.Type == domain.PlayerSom {
+			gs.collisionService.TriggerExplosion(bullet)
 		}
 	}
 	gs.gameState.SetBullets(activeBullets)
