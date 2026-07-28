@@ -3,9 +3,12 @@ package broadcast
 import (
 	"encoding/json"
 	"log"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
+
+const writeDeadline = 3 * time.Second
 
 type BroadcastService struct {
 	addConnChan    chan connectionEvent
@@ -94,6 +97,7 @@ func (bs *BroadcastService) sendToAll(message interface{}) {
 	}
 
 	for id, conn := range bs.connections {
+		conn.SetWriteDeadline(time.Now().Add(writeDeadline))
 		if err := conn.WriteMessage(websocket.TextMessage, data); err != nil {
 			log.Printf("Ошибка отправки игроку %s: %v", id, err)
 			bs.RemoveConnection(id)
@@ -118,8 +122,9 @@ func (bs *BroadcastService) sendToPlayer(playerId string, message interface{}) {
 		log.Printf("Соединение для игрока %s не найдено", playerId)
 		return
 	}
-
+	conn.SetWriteDeadline(time.Now().Add(writeDeadline))
 	if err := conn.WriteMessage(websocket.TextMessage, data); err != nil {
 		log.Printf("Ошибка отправки игроку %s: %v", playerId, err)
+		bs.RemoveConnection(playerId)
 	}
 }
