@@ -1,6 +1,7 @@
 package ports
 
 import (
+	_map "gamedevRooms/internal/adapters/map"
 	"gamedevRooms/internal/domain"
 	"time"
 )
@@ -28,8 +29,8 @@ type GameStateProvider interface {
 
 	GetPlayerRoom(id string) string
 	SetPlayerRoom(id, roomId string)
-	GetRoomManager() interface{}
-	SetRoomManager(roomManager interface{})
+	GetRoomManager() *_map.MapManager
+	SetRoomManager(roomManager *_map.MapManager)
 	GetCountOfPlayers() int
 	GetPlayersByRoom() map[string][]*domain.PlayerGameState
 	GetGameStartTime() time.Time

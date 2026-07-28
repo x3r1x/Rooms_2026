@@ -182,11 +182,7 @@ func (cs *CollisionService) CheckPlayerExitCollision(player *domain.PlayerGameSt
 		return false, "", ""
 	}
 
-	mapManager, ok := cs.state.GetRoomManager().(ports.MapManager)
-	if !ok || mapManager == nil {
-		log.Printf("RoomManager is not MapManager or is nil")
-		return false, "", ""
-	}
+	mapManager := cs.state.GetRoomManager()
 	roomInfo := mapManager.GetRoomInfo(currentRoomId)
 	if roomInfo == nil {
 		return false, "", ""

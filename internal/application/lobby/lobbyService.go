@@ -1,6 +1,8 @@
 package lobby
 
 import (
+	"gamedevRooms/internal/adapters/broadcast"
+	_map "gamedevRooms/internal/adapters/map"
 	"gamedevRooms/internal/application/game"
 	"gamedevRooms/internal/domain"
 	"gamedevRooms/internal/ports"
@@ -23,8 +25,8 @@ type LobbyService struct {
 	removeChan chan lobbyRemoveEvent
 
 	gameStateProvider ports.GameStateProvider
-	mapManager        ports.MapManager
-	broadcastService  ports.BroadcastService
+	mapManager        *_map.MapManager
+	broadcastService  *broadcast.BroadcastService
 }
 
 type lobbyAddEvent struct {
@@ -39,8 +41,8 @@ type lobbyRemoveEvent struct {
 
 func NewLobbyService(
 	gameStateProvider ports.GameStateProvider,
-	mapManager ports.MapManager,
-	broadcastService ports.BroadcastService,
+	mapManager *_map.MapManager,
+	broadcastService *broadcast.BroadcastService,
 ) *LobbyService {
 	l := &LobbyService{
 		state:             domain.WaitingLobbyState,
