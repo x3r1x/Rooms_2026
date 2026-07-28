@@ -1,9 +1,11 @@
 package lobby
 
 import (
+	"gamedevRooms/internal/adapters/broadcast"
+	_map "gamedevRooms/internal/adapters/map"
 	"gamedevRooms/internal/application/game"
 	"gamedevRooms/internal/domain"
-	"gamedevRooms/internal/ports"
+	"gamedevRooms/internal/state"
 	"log"
 	"sync"
 	"time"
@@ -20,11 +22,11 @@ type LobbyService struct {
 
 	addChan    chan lobbyAddEvent
 	readyChan  chan *domain.LobbyPlayer
-	removeChan chan string
+	removeChan chan lobbyRemoveEvent
 
-	gameStateProvider ports.GameStateProvider
-	mapManager        ports.MapManager
-	broadcastService  ports.BroadcastService
+	gameState        *state.GameState
+	mapManager       *_map.MapManager
+	broadcastService *broadcast.BroadcastService
 }
 
 type lobbyAddEvent struct {
@@ -32,20 +34,25 @@ type lobbyAddEvent struct {
 	conn   *websocket.Conn
 }
 
+type lobbyRemoveEvent struct {
+	id    string
+	force bool
+}
+
 func NewLobbyService(
-	gameStateProvider ports.GameStateProvider,
-	mapManager ports.MapManager,
-	broadcastService ports.BroadcastService,
+	gameStateProvider *state.GameState,
+	mapManager *_map.MapManager,
+	broadcastService *broadcast.BroadcastService,
 ) *LobbyService {
 	l := &LobbyService{
-		state:             domain.WaitingLobbyState,
-		players:           make(map[string]*domain.LobbyPlayer),
-		gameStateProvider: gameStateProvider,
-		mapManager:        mapManager,
-		broadcastService:  broadcastService,
-		addChan:           make(chan lobbyAddEvent),
-		readyChan:         make(chan *domain.LobbyPlayer),
-		removeChan:        make(chan string),
+		state:            domain.WaitingLobbyState,
+		players:          make(map[string]*domain.LobbyPlayer),
+		gameState:        gameStateProvider,
+		mapManager:       mapManager,
+		broadcastService: broadcastService,
+		addChan:          make(chan lobbyAddEvent),
+		readyChan:        make(chan *domain.LobbyPlayer),
+		removeChan:       make(chan lobbyRemoveEvent),
 	}
 	go l.run()
 	return l
@@ -64,8 +71,8 @@ func (l *LobbyService) UpdatePlayerInLobby(msg *domain.LobbyPlayer) {
 	l.readyChan <- msg
 }
 
-func (l *LobbyService) RemovePlayerFromLobby(id string) {
-	l.removeChan <- id
+func (l *LobbyService) RemovePlayerFromLobby(id string, force bool) {
+	l.removeChan <- lobbyRemoveEvent{id, force}
 }
 
 func (l *LobbyService) GetState() string {
@@ -154,13 +161,17 @@ func (l *LobbyService) sendReadyState(roomMessages map[string]domain.RoomMessage
 	}
 }
 
-func (l *LobbyService) removeUser(id string) {
-	player, exists := l.players[id]
+func (l *LobbyService) removeUser(event lobbyRemoveEvent) {
+	player, exists := l.players[event.id]
 	if !exists {
-		l.broadcastService.RemoveConnection(id)
+		l.broadcastService.RemoveConnection(event.id)
 		if l.state == domain.OngoingGameState && l.gameService != nil {
-			l.gameService.DeletePlayer(id)
+			l.gameService.DeletePlayer(event.id)
 		}
+		return
+	}
+
+	if player.Ready && !event.force {
 		return
 	}
 
@@ -168,14 +179,24 @@ func (l *LobbyService) removeUser(id string) {
 		l.playersReady--
 	}
 
-	l.broadcastService.RemoveConnection(id)
+	l.broadcastService.RemoveConnection(event.id)
 	if l.state == domain.OngoingGameState && l.gameService != nil {
-		l.gameService.DeletePlayer(id)
+		l.gameService.DeletePlayer(event.id)
 	}
 
-	delete(l.players, id)
-	log.Printf("Игрок %s покинул лобби. Осталось: %d", id, len(l.players))
+	delete(l.players, event.id)
+	log.Printf("Игрок %s покинул лобби. Осталось: %d", event.id, len(l.players))
 	l.broadcastLobbyState()
+	if l.state == domain.WaitingLobbyState {
+		currentTotal := len(l.players)
+		if currentTotal >= domain.MinCountOfPlayers &&
+			l.playersReady == currentTotal {
+
+			log.Println("После удаления игрока все оставшиеся готовы! Запускаем игру...")
+			l.StartGame()
+		}
+
+	}
 }
 
 func (l *LobbyService) doCountdown() {
@@ -198,11 +219,11 @@ func (l *LobbyService) StartGame() {
 		log.Println("ERROR: GameService is nil! Cannot start game.")
 		return
 	}
-	l.gameStateProvider.SetRoomManager(l.mapManager)
+	l.gameState.SetRoomManager(l.mapManager)
 
 	for _, player := range l.players {
 		if player.Ready {
-			l.gameStateProvider.AddPlayer(domain.NewPlayerGameState(
+			l.gameState.AddPlayer(domain.NewPlayerGameState(
 				player.Id,
 				player.Nickname,
 				player.PlayerClass,
@@ -210,7 +231,7 @@ func (l *LobbyService) StartGame() {
 		}
 	}
 
-	l.mapManager.LoadMapObjects(l.gameStateProvider)
+	l.mapManager.LoadMapObjects(l.gameState.GetCountOfPlayers())
 	roomMessages := l.mapManager.GetRoomMessages()
 	roomIDs := make([]string, 0, len(roomMessages))
 	for roomId := range roomMessages {
@@ -221,7 +242,7 @@ func (l *LobbyService) StartGame() {
 	if len(roomMessages) > 0 {
 		i, k := 1, 0
 		var spawnX, spawnY float64
-		for _, player := range l.gameStateProvider.GetAllPlayers() {
+		for _, player := range l.gameState.GetAllPlayers() {
 			position := i % 3
 			switch position {
 			case 0:
@@ -236,7 +257,7 @@ func (l *LobbyService) StartGame() {
 			}
 			player.X = spawnX
 			player.Y = spawnY
-			l.gameStateProvider.SetPlayerRoom(player.Id, roomIDs[k])
+			l.gameState.SetPlayerRoom(player.Id, roomIDs[k])
 			if i < 3 {
 				i++
 			} else {
@@ -264,8 +285,8 @@ func (l *LobbyService) HandleGameEnd() {
 	l.state = domain.WaitingLobbyState
 	l.playersReady = 0
 
-	for _, player := range l.gameStateProvider.GetAllPlayers() {
-		l.gameStateProvider.RemovePlayer(player.Id)
+	for _, player := range l.gameState.GetAllPlayers() {
+		l.gameState.RemovePlayer(player.Id)
 	}
 
 	l.broadcastLobbyState()

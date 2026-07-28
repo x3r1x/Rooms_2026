@@ -7,9 +7,12 @@ import (
 	"gamedevRooms/internal/domain"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
+
+const readDeadline = 30 * time.Second
 
 type WebsocketHandler struct {
 	lobby *lobby.LobbyService
@@ -40,9 +43,15 @@ func (wsh *WebsocketHandler) InitWebsocket(w http.ResponseWriter, r *http.Reques
 func (wsh *WebsocketHandler) HandleWebsocket(conn *websocket.Conn) {
 	var currentId string
 
+	conn.SetReadDeadline(time.Now().Add(readDeadline))
+	conn.SetPongHandler(func(string) error {
+		conn.SetReadDeadline(time.Now().Add(readDeadline))
+		log.Printf("Pong от игрока %s", currentId)
+		return nil
+	})
 	defer func() {
 		if currentId != "" {
-			wsh.lobby.RemovePlayerFromLobby(currentId)
+			wsh.lobby.RemovePlayerFromLobby(currentId, false)
 		}
 	}()
 
@@ -84,7 +93,7 @@ func (wsh *WebsocketHandler) handleWaitingLobbyState(p []byte, id string, conn *
 
 	if id != "" {
 		log.Println("Удаляем пользователя: ", id)
-		wsh.lobby.RemovePlayerFromLobby(id)
+		wsh.lobby.RemovePlayerFromLobby(id, true)
 	}
 	return id
 }

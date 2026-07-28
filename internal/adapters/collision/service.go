@@ -2,27 +2,21 @@ package collision
 
 import (
 	"gamedevRooms/internal/domain"
-	"gamedevRooms/internal/ports"
+	"gamedevRooms/internal/state"
 	"log"
 	"math"
 )
 
 type CollisionService struct {
-	state ports.GameStateProvider
+	state *state.GameState
 }
 
-func NewCollisionService(state ports.GameStateProvider) *CollisionService {
+func NewCollisionService(state *state.GameState) *CollisionService {
 	return &CollisionService{state: state}
 }
 
 func (cs *CollisionService) CheckBulletCollision(bullet domain.Bullet) (bool, *domain.PlayerGameState, *domain.Object) {
 	bulletSAT := cs.buildBulletSAT(bullet)
-
-	_, exists := cs.state.GetPlayer(bullet.OwnerId)
-	bulletRoomId := ""
-	if exists {
-		bulletRoomId = cs.state.GetPlayerRoom(bullet.OwnerId)
-	}
 
 	for _, player := range cs.state.GetAllPlayers() {
 		if player.Id == bullet.OwnerId {
@@ -31,7 +25,7 @@ func (cs *CollisionService) CheckBulletCollision(bullet domain.Bullet) (bool, *d
 		if player.Health <= 0 {
 			continue
 		}
-		if cs.state.GetPlayerRoom(player.Id) != bulletRoomId {
+		if cs.state.GetPlayerRoom(player.Id) != bullet.RoomId {
 			continue
 		}
 		playerSAT := cs.buildPlayerSAT(player, true)
@@ -44,7 +38,7 @@ func (cs *CollisionService) CheckBulletCollision(bullet domain.Bullet) (bool, *d
 		if !object.IsSolid {
 			continue
 		}
-		if object.RoomId != "" && object.RoomId != bulletRoomId {
+		if object.RoomId != "" && object.RoomId != bullet.RoomId {
 			continue
 		}
 		objectSAT := cs.buildObjectSAT(object)
@@ -146,18 +140,17 @@ func (cs *CollisionService) TriggerExplosion(bullet domain.Bullet) {
 }
 
 func (cs *CollisionService) handleExplosion(bullet domain.Bullet) {
-	bulletRoomId := ""
-	if owner, exists := cs.state.GetPlayer(bullet.OwnerId); exists {
-		bulletRoomId = cs.state.GetPlayerRoom(owner.Id)
+	owner, ownerExists := cs.state.GetPlayer(bullet.OwnerId)
+	if !ownerExists {
+		return
 	}
 	for _, target := range cs.state.GetAllPlayers() {
 		if target.Health <= 0 {
 			continue
 		}
-		if cs.state.GetPlayerRoom(target.Id) != bulletRoomId {
+		if cs.state.GetPlayerRoom(target.Id) != bullet.RoomId {
 			continue
 		}
-
 		dx := target.X - bullet.X
 		dy := target.Y - bullet.Y
 		distance := math.Sqrt(dx*dx + dy*dy)
@@ -193,11 +186,7 @@ func (cs *CollisionService) CheckPlayerExitCollision(player *domain.PlayerGameSt
 		return false, "", ""
 	}
 
-	mapManager, ok := cs.state.GetRoomManager().(ports.MapManager)
-	if !ok || mapManager == nil {
-		log.Printf("RoomManager is not MapManager or is nil")
-		return false, "", ""
-	}
+	mapManager := cs.state.GetRoomManager()
 	roomInfo := mapManager.GetRoomInfo(currentRoomId)
 	if roomInfo == nil {
 		return false, "", ""

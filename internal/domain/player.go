@@ -87,6 +87,7 @@ func createGunBullets(player *PlayerGameState) []Bullet {
 		Speed:     BulletSpeedGun,
 		OwnerId:   player.Id,
 		Type:      PlayerGun,
+		RoomId:    player.RoomId,
 	}}
 }
 
@@ -111,6 +112,7 @@ func createRifleBullets(player *PlayerGameState) []Bullet {
 			Speed:     BulletSpeedRifle,
 			OwnerId:   player.Id,
 			Type:      PlayerRifle,
+			RoomId:    player.RoomId,
 		})
 	}
 
@@ -134,5 +136,6 @@ func createSomBullet(player *PlayerGameState) []Bullet {
 		Speed:     BulletSpeedSom,
 		OwnerId:   player.Id,
 		Type:      PlayerSom,
+		RoomId:    player.RoomId,
 	}}
 }

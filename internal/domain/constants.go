@@ -43,7 +43,7 @@ const (
 	PlayerRebornTimer = 300
 	// константы общие служебные
 	TickTime                     = 16
-	GameDuration                 = 40
+	GameDuration                 = 120
 	MinCountOfPlayers            = 2
 	MinBarrierType               = 1
 	MaxBarrierType               = 7
