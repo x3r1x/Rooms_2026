@@ -1,7 +1,8 @@
-package game
+package state
 
 import (
 	"fmt"
+	_map "gamedevRooms/internal/adapters/map"
 	"gamedevRooms/internal/domain"
 	"log"
 	"time"
@@ -17,7 +18,7 @@ type GameState struct {
 	gameDuration  time.Duration
 	playerRooms   map[string]string
 	roomPlayers   map[string][]string
-	roomManager   interface{}
+	roomManager   *_map.MapManager
 }
 
 func NewGameState() *GameState {
@@ -31,7 +32,6 @@ func NewGameState() *GameState {
 	}
 }
 
-// ====ROOM====
 func (gs *GameState) GetPlayerRoom(id string) string {
 	if roomId, exists := gs.playerRooms[id]; exists {
 		return roomId
@@ -55,11 +55,11 @@ func (gs *GameState) GetGameStartTime() time.Time {
 	return gs.gameStartTime
 }
 
-func (gs *GameState) GetRoomManager() interface{} {
+func (gs *GameState) GetRoomManager() *_map.MapManager {
 	return gs.roomManager
 }
 
-func (gs *GameState) SetRoomManager(mm interface{}) {
+func (gs *GameState) SetRoomManager(mm *_map.MapManager) {
 	gs.roomManager = mm
 }
 
@@ -77,8 +77,6 @@ func (gs *GameState) removePlayerFromRoom(roomId, playerId string) {
 	}
 }
 
-// ==================
-// ===== OBJECT =====
 func (gs *GameState) GetObjects() map[string]*domain.Object {
 	return gs.objects
 }
@@ -96,10 +94,6 @@ func (gs *GameState) RemoveObject(id string) {
 		delete(gs.objects, id)
 	}
 }
-
-// ==================
-
-// === LOBBITOMIA ===
 
 func (gs *GameState) IsGameActive() bool {
 	return gs.isGameActive
@@ -123,8 +117,6 @@ func (gs *GameState) GetRemainingSeconds() int {
 	}
 	return int((gs.gameDuration - elapsed).Seconds())
 }
-
-// ==================
 
 func (gs *GameState) GetAllBullets() []domain.Bullet {
 	return gs.bullets
@@ -155,32 +147,6 @@ func (gs *GameState) AddPlayer(player *domain.PlayerGameState) {
 func (gs *GameState) RemovePlayer(playerId string) {
 	fmt.Println("Delete ", playerId)
 	delete(gs.players, playerId)
-}
-
-func (gs *GameState) UpdatePlayer(upd domain.ClientGameMessage) {
-	player, exist := gs.GetPlayer(upd.Id)
-	if !exist || player == nil {
-		return
-	}
-
-	player.Angle = upd.Angle
-	player.MoveX = upd.MX
-	player.MoveY = upd.MY
-
-	if gs.isGameActive && player.Health > 0 && upd.IsShoot && player.CooldownTimer <= 0 {
-		gs.AddBullet(player)
-		player.CooldownTimer = domain.ShootCooldown
-	}
-	if player.Health < 0 && player.RebornTimer != 0 {
-		player.RebornTimer--
-	} else if player.Health < 0 && player.RebornTimer == 0 {
-		player.Health = domain.MaxPlayerHealth
-	}
-}
-
-func (gs *GameState) AddBullet(player *domain.PlayerGameState) {
-	bullets := player.Weapon(player)
-	gs.bullets = append(gs.bullets, bullets...)
 }
 
 func (gs *GameState) GetCountOfPlayers() int {
