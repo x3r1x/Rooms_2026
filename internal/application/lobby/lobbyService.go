@@ -231,7 +231,8 @@ func (l *LobbyService) StartGame() {
 		}
 	}
 
-	l.mapManager.LoadMapObjects(l.gameState.GetCountOfPlayers())
+	objects := l.mapManager.LoadMapObjects(l.gameState.GetCountOfPlayers())
+	l.gameState.SetObjects(objects)
 	roomMessages := l.mapManager.GetRoomMessages()
 	roomIDs := make([]string, 0, len(roomMessages))
 	for roomId := range roomMessages {

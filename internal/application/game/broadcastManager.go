@@ -42,6 +42,7 @@ func (bm *BroadcastManager) broadcast() {
 	bullets := bm.gameState.GetAllBullets()
 	gameTime := float64(time.Since(bm.gameState.GetGameStartTime()).Milliseconds())
 	statistic := bm.getInGameStatistics()
+	kills := bm.gameState.GetKills()
 	for _, playersInRoom := range playersByRoom {
 		msg := domain.ServerGameMessage{
 			State:     domain.OngoingGameState,
@@ -49,17 +50,17 @@ func (bm *BroadcastManager) broadcast() {
 			Players:   playersInRoom,
 			Bullets:   bullets,
 			Statistic: statistic,
+			Kills:     kills,
 		}
-
 		data, err := json.Marshal(msg)
 		if err != nil {
 			continue
 		}
-
 		for _, p := range playersInRoom {
 			bm.broadcastService.BroadcastToPlayer(p.Id, data)
 		}
 	}
+	bm.gameState.ClearKills()
 }
 
 func (bm *BroadcastManager) broadcastFinal(message domain.ServerEndMessage) {

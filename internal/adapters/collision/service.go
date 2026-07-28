@@ -140,7 +140,7 @@ func (cs *CollisionService) TriggerExplosion(bullet domain.Bullet) {
 }
 
 func (cs *CollisionService) handleExplosion(bullet domain.Bullet) {
-	owner, ownerExists := cs.state.GetPlayer(bullet.OwnerId)
+	_, ownerExists := cs.state.GetPlayer(bullet.OwnerId)
 	if !ownerExists {
 		return
 	}
