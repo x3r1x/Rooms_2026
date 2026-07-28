@@ -29,7 +29,7 @@ function drawEffect(context, fx) {
 
     context.save();
     context.translate(fx.x, fx.y);
-    context.rotate(fx.direction + Math.PI);
+    context.rotate(fx.direction);
 
     context.drawImage(
         spriteSheet,
@@ -92,7 +92,7 @@ export function checkAndSpawnNewBulletEffects(stateA, stateB) {
                     spawnEffect(
                         bulletB.x,
                         bulletB.y,
-                        "MUZZLE_FLASH",
+                        "MUZZLE_FLASH_S",
                         bulletB.a
                     );
                     break;

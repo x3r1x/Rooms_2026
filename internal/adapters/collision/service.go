@@ -122,14 +122,14 @@ func (cs *CollisionService) HandlePlayerHit(player *domain.PlayerGameState, bull
 	player.Health -= cs.calculateDamage(bullet)
 	log.Printf("HIT! Player %s took damage. Health: %.2f", player.Id, player.Health)
 
-	//knockbackX := math.Cos(bullet.Direction) * cs.calculateKnockbackKoef(bullet)
-	//knockbackY := math.Sin(bullet.Direction) * cs.calculateKnockbackKoef(bullet)
-	//player.X += knockbackX
-	//player.Y += knockbackY
+	knockbackX := math.Cos(bullet.Direction) * cs.calculateKnockbackKoef(bullet)
+	knockbackY := math.Sin(bullet.Direction) * cs.calculateKnockbackKoef(bullet)
+	player.X += knockbackX
+	player.Y += knockbackY
 
-	//if hit, _ := cs.CheckPlayerObjectCollision(player); hit {
-	//	cs.ResolvePlayerCollisionSmooth(player)
-	//}
+	if hit, _ := cs.CheckPlayerObjectCollision(player); hit {
+		cs.ResolvePlayerCollisionSmooth(player)
+	}
 
 	if player.Health < 0 {
 		if killer, exist := cs.state.GetPlayer(bullet.OwnerId); exist {
@@ -176,9 +176,9 @@ func (cs *CollisionService) calculateDamage(bullet domain.Bullet) float64 {
 	return math.Round(bullet.Damage * domain.BulletDamageMulti)
 }
 
-//func (cs *CollisionService) calculateKnockbackKoef(bullet model.Bullet) float64 {
-//	return model.KnockbackForce * (bullet.Life/model.BulletLife*model.BulletDamageMulti + 1)
-//}
+func (cs *CollisionService) calculateKnockbackKoef(bullet domain.Bullet) float64 {
+	return domain.KnockbackForce * (bullet.Life/60*domain.BulletDamageMulti + 1)
+}
 
 func (cs *CollisionService) CheckPlayerExitCollision(player *domain.PlayerGameState) (bool, string, string) {
 	currentRoomId := cs.state.GetPlayerRoom(player.Id)
