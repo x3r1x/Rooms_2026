@@ -173,11 +173,11 @@ func (gs *GameState) GetCountOfPlayers() int {
 	return len(gs.players)
 }
 
-func (gs *GameState) GetPlayersByRoom() map[string][]*domain.PlayerGameState {
-	rooms := make(map[string][]*domain.PlayerGameState)
+func (gs *GameState) GetPlayersByRoom() map[string][]domain.PlayerGameState {
+	rooms := make(map[string][]domain.PlayerGameState)
 	for id, roomId := range gs.playerRooms {
 		if player, exists := gs.players[id]; exists {
-			rooms[roomId] = append(rooms[roomId], player)
+			rooms[roomId] = append(rooms[roomId], *player)
 		}
 	}
 	return rooms

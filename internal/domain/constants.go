@@ -2,19 +2,19 @@ package domain
 
 const (
 	// константы для пуль
-	BulletSpeedGun    = 25.0
-	BulletSpeedRifle  = 15.0
+	BulletSpeedGun    = 20.0
+	BulletSpeedRifle  = 25.0
 	BulletSpeedSom    = 3.0
 	BulletLifeGun     = 60.0
-	BulletLifeRifle   = 30.0
+	BulletLifeRifle   = 4.0
 	BulletLifeSom     = 600
-	BulletDamageGun   = 20.0
+	BulletDamageGun   = 12.0
 	BulletDamageRifle = 6.0
 	BulletDamageSom   = 100.0
 	PelletCount       = 5
-	SpreadAngle       = 0.4
+	SpreadAngle       = 0.6
 
-	ShootCooldown     = 15
+	ShootCooldown     = 16
 	BulletLengthGun   = 16.0
 	BulletWidthGun    = 7.0
 	BulletLengthRifle = 3.0
@@ -23,6 +23,7 @@ const (
 	BulletWidthSom    = 3.0
 	BulletDamageMulti = 1.2
 	ExplosionRadius   = 250
+	RecoilDistance    = 8.0
 	KnockbackForce    = 12.0
 	// константы для игроков
 	InitDirection     = 0
@@ -40,7 +41,7 @@ const (
 	PlayerShieldTimer = 200
 	// константы общие служебные
 	TickTime                     = 16
-	GameDuration                 = 120
+	GameDuration                 = 20
 	MinCountOfPlayers            = 2
 	MinBarrierType               = 1
 	MaxBarrierType               = 7

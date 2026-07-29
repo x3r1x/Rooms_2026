@@ -12,7 +12,7 @@ body {
 
 .wrapper-nickname {
     display: flex;
-    background-image: url(../assets/images/background.png);
+    background-image: url(assets/images/background.png);
     background-size: cover;
     justify-content: center;
     align-content: center;
@@ -56,6 +56,7 @@ body {
     image-rendering: pixelated;
     display: block;
     object-fit: contain;
+    cursor: crosshair;
 }
 
 .nickname-field {
@@ -99,7 +100,7 @@ body {
     border: 5px solid #ffffff;
     color: #ffffff;
     border-radius: 15px;
-    padding-left: 2vh;
+    padding-left: 1vh;
 }
 
 .button-send-nickname {
@@ -293,7 +294,7 @@ body {
     height: 90%;
     border: 5px solid #ffffff;
     border-radius: 15px;
-    background-image: url('../assets/images/background.png');
+    background-image: url('assets/images/background.png');
     flex-direction: column;
     gap: 5vh;
 }
@@ -367,8 +368,11 @@ body {
 
 .kill-feed-wrapper {
     position: absolute;
+    display: flex;
+    flex-direction: column;
     top: 100px;
     right: 0;
+    gap: 10px;
     max-width: 300px;
     min-width: 300px;
     overflow-x: hidden;
