@@ -81,6 +81,7 @@ func (gs *GameService) Run() {
 				gs.Stop()
 			}
 			gs.broadcastManager.broadcast()
+			gs.gameState.ClearKills()
 		}
 	}
 }

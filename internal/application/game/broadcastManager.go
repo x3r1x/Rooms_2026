@@ -39,16 +39,16 @@ func (bm *BroadcastManager) createRoomSnapshot(roomId string) ([]domain.PlayerGa
 
 func (bm *BroadcastManager) broadcast() {
 	playersByRoom := bm.gameState.GetPlayersByRoom()
-	bullets := bm.gameState.GetAllBullets()
+	bullets := bm.gameState.GetBulletsByRoom()
 	gameTime := float64(time.Since(bm.gameState.GetGameStartTime()).Milliseconds())
 	statistic := bm.getInGameStatistics()
 	kills := bm.gameState.GetKills()
-	for _, playersInRoom := range playersByRoom {
+	for roomId, playersInRoom := range playersByRoom {
 		msg := domain.ServerGameMessage{
 			State:     domain.OngoingGameState,
 			Time:      gameTime,
 			Players:   playersInRoom,
-			Bullets:   bullets,
+			Bullets:   bullets[roomId],
 			Statistic: statistic,
 			Kills:     kills,
 		}
@@ -60,7 +60,6 @@ func (bm *BroadcastManager) broadcast() {
 			bm.broadcastService.BroadcastToPlayer(p.Id, data)
 		}
 	}
-	bm.gameState.ClearKills()
 }
 
 func (bm *BroadcastManager) broadcastFinal(message domain.ServerEndMessage) {
