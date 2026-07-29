@@ -45,12 +45,12 @@ type ServerReadyMessage struct {
 }
 
 type ServerGameMessage struct {
-	State     string             `json:"s"`
-	Time      float64            `json:"t"`
-	Players   []*PlayerGameState `json:"p"`
-	Bullets   []Bullet           `json:"b"`
-	Statistic []PlayerStatistic  `json:"stat"`
-	Kills     []*Kill            `json:"k"`
+	State     string            `json:"s"`
+	Time      float64           `json:"t"`
+	Players   []PlayerGameState `json:"p"`
+	Bullets   []Bullet          `json:"b"`
+	Statistic []PlayerStatistic `json:"stat"`
+	Kills     []*Kill           `json:"k"`
 }
 
 type ServerCountdownMessage struct {
