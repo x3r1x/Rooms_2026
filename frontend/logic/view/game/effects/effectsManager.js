@@ -41,11 +41,9 @@ function drawEffect(context, fx) {
 }
 
 export function checkAndSpawnEffects(neighbouredSnapshots) {
-    checkAndSpawnNewBulletEffects(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB);
     checkAndSpawnExplosions(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB);
     checkAndSpawnDie(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB);
     checkAndSpawnHit(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB);
-    checkAndSpawnShield(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB);
 }
 
 export function updateAndDrawEffects(context) {
@@ -65,7 +63,7 @@ export function updateAndDrawEffects(context) {
     }
 }
 
-function checkAndSpawnNewBulletEffects(stateA, stateB) {
+/*function checkAndSpawnNewBulletEffects(stateA, stateB) {
     if (!stateA || !stateB || !stateA.b || !stateB.b) return;
 
     for (let i = 0; i < stateB.b.length; i++) {
@@ -109,7 +107,7 @@ function checkAndSpawnNewBulletEffects(stateA, stateB) {
 
         }
     }
-}
+}*/
 
 function checkAndSpawnExplosions(stateA, stateB) {
     if (!stateA || !stateB || !stateA.b || !stateB.b) return;
@@ -162,14 +160,14 @@ function checkAndSpawnDie(stateA, stateB){
     const newPlayers = stateB.p;
 
     for (let i = 0; i < newPlayers.length; i++) {
-        const newEntity = newPlayers[i];
-        const oldEntity = oldPlayers.find(e => e.id === newEntity.id);
-        if (oldEntity && oldEntity.h > 0 && newEntity.h <= 0) {
+        const newPlayer = newPlayers[i];
+        const oldPlayer = oldPlayer.find(e => e.id === newPlayer.id);
+        if (oldPlayers && oldPlayer.h > 0 && newPlayer.h <= 0) {
             spawnEffect(
-                newEntity.x,
-                newEntity.y,
+                newPlayer.x,
+                newPlayer.y,
                 "PLAYER_DEATH",
-                newEntity.a || 0
+                newPlayer.a
             );
         }
     }
@@ -189,27 +187,7 @@ function checkAndSpawnHit(stateA, stateB){
                 newPlayer.x,
                 newPlayer.y,
                 "PLAYER_HIT",
-                newPlayer.a || 0
-            );
-        }
-    }
-}
-
-function checkAndSpawnShield(stateA, stateB){
-    if (!stateA || !stateB) return;
-
-    const oldPlayers = stateA.p;
-    const newPlayers = stateB.p;
-
-    for (let i = 0; i < newPlayers.length; i++) {
-        const newPlayer = newPlayers[i];
-        const oldPlayer = oldPlayers.find(e => e.id === newPlayer.id);
-        if (oldPlayer && oldPlayer.h <= 0 && newPlayer.h > 0) {
-            spawnEffect(
-                newPlayer.x,
-                newPlayer.y,
-                "SHIELD",
-                newPlayer.a || 0
+                newPlayer.a
             );
         }
     }

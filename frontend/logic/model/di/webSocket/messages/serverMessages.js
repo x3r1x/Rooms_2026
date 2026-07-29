@@ -67,6 +67,7 @@ function processPlayer(player, state) {
         rebornTime: player.rt,
         roomId: player.room_id,
         pc: player.pc,
+        ps: player.ps,
     };
 
     if (newPlayerInModel.id === state.player.id) {
