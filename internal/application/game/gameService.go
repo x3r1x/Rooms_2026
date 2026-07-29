@@ -74,8 +74,8 @@ func (gs *GameService) Run() {
 		case <-ticker.C:
 			gs.gameState.IncrementTick()
 			gs.physicsEngine.updateShooterTimers()
-			gs.physicsEngine.updateBullets()
 			gs.physicsEngine.updatePlayers()
+			gs.physicsEngine.updateBullets()
 			remaining := gs.gameState.GetRemainingSeconds()
 			if remaining <= 0 {
 				gs.Stop()

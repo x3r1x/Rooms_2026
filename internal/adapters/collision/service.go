@@ -128,7 +128,7 @@ func (cs *CollisionService) HandlePlayerHit(player *domain.PlayerGameState, bull
 		cs.ResolvePlayerCollisionSmooth(player)
 	}
 
-	if player.Health < 0 {
+	if player.Health <= 0 {
 		if killer, exist := cs.state.GetPlayer(bullet.OwnerId); exist {
 			killer.BodyCount++
 			cs.state.AddKill(killer.Id, player.Id)
