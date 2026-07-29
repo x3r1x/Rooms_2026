@@ -74,6 +74,17 @@ func (p *PlayerGameState) setupWeaponByClass() {
 	}
 }
 
+func (p *PlayerGameState) SetCooldown() {
+	switch p.PlayerClass {
+	case PlayerGun:
+		p.CooldownTimer = ShootCooldown - 1
+	case PlayerRifle:
+		p.CooldownTimer = ShootCooldown*2 - 1
+	case PlayerSom:
+		p.CooldownTimer = ShootCooldown*10 - 1
+	}
+}
+
 func createGunBullets(player *PlayerGameState) []Bullet {
 	rotatedX := GunOffsetX*math.Cos(player.Angle) - GunOffsetY*math.Sin(player.Angle)
 	rotatedY := GunOffsetX*math.Sin(player.Angle) + GunOffsetY*math.Cos(player.Angle)

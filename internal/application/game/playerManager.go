@@ -25,13 +25,7 @@ func (pm *PlayerManager) UpdatePlayer(upd domain.ClientGameMessage) {
 
 	if pm.gameState.IsGameActive() && player.Health > 0 && upd.IsShoot && player.CooldownTimer <= 0 {
 		pm.AddBullet(player)
-		player.CooldownTimer = domain.ShootCooldown
-	}
-	if player.Health < 0 && player.RebornTimer != 0 {
-		player.RebornTimer--
-	} else if player.Health < 0 && player.RebornTimer == 0 {
-		player.Health = domain.MaxPlayerHealth
-
+		player.SetCooldown()
 	}
 }
 
