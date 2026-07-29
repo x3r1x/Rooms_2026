@@ -1,6 +1,4 @@
 import {GAME_SPRITES} from "../../../model/game/storage/gameConstants.js";
-import {handleEnemies} from "../../../model/game/engine/players";
-import {handleBullets} from "../../../model/game/engine/bullet";
 
 const effects = [];
 
