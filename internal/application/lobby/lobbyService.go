@@ -270,11 +270,8 @@ func (l *LobbyService) StartGame() {
 	l.sendReadyState(roomMessages)
 	l.doCountdown()
 
-	l.gameService.Run()
+	go l.gameService.Run()
 	l.playersReady = 0
-	for _, player := range l.players {
-		delete(l.players, player.Id)
-	}
 }
 
 func (l *LobbyService) SetGameService(gs *game.GameService) {
