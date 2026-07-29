@@ -3,6 +3,7 @@ const playersConnected = document.getElementById("playersConnected");
 const lobbyList = document.getElementById("lobbyList")
 const btn = document.getElementById('changeWeaponBtn');
 export let selectedWeaponClass = "g";
+
 export function updateReadyText(isReady) {
     if (isReady) {
         readyButton.textContent = "NOT READY";
@@ -26,25 +27,66 @@ export function updateLobbyView(ownId, playersInLobby) {
     }).join('')
 }
 
-export function updatePlayerClass(){
+export function updatePlayerClass() {
     const weapons = [
-        { name: "ПИСТОЛЕТ", img: "/frontend/assets/images/g.png", code: "g"},
-        { name: "ДРОБОВИК", img: "/frontend/assets/images/r.png", code: "r" },
-        { name: "СООООООМ", img: "/frontend/assets/images/s.png", code: "s"},
+        {
+            name: "ПИСТОЛЕТ",
+            img: "/frontend/assets/images/g.png",
+            code: "g",
+            description: `
+                <span class="weapon-title">ПИСТОЛЕТ</span><br>
+                <span class="stat">Урон:</span> Средний<br>
+                <span class="stat">Скорость пули:</span> Высокая<br>
+                <span class="stat">Скорость игрока:</span> Максимальная<br>
+                <span class="stat">Особенность:</span> Бесконечный боезапас и абсолютная надежность. Идеален для динамичных маневров.
+            `
+        },
+        {
+            name: "ДРОБОВИК",
+            img: "/frontend/assets/images/r.png",
+            code: "r",
+            description: `
+                <span class="weapon-title">ДРОБОЛОБИК</span><br>
+                <span class="stat">Урон:</span> Огромный (вблизи)<br>
+                <span class="stat">Скорость пули:</span> Дробь летит быстро, но быстро гаснет<br>
+                <span class="stat">Скорость игрока:</span> Средняя<br>
+                <span class="stat">Особенность:</span> Стреляет веером. Сносит толпы врагов мощным хвостовым ударом на короткой дистанции.
+            `
+        },
+        {
+            name: "СОМ",
+            img: "/frontend/assets/images/s.png",
+            code: "s",
+            description: `
+                <span class="weapon-title">СОМ</span><br>
+                <span class="stat">Урон:</span> Колоссальный<br>
+                <span class="stat">Скорость пули:</span> Медленная<br>
+                <span class="stat">Скорость игрока:</span> Пониженная<br>
+                <span class="stat">Особенность:</span> Наносит урон по площади. Оставляет за собой выжженную зону и панику на всей карте.
+            `
+        },
     ];
 
     let currentIndex = 0;
 
-
-    const nameSpan = document.getElementById('weaponName');
     const imageImg = document.getElementById('weaponImage');
+    const descriptionP = document.getElementById('weaponDescription');
+
+    function updateWeapon() {
+        const currentWeapon = weapons[currentIndex];
+
+        imageImg.src = currentWeapon.img;
+        selectedWeaponClass = currentWeapon.code;
+        descriptionP.innerHTML = currentWeapon.description;
+    }
+
+    updateWeapon();
 
     btn.addEventListener('click', () => {
         currentIndex = (currentIndex + 1) % weapons.length;
-        const currentWeapon = weapons[currentIndex];
-        nameSpan.textContent = currentWeapon.name;
-        selectedWeaponClass = currentWeapon.code;
-        imageImg.src = currentWeapon.img;
+        updateWeapon();
     });
 }
+
+
 
