@@ -44,7 +44,6 @@ func (wsh *WebsocketHandler) InitWebsocket(w http.ResponseWriter, r *http.Reques
 
 func (wsh *WebsocketHandler) HandleWebsocket(conn *websocket.Conn) {
 	defer recovery.Recover()
-	defer conn.Close()
 	var currentId string
 	if err := conn.SetReadDeadline(time.Now().Add(readDeadlineLobby)); err != nil {
 		return
