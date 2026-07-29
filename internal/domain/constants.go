@@ -27,8 +27,6 @@ const (
 	RecoilDistance     = 8.0
 	KnockbackForce     = 12.0
 	// константы для игроков
-	PlayerSpawnPointX = 710
-	PlayerSpawnPointY = 400
 	InitDirection     = 0
 	InitValue         = 0
 	PlayerVisualSize  = 34.0
@@ -41,6 +39,7 @@ const (
 	PlayerSpeed       = 0.4
 	MaxPlayerHealth   = 100
 	PlayerRebornTimer = 300
+	PlayerShieldTimer = 200
 	// константы общие служебные
 	TickTime                     = 16
 	GameDuration                 = 120

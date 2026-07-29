@@ -61,11 +61,18 @@ func (pe *PhysicsEngine) updatePlayers() {
 				player.RebornTimer--
 			} else if player.RebornTimer == 0 {
 				player.Health = domain.MaxPlayerHealth
-				player.RebornTimer = domain.PlayerRebornTimer
-				player.X = domain.PlayerSpawnPointX
-				player.Y = domain.PlayerSpawnPointY
+				player.PlayerShield = true
+				player.CooldownTimer = domain.PlayerShieldTimer
+				player.PlayerShieldTimer = domain.PlayerShieldTimer
 			}
 			continue
+		}
+
+		if player.PlayerShield && player.PlayerShieldTimer > 0 {
+			player.PlayerShieldTimer--
+			if player.PlayerShieldTimer == 0 {
+				player.PlayerShield = false
+			}
 		}
 
 		if player.MoveX == 0 && player.MoveY == 0 {

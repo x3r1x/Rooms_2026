@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-const readDeadline = 30 * time.Second
+const readDeadline = 300 * time.Second
 
 type WebsocketHandler struct {
 	lobby *lobby.LobbyService

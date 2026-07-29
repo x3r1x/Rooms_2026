@@ -109,6 +109,9 @@ func (cs *CollisionService) HandlePlayerHit(player *domain.PlayerGameState, bull
 	if player == nil {
 		return
 	}
+	if player.PlayerShield {
+		return
+	}
 	if bullet.Type == domain.PlayerSom {
 		cs.handleExplosion(bullet)
 		return
@@ -116,10 +119,10 @@ func (cs *CollisionService) HandlePlayerHit(player *domain.PlayerGameState, bull
 	player.Health -= cs.calculateDamage(bullet)
 	log.Printf("HIT! Player %s took damage. Health: %.2f", player.Id, player.Health)
 
-	knockbackX := math.Cos(bullet.Direction) * cs.calculateKnockbackKoef(bullet)
-	knockbackY := math.Sin(bullet.Direction) * cs.calculateKnockbackKoef(bullet)
-	player.X += knockbackX
-	player.Y += knockbackY
+	//knockbackX := math.Cos(bullet.Direction) * cs.calculateKnockbackKoef(bullet)
+	//knockbackY := math.Sin(bullet.Direction) * cs.calculateKnockbackKoef(bullet)
+	//player.X += knockbackX
+	//player.Y += knockbackY
 
 	if hit, _ := cs.CheckPlayerObjectCollision(player); hit {
 		cs.ResolvePlayerCollisionSmooth(player)

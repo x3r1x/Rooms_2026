@@ -31,6 +31,7 @@ func (pm *PlayerManager) UpdatePlayer(upd domain.ClientGameMessage) {
 		player.RebornTimer--
 	} else if player.Health < 0 && player.RebornTimer == 0 {
 		player.Health = domain.MaxPlayerHealth
+
 	}
 }
 

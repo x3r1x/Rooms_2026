@@ -8,21 +8,23 @@ import (
 type WeaponFunc func(player *PlayerGameState) []Bullet
 
 type PlayerGameState struct {
-	Id            string     `json:"id"`
-	Nickname      string     `json:"-"`
-	Health        float64    `json:"h"`
-	X             float64    `json:"x"`
-	Y             float64    `json:"y"`
-	Angle         float64    `json:"a"`
-	MoveX         float64    `json:"mx"`
-	MoveY         float64    `json:"my"`
-	CooldownTimer int        `json:"-"`
-	RebornTimer   int        `json:"rt"`
-	BodyCount     int        `json:"-"`
-	DeathCount    int        `json:"-"`
-	RoomId        string     `json:"room_id"`
-	PlayerClass   string     `json:"pc"`
-	Weapon        WeaponFunc `json:"-"`
+	Id                string     `json:"id"`
+	Nickname          string     `json:"-"`
+	Health            float64    `json:"h"`
+	X                 float64    `json:"x"`
+	Y                 float64    `json:"y"`
+	Angle             float64    `json:"a"`
+	MoveX             float64    `json:"mx"`
+	MoveY             float64    `json:"my"`
+	CooldownTimer     int        `json:"-"`
+	RebornTimer       int        `json:"rt"`
+	PlayerShield      bool       `json:"ps"`
+	PlayerShieldTimer int        `json:"-"`
+	BodyCount         int        `json:"-"`
+	DeathCount        int        `json:"-"`
+	RoomId            string     `json:"room_id"`
+	PlayerClass       string     `json:"pc"`
+	Weapon            WeaponFunc `json:"-"`
 }
 
 type PlayerStatistic struct {
@@ -40,19 +42,21 @@ type PlayerFinalState struct {
 
 func NewPlayerGameState(id, nickname, playerClass string) *PlayerGameState {
 	p := &PlayerGameState{
-		Id:            id,
-		Nickname:      nickname,
-		Health:        MaxPlayerHealth,
-		X:             PlayerSpawnPointX,
-		Y:             PlayerSpawnPointY,
-		Angle:         InitDirection,
-		MoveX:         InitValue,
-		MoveY:         InitValue,
-		CooldownTimer: InitValue,
-		RebornTimer:   InitValue,
-		BodyCount:     InitValue,
-		DeathCount:    InitValue,
-		PlayerClass:   playerClass,
+		Id:                id,
+		Nickname:          nickname,
+		Health:            MaxPlayerHealth,
+		X:                 InitValue,
+		Y:                 InitValue,
+		Angle:             InitDirection,
+		MoveX:             InitValue,
+		MoveY:             InitValue,
+		CooldownTimer:     InitValue,
+		PlayerShield:      false,
+		PlayerShieldTimer: InitValue,
+		RebornTimer:       InitValue,
+		BodyCount:         InitValue,
+		DeathCount:        InitValue,
+		PlayerClass:       playerClass,
 	}
 
 	p.setupWeaponByClass()
