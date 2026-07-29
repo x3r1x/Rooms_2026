@@ -4,8 +4,18 @@ const killFeed = document.getElementById("killFeed");
 
 export function updateKillFeed(killsInfo, playersNicknames, player, enemies) {
     killsInfo.forEach((killInfo) => {
-        const isPlayer = killInfo.kId === player.id || killInfo.vId === player.id;
-        console.log(isPlayer);
+        let isPlayer = "";
+        if (killInfo.kId === player.id) {
+            if (killInfo.vId === player.id) {
+                isPlayer = GAME_CONSTANTS.IS_PLAYER.BOTH
+            } else {
+                isPlayer = GAME_CONSTANTS.IS_PLAYER.KILLER
+            }
+        }
+        if (killInfo.vId === player.id && isPlayer !== GAME_CONSTANTS.IS_PLAYER.BOTH) {
+            isPlayer = GAME_CONSTANTS.IS_PLAYER.VICTIM
+        }
+
         const weaponSpritePath = getWeaponSpritePath(killInfo.kId, player, enemies);
 
         addToKillFeed(playersNicknames[killInfo.kId], playersNicknames[killInfo.vId], weaponSpritePath, isPlayer);
@@ -41,21 +51,31 @@ function returnWeaponPath(playerType) {
 
 function addToKillFeed(killerNickname, victimNickname, weapon, isPlayer) {
     const newKillFeedElement = document.createElement("div");
-    if (isPlayer) {
-        newKillFeedElement.className = "kill-feed-element me";
-    } else {
+    if (isPlayer === GAME_CONSTANTS.IS_PLAYER.NO_PLAYER) {
         newKillFeedElement.className = "kill-feed-element";
+    } else {
+        newKillFeedElement.className = "kill-feed-element me";
     }
 
     const killerInfo = document.createElement("p");
-    killerInfo.className = "kill-feed-player-text";
+    if (isPlayer === GAME_CONSTANTS.IS_PLAYER.KILLER || isPlayer === GAME_CONSTANTS.IS_PLAYER.BOTH) {
+        killerInfo.className = "kill-feed-player-text me";
+    } else {
+        killerInfo.className = "kill-feed-player-text";
+    }
     killerInfo.innerHTML = killerNickname;
+
     const gunImage = document.createElement("img");
     gunImage.className = "kill-feed-gun-image";
     gunImage.src = weapon;
     gunImage.alt = "";
+
     const victimInfo = document.createElement("p");
-    victimInfo.className = "kill-feed-player-text";
+    if (isPlayer === GAME_CONSTANTS.IS_PLAYER.VICTIM || isPlayer === GAME_CONSTANTS.IS_PLAYER.BOTH) {
+        victimInfo.className = "kill-feed-player-text me";
+    } else {
+        victimInfo.className = "kill-feed-player-text";
+    }
     victimInfo.innerHTML = victimNickname;
 
     newKillFeedElement.appendChild(killerInfo);

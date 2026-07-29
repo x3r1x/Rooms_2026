@@ -1,6 +1,6 @@
 import {GAME_CONSTANTS} from "../storage/gameConstants.js";
 import {canMoveTo} from "./collision.js";
-import {lerp, lerpDirection} from "./interpolation.js";
+import {lerp} from "./interpolation.js";
 
 export function updatePlayer(direction, elapsedTime, player) {
     updateVisualDirection(player);
@@ -50,7 +50,7 @@ function clearEnemies(enemies, snaps) {
 function lerpEnemy(modelEnemy, enemyStart, enemyEnd, lerpCoefficient) {
     modelEnemy.x = lerp(enemyStart.x, enemyEnd.x, lerpCoefficient);
     modelEnemy.y = lerp(enemyStart.y, enemyEnd.y, lerpCoefficient);
-    modelEnemy.direction = lerpDirection(enemyStart.a, enemyEnd.a, lerpCoefficient);
+    modelEnemy.direction = lerp(enemyStart.a, enemyEnd.a, lerpCoefficient);
     modelEnemy.hp = lerp(enemyStart.h, enemyEnd.h, lerpCoefficient);
 }
 

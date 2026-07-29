@@ -27,6 +27,13 @@ export const GAME_CONSTANTS = {
         ROCKET_LAUNCHER: "s"
     },
 
+    IS_PLAYER: {
+        NO_PLAYER: "n",
+        KILLER: "k",
+        VICTIM: "v",
+        BOTH: "b"
+    },
+
     BULLET: {
         PLAYER: {},
         ENEMY: {},

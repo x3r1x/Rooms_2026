@@ -9,20 +9,6 @@ export function lerp(start, end, dt) {
     return start + (end - start) * dt;
 }
 
-export function lerpDirection(start, end, dt) {
-    let diff = start - end;
-
-    if (diff < -Math.PI) {
-        diff += 2 * Math.PI;
-    }
-
-    if (diff > Math.PI) {
-        diff -= 2 * Math.PI;
-    }
-
-    return start + diff * dt;
-}
-
 export function getSnapshotsAmount() {
     return snapshotsAmount;
 }
