@@ -25,15 +25,17 @@ function drawMainPlayer(context, player) {
         } else {
             player.spriteIndex = 0;
         }
-        context.save();
-        context.translate(player.x, player.y);
-        context.rotate(player.direction);
-        context.drawImage(
-            spriteSheet,
-            player.spriteIndex * frameWidth, 0, frameWidth, frameHeight,
-            -GAME_CONSTANTS.PLAYER_VISUAL_WIDTH / 2, -GAME_CONSTANTS.PLAYER_VISUAL_HEIGHT / 2, GAME_CONSTANTS.PLAYER_VISUAL_WIDTH, GAME_CONSTANTS.PLAYER_VISUAL_HEIGHT
-        );
-        context.restore();
+        if (!(player.ps && Math.floor(Date.now() / 50) % 2 === 0)) {
+            context.save();
+            context.translate(player.x, player.y);
+            context.rotate(player.direction);
+            context.drawImage(
+                spriteSheet,
+                player.spriteIndex * frameWidth, 0, frameWidth, frameHeight,
+                -GAME_CONSTANTS.PLAYER_VISUAL_WIDTH / 2, -GAME_CONSTANTS.PLAYER_VISUAL_HEIGHT / 2, GAME_CONSTANTS.PLAYER_VISUAL_WIDTH, GAME_CONSTANTS.PLAYER_VISUAL_HEIGHT
+            );
+            context.restore();
+        }
         drawHealthBar(context, player);
         drawName(context, player);
     } else {
@@ -54,15 +56,18 @@ function drawEnemy(context, enemy) {
         } else {
             enemy.spriteIndex = 0;
         }
-        context.save();
-        context.translate(enemy.x, enemy.y);
-        context.rotate(enemy.direction);
-        context.drawImage(
-            spriteSheet,
-            enemy.spriteIndex * frameWidth, 0, frameWidth, frameHeight,
-            -GAME_CONSTANTS.PLAYER_VISUAL_WIDTH / 2, -GAME_CONSTANTS.PLAYER_VISUAL_HEIGHT / 2, GAME_CONSTANTS.PLAYER_VISUAL_WIDTH, GAME_CONSTANTS.PLAYER_VISUAL_HEIGHT
-        );
-        context.restore();
+
+        if (!(enemy.ps && Math.floor(Date.now() / 50) % 2 === 0)) {
+            context.save();
+            context.translate(enemy.x, enemy.y);
+            context.rotate(enemy.direction);
+            context.drawImage(
+                spriteSheet,
+                enemy.spriteIndex * frameWidth, 0, frameWidth, frameHeight,
+                -GAME_CONSTANTS.PLAYER_VISUAL_WIDTH / 2, -GAME_CONSTANTS.PLAYER_VISUAL_HEIGHT / 2, GAME_CONSTANTS.PLAYER_VISUAL_WIDTH, GAME_CONSTANTS.PLAYER_VISUAL_HEIGHT
+            );
+            context.restore();
+        }
         drawHealthBar(context, enemy);
         drawName(context, enemy)
     }
@@ -87,7 +92,7 @@ function drawName(context, player) {
     const nickname = gameNicknames[player.id];
 
     context.fillStyle = "white";
-    context.font = "16px Arial";
+    context.font = "16px monospace";
     context.textAlign = "center";
 
     const textX = player.x;

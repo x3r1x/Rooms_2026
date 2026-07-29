@@ -40,12 +40,10 @@ function drawEffect(context, fx) {
     context.restore();
 }
 
-export function checkAndSpawnEffects(neighbouredSnapshots, didRoomChange) {
-    checkAndSpawnNewBulletEffects(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB, didRoomChange);
-    checkAndSpawnExplosions(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB, didRoomChange);
-    checkAndSpawnDie(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB, didRoomChange);
-    checkAndSpawnHit(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB, didRoomChange);
-    checkAndSpawnShield(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB, didRoomChange);
+export function checkAndSpawnEffects(neighbouredSnapshots) {
+    checkAndSpawnExplosions(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB);
+    checkAndSpawnDie(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB);
+    checkAndSpawnHit(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB);
 }
 
 export function updateAndDrawEffects(context) {
@@ -65,7 +63,7 @@ export function updateAndDrawEffects(context) {
     }
 }
 
-function checkAndSpawnNewBulletEffects(stateA, stateB, didRoomChange) {
+/*function checkAndSpawnNewBulletEffects(stateA, stateB, didRoomChange) {
     if (!stateA || !stateB || !stateA.b || !stateB.b || didRoomChange) return;
 
     for (let i = 0; i < stateB.b.length; i++) {
@@ -109,7 +107,7 @@ function checkAndSpawnNewBulletEffects(stateA, stateB, didRoomChange) {
 
         }
     }
-}
+}*/
 
 function checkAndSpawnExplosions(stateA, stateB, didRoomChange) {
     if (!stateA || !stateB || !stateA.b || !stateB.b || didRoomChange) return;
@@ -162,14 +160,14 @@ function checkAndSpawnDie(stateA, stateB, didRoomChange){
     const newPlayers = stateB.p;
 
     for (let i = 0; i < newPlayers.length; i++) {
-        const newEntity = newPlayers[i];
-        const oldEntity = oldPlayers.find(e => e.id === newEntity.id);
-        if (oldEntity && oldEntity.h > 0 && newEntity.h <= 0) {
+        const newPlayer = newPlayers[i];
+        const oldPlayer = oldPlayer.find(e => e.id === newPlayer.id);
+        if (oldPlayers && oldPlayer.h > 0 && newPlayer.h <= 0) {
             spawnEffect(
-                newEntity.x,
-                newEntity.y,
+                newPlayer.x,
+                newPlayer.y,
                 "PLAYER_DEATH",
-                newEntity.a || 0
+                newPlayer.a
             );
         }
     }
@@ -189,27 +187,7 @@ function checkAndSpawnHit(stateA, stateB, didRoomChange){
                 newPlayer.x,
                 newPlayer.y,
                 "PLAYER_HIT",
-                newPlayer.a || 0
-            );
-        }
-    }
-}
-
-function checkAndSpawnShield(stateA, stateB, didRoomChange){
-    if (!stateA || !stateB || didRoomChange) return;
-
-    const oldPlayers = stateA.p;
-    const newPlayers = stateB.p;
-
-    for (let i = 0; i < newPlayers.length; i++) {
-        const newPlayer = newPlayers[i];
-        const oldPlayer = oldPlayers.find(e => e.id === newPlayer.id);
-        if (oldPlayer && oldPlayer.h <= 0 && newPlayer.h > 0) {
-            spawnEffect(
-                newPlayer.x,
-                newPlayer.y,
-                "SHIELD",
-                newPlayer.a || 0
+                newPlayer.a
             );
         }
     }

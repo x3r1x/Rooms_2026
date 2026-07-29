@@ -52,6 +52,7 @@ function lerpEnemy(modelEnemy, enemyStart, enemyEnd, lerpCoefficient) {
     modelEnemy.y = lerp(enemyStart.y, enemyEnd.y, lerpCoefficient);
     modelEnemy.direction = lerp(enemyStart.a, enemyEnd.a, lerpCoefficient);
     modelEnemy.hp = lerp(enemyStart.h, enemyEnd.h, lerpCoefficient);
+    modelEnemy.ps = lerp(enemyStart.ps, enemyEnd.ps, lerpCoefficient);
 }
 
 function extrapolateEnemy(modelEnemy, extrapolationTime, startEnemy) {
