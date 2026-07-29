@@ -3,12 +3,7 @@ import {handleEnemies, updatePlayer} from "./players.js";
 import {handleBullets} from "./bullet.js";
 import {getNeighbouringSnapshots, getClientTime} from "../storage/interpolation.js";
 import {GAME_CONSTANTS} from "../storage/gameConstants.js";
-import {
-    checkAndSpawnDie,
-    checkAndSpawnNewBulletEffects,
-    checkAndSpawnExplosions,
-    checkAndSpawnHit, checkAndSpawnShield
-} from "../../../view/game/effects/effectsManager.js";
+import {checkAndSpawnEffects} from "../../../view/game/effects/effectsManager.js";
 
 export function updateGame(elapsedTime, state) {
     updateMovementDirection(state.player.movementDirection);
@@ -22,11 +17,7 @@ export function updateGame(elapsedTime, state) {
     const lerpCoefficient = (renderTime - neighbouredSnapshots.snapA.t) / (neighbouredSnapshots.snapB.t - neighbouredSnapshots.snapA.t);
     const extrapolationTime = renderTime - neighbouredSnapshots.snapA.t;
 
-    checkAndSpawnNewBulletEffects(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB);
-    checkAndSpawnExplosions(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB);
-    checkAndSpawnDie(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB);
-    checkAndSpawnHit(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB);
-    checkAndSpawnShield(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB);
+    checkAndSpawnEffects(neighbouredSnapshots);
 
     handleEnemies(state.enemies, neighbouredSnapshots, extrapolationTime, lerpCoefficient);
     handleBullets(state.bullets, neighbouredSnapshots, extrapolationTime, lerpCoefficient);

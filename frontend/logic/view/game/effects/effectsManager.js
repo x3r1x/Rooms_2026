@@ -1,4 +1,6 @@
 import {GAME_SPRITES} from "../../../model/game/storage/gameConstants.js";
+import {handleEnemies} from "../../../model/game/engine/players";
+import {handleBullets} from "../../../model/game/engine/bullet";
 
 const effects = [];
 
@@ -39,6 +41,15 @@ function drawEffect(context, fx) {
 
     context.restore();
 }
+
+export function checkAndSpawnEffects(neighbouredSnapshots) {
+    checkAndSpawnNewBulletEffects(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB);
+    checkAndSpawnExplosions(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB);
+    checkAndSpawnDie(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB);
+    checkAndSpawnHit(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB);
+    checkAndSpawnShield(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB);
+}
+
 export function updateAndDrawEffects(context) {
     const now = Date.now();
 
@@ -56,7 +67,7 @@ export function updateAndDrawEffects(context) {
     }
 }
 
-export function checkAndSpawnNewBulletEffects(stateA, stateB) {
+function checkAndSpawnNewBulletEffects(stateA, stateB) {
     if (!stateA || !stateB || !stateA.b || !stateB.b) return;
 
     for (let i = 0; i < stateB.b.length; i++) {
@@ -102,7 +113,7 @@ export function checkAndSpawnNewBulletEffects(stateA, stateB) {
     }
 }
 
-export function checkAndSpawnExplosions(stateA, stateB) {
+function checkAndSpawnExplosions(stateA, stateB) {
     if (!stateA || !stateB || !stateA.b || !stateB.b) return;
 
     for (let i = 0; i < stateA.b.length; i++) {
@@ -146,7 +157,7 @@ export function checkAndSpawnExplosions(stateA, stateB) {
     }
 }
 
-export function checkAndSpawnDie(stateA, stateB){
+function checkAndSpawnDie(stateA, stateB){
     if (!stateA || !stateB) return;
 
     const oldPlayers = stateA.p;
@@ -166,7 +177,7 @@ export function checkAndSpawnDie(stateA, stateB){
     }
 }
 
-export function checkAndSpawnHit(stateA, stateB){
+function checkAndSpawnHit(stateA, stateB){
     if (!stateA || !stateB) return;
 
     const oldPlayers = stateA.p;
@@ -186,7 +197,7 @@ export function checkAndSpawnHit(stateA, stateB){
     }
 }
 
-export function checkAndSpawnShield(stateA, stateB){
+function checkAndSpawnShield(stateA, stateB){
     if (!stateA || !stateB) return;
 
     const oldPlayers = stateA.p;
