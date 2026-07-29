@@ -90,7 +90,6 @@ func (mm *MapManager) parseHitbox(hitboxStr string) []HitboxRect {
 		return nil
 	}
 	var hitboxes []HitboxRect
-	log.Println(hitboxStr)
 	err := json.Unmarshal([]byte(hitboxStr), &hitboxes)
 	if err != nil {
 		log.Printf("Ошибка парсинга hitbox: %v", err)

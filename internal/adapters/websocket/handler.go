@@ -12,7 +12,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-const readDeadline = 300 * time.Second
+const readDeadlineLobby = 30 * time.Second
+const readDeadlineGame = 10 * time.Second
 
 type WebsocketHandler struct {
 	lobby *lobby.LobbyService
@@ -42,13 +43,7 @@ func (wsh *WebsocketHandler) InitWebsocket(w http.ResponseWriter, r *http.Reques
 
 func (wsh *WebsocketHandler) HandleWebsocket(conn *websocket.Conn) {
 	var currentId string
-
-	conn.SetReadDeadline(time.Now().Add(readDeadline))
-	conn.SetPongHandler(func(string) error {
-		conn.SetReadDeadline(time.Now().Add(readDeadline))
-		log.Printf("Pong от игрока %s", currentId)
-		return nil
-	})
+	conn.SetReadDeadline(time.Now().Add(readDeadlineLobby))
 	defer func() {
 		if currentId != "" {
 			wsh.lobby.RemovePlayerFromLobby(currentId, false)
@@ -64,8 +59,10 @@ func (wsh *WebsocketHandler) HandleWebsocket(conn *websocket.Conn) {
 
 		switch wsh.lobby.GetState() {
 		case domain.WaitingLobbyState:
+			conn.SetReadDeadline(time.Now().Add(readDeadlineLobby))
 			currentId = wsh.handleWaitingLobbyState(p, currentId, conn)
 		case domain.OngoingGameState:
+			conn.SetReadDeadline(time.Now().Add(readDeadlineGame))
 			wsh.handleOngoingGameState(p, currentId)
 		}
 	}
