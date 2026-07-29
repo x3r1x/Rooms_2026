@@ -1,7 +1,7 @@
 import {keys} from '../../../controller/gameListeners.js';
 import {handleEnemies, updatePlayer} from "./players.js";
 import {handleBullets} from "./bullet.js";
-import {getNeighbouringSnapshots, getClientTime} from "../storage/interpolation.js";
+import {getNeighbouringSnapshots, getClientTime} from "./interpolation.js";
 import {GAME_CONSTANTS} from "../storage/gameConstants.js";
 import {checkAndSpawnEffects} from "../../../view/game/effects/effectsManager.js";
 

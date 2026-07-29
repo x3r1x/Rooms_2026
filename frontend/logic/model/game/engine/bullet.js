@@ -1,4 +1,4 @@
-import {lerp} from "../storage/interpolation.js";
+import {lerp} from "./interpolation.js";
 import {GAME_CONSTANTS} from "../storage/gameConstants.js";
 
 export function handleBullets(bullets, snaps, extrapolationTime, lerpCoefficient) {

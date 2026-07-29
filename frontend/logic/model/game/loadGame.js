@@ -6,7 +6,7 @@ import {gameState} from "./storage/gameState.js";
 import {updateGame} from "./engine/updateGame.js";
 import {drawGame} from "../../view/game/painters/drawGame.js";
 import {appState, socket} from "../app/appState.js";
-import {addToClientTime} from "./storage/interpolation.js";
+import {addToClientTime} from "./engine/interpolation.js";
 import {APP_STATES} from "../app/appConstants.js";
 
 export const canvas = document.getElementById("canvas");

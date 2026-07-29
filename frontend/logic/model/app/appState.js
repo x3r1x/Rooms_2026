@@ -15,7 +15,7 @@ import {
 } from "../game/storage/gameState.js";
 import {initGameEndListeners} from "../../controller/gameEndListeners.js";
 import {fillResultWindow} from "../../view/app/gameEndView.js";import {initRegistrationListeners} from "../../controller/registrationListeners.js";
-import {resetInterpolationModule} from "../game/storage/interpolation.js";
+import {resetInterpolationModule} from "../game/engine/interpolation.js";
 
 export let appState = null
 export let socket = null

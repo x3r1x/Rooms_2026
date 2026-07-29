@@ -1,6 +1,6 @@
 import {GAME_CONSTANTS} from "../storage/gameConstants.js";
 import {canMoveTo} from "./collision.js";
-import {lerp, lerpDirection} from "../storage/interpolation.js";
+import {lerp, lerpDirection} from "./interpolation.js";
 
 export function updatePlayer(direction, elapsedTime, player) {
     updateVisualDirection(player);

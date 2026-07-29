@@ -1,4 +1,4 @@
-import {GAME_CONSTANTS} from "./gameConstants.js";
+import {GAME_CONSTANTS} from "../storage/gameConstants.js";
 
 let snapshots = new Array(GAME_CONSTANTS.SNAPSHOTS_AMOUNT);
 let head = 0;

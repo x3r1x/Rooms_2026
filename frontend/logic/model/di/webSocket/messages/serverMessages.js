@@ -3,7 +3,7 @@ import {updateStatisticView} from "../../../../view/app/statisticsView.js";
 import {updateLobbyView} from "../../../../view/app/lobbyView.js";
 import {changeCountdownTimer} from "../../../../view/app/countdownView.js";
 import {parseMap} from "../../preloadingResources/mapHandler.js";
-import {getSnapshotsAmount, saveSnapshot} from "../../../game/storage/interpolation.js";
+import {getSnapshotsAmount, saveSnapshot} from "../../../game/engine/interpolation.js";
 import {updateKillFeed} from "../../../../view/app/killFeedView.js";
 
 export function processWaitingMessage(parsedMessage, lobbyState) {
