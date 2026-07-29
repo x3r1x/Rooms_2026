@@ -2,6 +2,7 @@ package collision
 
 import (
 	"gamedevRooms/internal/domain"
+	"gamedevRooms/internal/recovery"
 	"math"
 )
 
@@ -11,6 +12,7 @@ type SATBox struct {
 }
 
 func CheckCollisionSAT(box1, box2 SATBox) bool {
+	defer recovery.Recover()
 	if !checkAxes(box1.Points, box2.Points, box1.Normals) {
 		return false
 	}

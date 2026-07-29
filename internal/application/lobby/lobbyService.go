@@ -5,6 +5,7 @@ import (
 	_map "gamedevRooms/internal/adapters/map"
 	"gamedevRooms/internal/application/game"
 	"gamedevRooms/internal/domain"
+	"gamedevRooms/internal/recovery"
 	"gamedevRooms/internal/state"
 	"log"
 	"sync"
@@ -88,6 +89,7 @@ func (l *LobbyService) GetGameService() *game.GameService {
 }
 
 func (l *LobbyService) run() {
+	defer recovery.Recover()
 	for {
 		select {
 		case reg := <-l.addChan:

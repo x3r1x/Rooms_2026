@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"gamedevRooms/internal/adapters/broadcast"
 	"gamedevRooms/internal/domain"
+	"gamedevRooms/internal/recovery"
 	"gamedevRooms/internal/state"
 	"time"
 )
@@ -38,6 +39,7 @@ func (bm *BroadcastManager) createRoomSnapshot(roomId string) ([]domain.PlayerGa
 }
 
 func (bm *BroadcastManager) broadcast() {
+	defer recovery.Recover()
 	playersByRoom := bm.gameState.GetPlayersByRoom()
 	bullets := bm.gameState.GetBulletsByRoom()
 	gameTime := float64(time.Since(bm.gameState.GetGameStartTime()).Milliseconds())

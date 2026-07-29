@@ -8,12 +8,14 @@ import (
 	"gamedevRooms/internal/adapters/websocket"
 	"gamedevRooms/internal/application/game"
 	"gamedevRooms/internal/application/lobby"
+	"gamedevRooms/internal/recovery"
 	"gamedevRooms/internal/state"
 	"log"
 	"net/http"
 )
 
 func main() {
+	defer recovery.Recover()
 	broadcastService := broadcast.NewBroadcastService()
 	gameState := state.NewGameState()
 	mapManager := _map.NewMapManager()
@@ -30,6 +32,7 @@ func main() {
 		collisionService,
 		broadcastService,
 		func() {
+			defer recovery.Recover()
 			lobbyService.HandleGameEnd()
 		},
 	)

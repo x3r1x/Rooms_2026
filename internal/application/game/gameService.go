@@ -4,6 +4,7 @@ import (
 	"gamedevRooms/internal/adapters/broadcast"
 	"gamedevRooms/internal/adapters/collision"
 	"gamedevRooms/internal/domain"
+	"gamedevRooms/internal/recovery"
 	"gamedevRooms/internal/state"
 	"log"
 	"time"
@@ -57,6 +58,7 @@ func (gs *GameService) Stop() {
 }
 
 func (gs *GameService) Run() {
+	defer recovery.Recover()
 	ticker := time.NewTicker(domain.TickTime * time.Millisecond)
 	defer ticker.Stop()
 

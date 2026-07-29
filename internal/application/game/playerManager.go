@@ -2,6 +2,7 @@ package game
 
 import (
 	"gamedevRooms/internal/domain"
+	"gamedevRooms/internal/recovery"
 	"gamedevRooms/internal/state"
 )
 
@@ -14,6 +15,7 @@ func NewPlayerManager(state *state.GameState) *PlayerManager {
 }
 
 func (pm *PlayerManager) UpdatePlayer(upd domain.ClientGameMessage) {
+	defer recovery.Recover()
 	player, exist := pm.gameState.GetPlayer(upd.Id)
 	if !exist || player == nil {
 		return
@@ -36,6 +38,7 @@ func (pm *PlayerManager) UpdatePlayer(upd domain.ClientGameMessage) {
 }
 
 func (pm *PlayerManager) AddBullet(player *domain.PlayerGameState) {
+	defer recovery.Recover()
 	bullets := player.Weapon(player)
 	pm.gameState.SetBullets(append(pm.gameState.GetAllBullets(), bullets...))
 }

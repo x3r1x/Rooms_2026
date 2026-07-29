@@ -2,6 +2,7 @@ package collision
 
 import (
 	"gamedevRooms/internal/domain"
+	"gamedevRooms/internal/recovery"
 	"gamedevRooms/internal/state"
 	"log"
 	"math"
@@ -16,6 +17,7 @@ func NewCollisionService(state *state.GameState) *CollisionService {
 }
 
 func (cs *CollisionService) CheckBulletCollision(bullet domain.Bullet) (bool, *domain.PlayerGameState, *domain.Object) {
+	defer recovery.Recover()
 	bulletSAT := cs.buildBulletSAT(bullet)
 
 	for _, player := range cs.state.GetAllPlayers() {
@@ -51,6 +53,7 @@ func (cs *CollisionService) CheckBulletCollision(bullet domain.Bullet) (bool, *d
 }
 
 func (cs *CollisionService) CheckPlayerObjectCollision(player *domain.PlayerGameState) (bool, *domain.Object) {
+	defer recovery.Recover()
 	playerSAT := cs.buildPlayerSAT(player, false)
 
 	for _, object := range cs.state.GetObjects() {

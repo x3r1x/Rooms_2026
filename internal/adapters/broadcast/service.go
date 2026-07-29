@@ -2,6 +2,7 @@ package broadcast
 
 import (
 	"encoding/json"
+	"gamedevRooms/internal/recovery"
 	"log"
 	"time"
 
@@ -45,6 +46,7 @@ func NewBroadcastService() *BroadcastService {
 }
 
 func (bs *BroadcastService) run() {
+	defer recovery.Recover()
 	for {
 		select {
 		case event := <-bs.addConnChan:
@@ -90,6 +92,7 @@ func (bs *BroadcastService) BroadcastToPlayer(playerId string, message interface
 }
 
 func (bs *BroadcastService) sendToAll(message interface{}) {
+	defer recovery.Recover()
 	data, err := json.Marshal(message)
 	if err != nil {
 		log.Println("Ошибка маршалинга:", err)
@@ -106,6 +109,8 @@ func (bs *BroadcastService) sendToAll(message interface{}) {
 }
 
 func (bs *BroadcastService) sendToPlayer(playerId string, message interface{}) {
+	defer recovery.Recover()
+
 	var data []byte
 	var err error
 	if b, ok := message.([]byte); ok {

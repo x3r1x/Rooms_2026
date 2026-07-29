@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gamedevRooms/internal/application/lobby"
 	"gamedevRooms/internal/domain"
+	"gamedevRooms/internal/recovery"
 	"log"
 	"net/http"
 	"time"
@@ -42,6 +43,7 @@ func (wsh *WebsocketHandler) InitWebsocket(w http.ResponseWriter, r *http.Reques
 }
 
 func (wsh *WebsocketHandler) HandleWebsocket(conn *websocket.Conn) {
+	defer recovery.Recover()
 	var currentId string
 	conn.SetReadDeadline(time.Now().Add(readDeadlineLobby))
 	defer func() {

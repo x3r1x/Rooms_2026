@@ -3,6 +3,7 @@ package game
 import (
 	"gamedevRooms/internal/adapters/collision"
 	"gamedevRooms/internal/domain"
+	"gamedevRooms/internal/recovery"
 	"gamedevRooms/internal/state"
 	"log"
 	"math"
@@ -29,6 +30,7 @@ func (pe *PhysicsEngine) updateShooterTimers() {
 }
 
 func (pe *PhysicsEngine) updateBullets() {
+	defer recovery.Recover()
 	activeBullets := make([]domain.Bullet, 0)
 	for _, bullet := range pe.gameState.GetAllBullets() {
 		if bullet.Life > 0 {
@@ -55,6 +57,7 @@ func (pe *PhysicsEngine) updateBullets() {
 }
 
 func (pe *PhysicsEngine) updatePlayers() {
+	defer recovery.Recover()
 	for _, player := range pe.gameState.GetAllPlayers() {
 		if player.Health <= 0 {
 			if player.RebornTimer > 0 {

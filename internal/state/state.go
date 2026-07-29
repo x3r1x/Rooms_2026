@@ -4,6 +4,7 @@ import (
 	"fmt"
 	_map "gamedevRooms/internal/adapters/map"
 	"gamedevRooms/internal/domain"
+	"gamedevRooms/internal/recovery"
 	"log"
 	"time"
 )
@@ -42,6 +43,7 @@ func (gs *GameState) GetPlayerRoom(id string) string {
 }
 
 func (gs *GameState) SetPlayerRoom(id, roomId string) {
+	defer recovery.Recover()
 	if oldRoom, exists := gs.playerRooms[id]; exists {
 		gs.removePlayerFromRoom(oldRoom, id)
 	}
@@ -156,11 +158,13 @@ func (gs *GameState) IncrementTick() {
 }
 
 func (gs *GameState) AddPlayer(player *domain.PlayerGameState) {
+	defer recovery.Recover()
 	log.Println("Register ", player.Id)
 	gs.players[player.Id] = player
 }
 
 func (gs *GameState) RemovePlayer(playerId string) {
+	defer recovery.Recover()
 	fmt.Println("Delete ", playerId)
 	delete(gs.players, playerId)
 }
