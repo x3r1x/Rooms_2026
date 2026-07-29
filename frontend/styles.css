@@ -395,6 +395,7 @@ body {
 }
 
 .kill-feed-element.show {
+    min-height: 30px;
     opacity: 0.4;
     transform: translateX(0);
 }
