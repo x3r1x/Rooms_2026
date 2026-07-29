@@ -66,3 +66,12 @@ export function getNeighbouringSnapshots(targetTime) {
         snapB: null
     }
 }
+
+export function didRoomChange(snapA, snapB, playerId) {
+    const roomA = snapA.p.find((player) => player.id === playerId).room_id;
+    const roomB = snapB.p.find((player) => player.id === playerId).room_id;
+
+    if (!roomA || !roomB) return true;
+
+    return roomA !== roomB
+}

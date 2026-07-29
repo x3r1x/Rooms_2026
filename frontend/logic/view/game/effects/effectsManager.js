@@ -40,12 +40,12 @@ function drawEffect(context, fx) {
     context.restore();
 }
 
-export function checkAndSpawnEffects(neighbouredSnapshots) {
-    checkAndSpawnNewBulletEffects(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB);
-    checkAndSpawnExplosions(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB);
-    checkAndSpawnDie(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB);
-    checkAndSpawnHit(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB);
-    checkAndSpawnShield(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB);
+export function checkAndSpawnEffects(neighbouredSnapshots, didRoomChange) {
+    checkAndSpawnNewBulletEffects(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB, didRoomChange);
+    checkAndSpawnExplosions(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB, didRoomChange);
+    checkAndSpawnDie(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB, didRoomChange);
+    checkAndSpawnHit(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB, didRoomChange);
+    checkAndSpawnShield(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB, didRoomChange);
 }
 
 export function updateAndDrawEffects(context) {
@@ -65,8 +65,8 @@ export function updateAndDrawEffects(context) {
     }
 }
 
-function checkAndSpawnNewBulletEffects(stateA, stateB) {
-    if (!stateA || !stateB || !stateA.b || !stateB.b) return;
+function checkAndSpawnNewBulletEffects(stateA, stateB, didRoomChange) {
+    if (!stateA || !stateB || !stateA.b || !stateB.b || didRoomChange) return;
 
     for (let i = 0; i < stateB.b.length; i++) {
         const bulletB = stateB.b[i];
@@ -111,8 +111,8 @@ function checkAndSpawnNewBulletEffects(stateA, stateB) {
     }
 }
 
-function checkAndSpawnExplosions(stateA, stateB) {
-    if (!stateA || !stateB || !stateA.b || !stateB.b) return;
+function checkAndSpawnExplosions(stateA, stateB, didRoomChange) {
+    if (!stateA || !stateB || !stateA.b || !stateB.b || didRoomChange) return;
 
     for (let i = 0; i < stateA.b.length; i++) {
         const oldBullet = stateA.b[i];
@@ -155,8 +155,8 @@ function checkAndSpawnExplosions(stateA, stateB) {
     }
 }
 
-function checkAndSpawnDie(stateA, stateB){
-    if (!stateA || !stateB) return;
+function checkAndSpawnDie(stateA, stateB, didRoomChange){
+    if (!stateA || !stateB || didRoomChange) return;
 
     const oldPlayers = stateA.p;
     const newPlayers = stateB.p;
@@ -175,8 +175,8 @@ function checkAndSpawnDie(stateA, stateB){
     }
 }
 
-function checkAndSpawnHit(stateA, stateB){
-    if (!stateA || !stateB) return;
+function checkAndSpawnHit(stateA, stateB, didRoomChange){
+    if (!stateA || !stateB || didRoomChange) return;
 
     const oldPlayers = stateA.p;
     const newPlayers = stateB.p;
@@ -195,8 +195,8 @@ function checkAndSpawnHit(stateA, stateB){
     }
 }
 
-function checkAndSpawnShield(stateA, stateB){
-    if (!stateA || !stateB) return;
+function checkAndSpawnShield(stateA, stateB, didRoomChange){
+    if (!stateA || !stateB || didRoomChange) return;
 
     const oldPlayers = stateA.p;
     const newPlayers = stateB.p;

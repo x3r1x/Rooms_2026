@@ -1,11 +1,11 @@
 import {lerp} from "./interpolation.js";
 import {GAME_CONSTANTS} from "../storage/gameConstants.js";
 
-export function handleBullets(bullets, snaps, extrapolationTime, lerpCoefficient) {
+export function handleBullets(bullets, snaps, extrapolationTime, lerpCoefficient, didRoomChange) {
     clearBullets(bullets, snaps);
 
     snaps.snapA.b.forEach((bulletStart) => {
-        if (bulletStart.id in bullets) {
+        if (bulletStart.id in bullets  && !didRoomChange) {
             const bulletEnd = snaps.snapB.b.find((bulletEnd) => bulletEnd.id === bulletStart.id);
 
             if (bulletEnd) {

@@ -85,7 +85,8 @@ function processBullet(bullet, state) {
             direction: bullet.a,
             ownerId: bullet.oId,
             id: bullet.id,
-            type: bullet.t
+            type: bullet.t,
+            roomId: bullet.roomId
         }
     }
 }

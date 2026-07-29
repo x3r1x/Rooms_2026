@@ -1,7 +1,7 @@
 import {keys} from '../../../controller/gameListeners.js';
 import {handleEnemies, updatePlayer} from "./players.js";
 import {handleBullets} from "./bullet.js";
-import {getNeighbouringSnapshots, getClientTime} from "./interpolation.js";
+import {getNeighbouringSnapshots, getClientTime, didRoomChange} from "./interpolation.js";
 import {GAME_CONSTANTS} from "../storage/gameConstants.js";
 import {checkAndSpawnEffects} from "../../../view/game/effects/effectsManager.js";
 
@@ -13,14 +13,15 @@ export function updateGame(elapsedTime, state) {
     const neighbouredSnapshots = getNeighbouringSnapshots(renderTime);
 
     if (!neighbouredSnapshots.snapA || !neighbouredSnapshots.snapB) return;
-
+    const isInNewRoom = didRoomChange(neighbouredSnapshots.snapA, neighbouredSnapshots.snapB, state.player.id);
     const lerpCoefficient = (renderTime - neighbouredSnapshots.snapA.t) / (neighbouredSnapshots.snapB.t - neighbouredSnapshots.snapA.t);
     const extrapolationTime = renderTime - neighbouredSnapshots.snapA.t;
 
-    checkAndSpawnEffects(neighbouredSnapshots);
+    checkAndSpawnEffects(neighbouredSnapshots, isInNewRoom);
 
-    handleEnemies(state.enemies, neighbouredSnapshots, extrapolationTime, lerpCoefficient);
-    handleBullets(state.bullets, neighbouredSnapshots, extrapolationTime, lerpCoefficient);
+    handleEnemies(state.enemies, neighbouredSnapshots, extrapolationTime, lerpCoefficient, isInNewRoom);
+    handleBullets(state.bullets, neighbouredSnapshots, extrapolationTime, lerpCoefficient, isInNewRoom);
+
 }
 
 function updateMovementDirection(direction) {
