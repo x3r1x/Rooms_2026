@@ -31,7 +31,7 @@ export function updatePlayerClass() {
     const weapons = [
         {
             name: "ПИСТОЛЕТ",
-            img: "/frontend/assets/images/g.png",
+            img: "/assets/images/g.png",
             code: "g",
             description: `
                 <span class="weapon-title">ПИСТОЛЕТ</span><br>
@@ -43,7 +43,7 @@ export function updatePlayerClass() {
         },
         {
             name: "ДРОБОВИК",
-            img: "/frontend/assets/images/r.png",
+            img: "/assets/images/r.png",
             code: "r",
             description: `
                 <span class="weapon-title">ДРОБОЛОБИК</span><br>
@@ -55,7 +55,7 @@ export function updatePlayerClass() {
         },
         {
             name: "СОМ",
-            img: "/frontend/assets/images/s.png",
+            img: "/assets/images/s.png",
             code: "s",
             description: `
                 <span class="weapon-title">СОМ</span><br>
