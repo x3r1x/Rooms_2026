@@ -5,7 +5,6 @@ import (
 	"gamedevRooms/internal/domain"
 	"gamedevRooms/internal/recovery"
 	"gamedevRooms/internal/state"
-	"log"
 	"math"
 )
 
@@ -44,7 +43,6 @@ func (pe *PhysicsEngine) updateBullets() {
 					if bullet.Type == domain.PlayerSom {
 						pe.collisionService.TriggerExplosion(bullet)
 					}
-					log.Printf("Пуля попала в стену ID: %s", obj.Id)
 				}
 				continue
 			}

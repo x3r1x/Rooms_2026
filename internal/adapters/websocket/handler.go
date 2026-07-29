@@ -44,8 +44,11 @@ func (wsh *WebsocketHandler) InitWebsocket(w http.ResponseWriter, r *http.Reques
 
 func (wsh *WebsocketHandler) HandleWebsocket(conn *websocket.Conn) {
 	defer recovery.Recover()
+	defer conn.Close()
 	var currentId string
-	conn.SetReadDeadline(time.Now().Add(readDeadlineLobby))
+	if err := conn.SetReadDeadline(time.Now().Add(readDeadlineLobby)); err != nil {
+		return
+	}
 	defer func() {
 		if currentId != "" {
 			wsh.lobby.RemovePlayerFromLobby(currentId, false)
@@ -61,10 +64,14 @@ func (wsh *WebsocketHandler) HandleWebsocket(conn *websocket.Conn) {
 
 		switch wsh.lobby.GetState() {
 		case domain.WaitingLobbyState:
-			conn.SetReadDeadline(time.Now().Add(readDeadlineLobby))
+			if err := conn.SetReadDeadline(time.Now().Add(readDeadlineLobby)); err != nil {
+				return
+			}
 			currentId = wsh.handleWaitingLobbyState(p, currentId, conn)
 		case domain.OngoingGameState:
-			conn.SetReadDeadline(time.Now().Add(readDeadlineGame))
+			if err := conn.SetReadDeadline(time.Now().Add(readDeadlineGame)); err != nil {
+				return
+			}
 			wsh.handleOngoingGameState(p, currentId)
 		}
 	}

@@ -14,18 +14,16 @@ const (
 	PelletCount       = 5
 	SpreadAngle       = 0.4
 
-	ShootCooldown      = 15
-	BulletLengthGun    = 16.0
-	BulletWidthGun     = 7.0
-	BulletLengthRifle  = 3.0
-	BulletWidthRifle   = 3.0
-	BulletLengthSom    = 11.0
-	BulletWidthSom     = 3.0
-	BulletDamageMulti  = 1.2
-	BulletBarrelOffset = 5.0
-	ExplosionRadius    = 250
-	RecoilDistance     = 8.0
-	KnockbackForce     = 12.0
+	ShootCooldown     = 15
+	BulletLengthGun   = 16.0
+	BulletWidthGun    = 7.0
+	BulletLengthRifle = 3.0
+	BulletWidthRifle  = 3.0
+	BulletLengthSom   = 11.0
+	BulletWidthSom    = 3.0
+	BulletDamageMulti = 1.2
+	ExplosionRadius   = 250
+	KnockbackForce    = 12.0
 	// константы для игроков
 	InitDirection     = 0
 	InitValue         = 0

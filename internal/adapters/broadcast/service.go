@@ -36,7 +36,7 @@ type playerEvent struct {
 func NewBroadcastService() *BroadcastService {
 	bs := &BroadcastService{
 		addConnChan:    make(chan connectionEvent),
-		removeConnChan: make(chan string),
+		removeConnChan: make(chan string, 100),
 		broadcastChan:  make(chan broadcastEvent),
 		toPlayerChan:   make(chan playerEvent),
 		connections:    make(map[string]*websocket.Conn),
@@ -55,7 +55,9 @@ func (bs *BroadcastService) run() {
 
 		case playerId := <-bs.removeConnChan:
 			if conn, exists := bs.connections[playerId]; exists {
-				conn.Close()
+				if err := conn.Close(); err != nil {
+					log.Printf("Ошибка закрытия соединения для игрока %s: %v", playerId, err)
+				}
 				delete(bs.connections, playerId)
 				log.Printf("Удалено соединение для игрока %s", playerId)
 			}
@@ -100,7 +102,11 @@ func (bs *BroadcastService) sendToAll(message interface{}) {
 	}
 
 	for id, conn := range bs.connections {
-		conn.SetWriteDeadline(time.Now().Add(writeDeadline))
+		if err := conn.SetWriteDeadline(time.Now().Add(writeDeadline)); err != nil {
+			log.Printf("Ошибка установки дедлайна для игрока %s: %v", id, err)
+			bs.RemoveConnection(id)
+			continue
+		}
 		if err := conn.WriteMessage(websocket.TextMessage, data); err != nil {
 			log.Printf("Ошибка отправки игроку %s: %v", id, err)
 			bs.RemoveConnection(id)
@@ -127,7 +133,11 @@ func (bs *BroadcastService) sendToPlayer(playerId string, message interface{}) {
 		log.Printf("Соединение для игрока %s не найдено", playerId)
 		return
 	}
-	conn.SetWriteDeadline(time.Now().Add(writeDeadline))
+	if err := conn.SetWriteDeadline(time.Now().Add(writeDeadline)); err != nil {
+		log.Printf("Ошибка установки дедлайна для игрока %s: %v", playerId, err)
+		bs.RemoveConnection(playerId)
+		return
+	}
 	if err := conn.WriteMessage(websocket.TextMessage, data); err != nil {
 		log.Printf("Ошибка отправки игроку %s: %v", playerId, err)
 		bs.RemoveConnection(playerId)
