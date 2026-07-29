@@ -65,6 +65,17 @@ function addToKillFeed(killerNickname, victimNickname, weapon, isPlayer) {
     killFeed.appendChild(newKillFeedElement);
 
     setTimeout(() => {
+        newKillFeedElement.classList.add("show");
+    }, 20);
+
+    const deleteTime = GAME_CONSTANTS.KILL_FEED_DELETE_TIME;
+    const transitionTime = 400;
+
+    setTimeout(() => {
+        newKillFeedElement.classList.remove("show");
+    }, deleteTime - transitionTime);
+
+    setTimeout(() => {
         newKillFeedElement.remove();
-    }, GAME_CONSTANTS.KILL_FEED_DELETE_TIME);
+    }, deleteTime);
 }
