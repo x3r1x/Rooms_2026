@@ -9,20 +9,6 @@ export function lerp(start, end, dt) {
     return start + (end - start) * dt;
 }
 
-export function lerpDirection(start, end, dt) {
-    let diff = start - end;
-
-    if (diff < -Math.PI) {
-        diff += 2 * Math.PI;
-    }
-
-    if (diff > Math.PI) {
-        diff -= 2 * Math.PI;
-    }
-
-    return start + diff * dt;
-}
-
 export function getSnapshotsAmount() {
     return snapshotsAmount;
 }
@@ -79,4 +65,13 @@ export function getNeighbouringSnapshots(targetTime) {
         snapA: null,
         snapB: null
     }
+}
+
+export function didRoomChange(snapA, snapB, playerId) {
+    const roomA = snapA.p.find((player) => player.id === playerId).room_id;
+    const roomB = snapB.p.find((player) => player.id === playerId).room_id;
+
+    if (!roomA || !roomB) return true;
+
+    return roomA !== roomB
 }

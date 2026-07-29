@@ -5,7 +5,9 @@ export function drawPlayers(context, mainPlayer, enemies) {
     drawMainPlayer(context, mainPlayer);
 
     for (const enemy of Object.values(enemies)) {
-        drawEnemy(context, enemy)
+        if (mainPlayer.roomId === enemy.roomId) {
+            drawEnemy(context, enemy)
+        }
     }
 }
 

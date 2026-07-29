@@ -5,7 +5,7 @@ import {updateAndDrawEffects} from "../effects/effectsManager.js";
 
 export function drawGame(canvas, context, state) {
     drawBackground(canvas, context);
-    drawBullets(context, state.player.id, state.bullets);
+    drawBullets(context, state.player, state.bullets);
     drawPlayers(context, state.player, state.enemies);
 
     updateAndDrawEffects(context);

@@ -12,7 +12,7 @@ type Bullet struct {
 	Life      float64 `json:"-"`
 	Speed     float64 `json:"-"`
 	Damage    float64 `json:"-"`
-	RoomId    string  `json:"-"`
+	RoomId    string  `json:"roomId"`
 }
 
 func (b *Bullet) Move() {

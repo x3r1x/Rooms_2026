@@ -1,7 +1,9 @@
 import {GAME_SPRITES} from "../../../model/game/storage/gameConstants.js";
-export function drawBullets(context, playerId, bullets) {
+export function drawBullets(context, player, bullets) {
     for (const bullet of Object.values(bullets)) {
-        if (bullet.ownerId === playerId) {
+        if (bullet.roomId !== player.roomId) continue;
+
+        if (bullet.ownerId === player.id) {
             drawPlayerBullet(context, bullet);
         } else {
             drawEnemyBullet(context, bullet);

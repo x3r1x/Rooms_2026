@@ -164,6 +164,7 @@ body {
     display: flex;
     flex-direction: column;
     width: 100%;
+    margin-top: 5px;
     gap: 10px;
     overflow-y: auto;
     overflow-x: hidden;
@@ -412,6 +413,10 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     text-wrap: nowrap;
+}
+
+.kill-feed-player-text.me {
+    color: #ff4444;
 }
 
 .screen-game-over {
