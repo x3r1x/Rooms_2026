@@ -4,6 +4,7 @@ const button = document.getElementById("nicknameButton");
 const nicknameInput = document.getElementById("nicknameInput");
 
 export function initRegistrationListeners(socket) {
+    setRegistrationStates(false);
     button.onclick = () => {
         socket = getSocket(nicknameInput.value);
         setRegistrationStates(true);
