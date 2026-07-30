@@ -16,7 +16,7 @@ import {
 } from "../../app/appState.js";
 
 export function getSocket(nickname) {
-     // const socket = new WebSocket("ws://84.201.159.214:8080/ws");
+    //const socket = new WebSocket("ws://84.201.159.214:8080/ws");
     const socket = new WebSocket("ws://localhost:8080/ws");
 
     socket.onopen = function (event) {
@@ -56,9 +56,6 @@ export function parseMessage(socket, message) {
             break;
 
         case APP_STATES.GAME_ONGOING:
-            if (parsedMessage.k.length !== 0) {
-                console.log("There!");
-            }
             switchToOngoingGameState();
             sendGameInfo(socket, gameState);
 
