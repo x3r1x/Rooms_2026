@@ -5,13 +5,13 @@ import {lerp} from "./interpolation.js";
 export function updatePlayer(direction, elapsedTime, player) {
     updateVisualDirection(player);
 
-    const nextX = player.x + direction.x * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;
-    const nextY = player.y + direction.y * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;
-
-    if (canMoveTo({x: nextX, y: nextY}, player)) {
-        player.x = nextX;
-        player.y = nextY;
-    }
+    // const nextX = player.x + direction.x * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;
+    // const nextY = player.y + direction.y * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;
+    //
+    // if (canMoveTo({x: nextX, y: nextY}, player)) {
+    //     player.x = nextX;
+    //     player.y = nextY;
+    // }
 }
 
 export function updateVisualDirection(player) {

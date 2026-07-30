@@ -168,6 +168,8 @@ func (cs *CollisionService) handleExplosion(bullet domain.Bullet) {
 				if killer, exists := cs.state.GetPlayer(bullet.OwnerId); exists {
 					if killer.Id != target.Id {
 						killer.BodyCount++
+					} else {
+						killer.BodyCount--
 					}
 					cs.state.AddKill(killer.Id, target.Id)
 				}
