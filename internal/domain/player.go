@@ -14,6 +14,7 @@ type PlayerGameState struct {
 	X                 float64    `json:"x"`
 	Y                 float64    `json:"y"`
 	Angle             float64    `json:"a"`
+	Speed             float64    `json:"-"`
 	MoveX             float64    `json:"mx"`
 	MoveY             float64    `json:"my"`
 	CooldownTimer     int        `json:"-"`
@@ -58,9 +59,20 @@ func NewPlayerGameState(id, nickname, playerClass string) *PlayerGameState {
 		DeathCount:        InitValue,
 		PlayerClass:       playerClass,
 	}
-
+	p.setupSpeedByClass()
 	p.setupWeaponByClass()
 	return p
+}
+
+func (p *PlayerGameState) setupSpeedByClass() {
+	switch p.PlayerClass {
+	case PlayerGun:
+		p.Speed = PlayerSpeed
+	case PlayerRifle:
+		p.Speed = PlayerSpeed
+	case PlayerSom:
+		p.Speed = PlayerSpeed
+	}
 }
 
 func (p *PlayerGameState) setupWeaponByClass() {

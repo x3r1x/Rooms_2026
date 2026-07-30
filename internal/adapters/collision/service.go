@@ -151,7 +151,7 @@ func (cs *CollisionService) handleExplosion(bullet domain.Bullet) {
 		return
 	}
 	for _, target := range cs.state.GetAllPlayers() {
-		if target.Health <= 0 {
+		if target.Health <= 0 || target.PlayerShield {
 			continue
 		}
 		if cs.state.GetPlayerRoom(target.Id) != bullet.RoomId {
