@@ -6,13 +6,13 @@ const (
 	BulletSpeedRifle  = 25.0
 	BulletSpeedSom    = 3.0
 	BulletLifeGun     = 60.0
-	BulletLifeRifle   = 4.0
+	BulletLifeRifle   = 40.0
 	BulletLifeSom     = 600
 	BulletDamageGun   = 12.0
-	BulletDamageRifle = 6.0
+	BulletDamageRifle = 5.0
 	BulletDamageSom   = 100.0
-	PelletCount       = 5
-	SpreadAngle       = 0.6
+	PelletCount       = 6
+	SpreadAngle       = 0.4
 
 	ShootCooldown     = 16
 	BulletLengthGun   = 16.0
@@ -23,7 +23,6 @@ const (
 	BulletWidthSom    = 3.0
 	BulletDamageMulti = 1.2
 	ExplosionRadius   = 250
-	RecoilDistance    = 8.0
 	KnockbackForce    = 12.0
 	// константы для игроков
 	InitDirection     = 0
@@ -35,13 +34,16 @@ const (
 	RifleOffsetY      = 19.0
 	SomOffsetX        = 21.0
 	SomOffsetY        = 19.0
-	PlayerSpeed       = 0.4
+	PlayerSpeedGun    = 0.6
+	PlayerSpeedRifle  = 0.4
+	PlayerSpeedSom    = 0.2
 	MaxPlayerHealth   = 100
 	PlayerRebornTimer = 300
 	PlayerShieldTimer = 200
 	// константы общие служебные
 	TickTime                     = 16
 	GameDuration                 = 30
+	MaxPlayers                   = 30
 	MinCountOfPlayers            = 2
 	MinBarrierType               = 1
 	MaxBarrierType               = 7

@@ -87,8 +87,8 @@ func (pe *PhysicsEngine) updatePlayers() {
 			moveY = player.MoveY / vectorLength
 		}
 
-		deltaX := moveX * domain.TickTime * domain.PlayerSpeed
-		deltaY := moveY * domain.TickTime * domain.PlayerSpeed
+		deltaX := moveX * domain.TickTime * player.Speed
+		deltaY := moveY * domain.TickTime * player.Speed
 
 		player.X += deltaX
 		if hit, _ := pe.collisionService.CheckPlayerObjectCollision(player); hit {
