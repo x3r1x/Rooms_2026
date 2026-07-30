@@ -21,7 +21,6 @@ export function updateGame(elapsedTime, state) {
 
     handleEnemies(state.enemies, neighbouredSnapshots, extrapolationTime, lerpCoefficient, isInNewRoom);
     handleBullets(state.bullets, neighbouredSnapshots, extrapolationTime, lerpCoefficient, isInNewRoom);
-
 }
 
 function updateMovementDirection(direction) {
