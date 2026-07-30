@@ -1,16 +1,17 @@
 import {GAME_CONSTANTS} from "../storage/gameConstants.js";
-import {canMoveTo} from "./collision.js";
 import {lerp} from "./interpolation.js";
 
 export function updatePlayer(direction, elapsedTime, player) {
     updateVisualDirection(player);
 
-    // const nextX = player.x + direction.x * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;
-    // const nextY = player.y + direction.y * GAME_CONSTANTS.PLAYER_SPEED * elapsedTime;
-    //
+    const playerSpeed = getPlayerSpeed(player.pc);
+
+    const nextX = player.x + direction.x * playerSpeed * elapsedTime;
+    const nextY = player.y + direction.y * playerSpeed * elapsedTime;
+
     // if (canMoveTo({x: nextX, y: nextY}, player)) {
-    //     player.x = nextX;
-    //     player.y = nextY;
+    player.x = nextX;
+    player.y = nextY;
     // }
 }
 
@@ -36,6 +37,19 @@ export function handleEnemies(enemies, snaps, extrapolationTime, lerpCoefficient
     })
 }
 
+export function getPlayerSpeed(playerType) {
+    switch (playerType) {
+        case GAME_CONSTANTS.PLAYER_TYPES.PISTOL:
+            return GAME_CONSTANTS.PISTOL_PLAYER_SPEED;
+        case GAME_CONSTANTS.PLAYER_TYPES.SHOTGUN:
+            return GAME_CONSTANTS.SHOTGUN_PLAYER_SPEED;
+        case GAME_CONSTANTS.PLAYER_TYPES.ROCKET_LAUNCHER:
+            return GAME_CONSTANTS.ROCKET_PLAYER_SPEED;
+    }
+
+    return 0;
+}
+
 function clearEnemies(enemies, snaps) {
     for (const id in enemies) {
         const inSnapA = snaps.snapA.p.some((enemy) => enemy.id === id);
@@ -56,6 +70,8 @@ function lerpEnemy(modelEnemy, enemyStart, enemyEnd, lerpCoefficient) {
 }
 
 function extrapolateEnemy(modelEnemy, extrapolationTime, startEnemy) {
-    modelEnemy.x = startEnemy.x + extrapolationTime * startEnemy.mx * GAME_CONSTANTS.PLAYER_SPEED;
-    modelEnemy.y = startEnemy.y + extrapolationTime * startEnemy.my * GAME_CONSTANTS.PLAYER_SPEED;
+    const enemySpeed = getPlayerSpeed(modelEnemy.pc);
+
+    modelEnemy.x = startEnemy.x + extrapolationTime * startEnemy.mx * enemySpeed;
+    modelEnemy.y = startEnemy.y + extrapolationTime * startEnemy.my * enemySpeed;
 }

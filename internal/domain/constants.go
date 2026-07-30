@@ -63,7 +63,7 @@ const (
 	LeftMarker                   = "left"
 	BottomMarker                 = "bottom"
 	RightMarker                  = "right"
-	ConnectNeighbouredRoomChance = 0.4
+	ConnectNeighbouredRoomChance = 0.7
 	TileSize                     = 36
 	PlayerHalfSize               = PlayerVisualSize / 2.0
 	Epsilon                      = 0.001
