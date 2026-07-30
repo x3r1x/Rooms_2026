@@ -6,15 +6,17 @@ const nicknameInput = document.getElementById("nicknameInput");
 export function initRegistrationListeners(socket) {
     setRegistrationStates(false);
     button.onclick = () => {
-        socket = getSocket(nicknameInput.value);
-        setRegistrationStates(true);
+        if (nicknameInput.value.trim() !== "") {
+            socket = getSocket(nicknameInput.value);
+            setRegistrationStates(true);
 
-        socket.onerror = () => {
-            setRegistrationStates(false);
+            socket.onerror = () => {
+                setRegistrationStates(false);
+            }
         }
     }
     nicknameInput.onkeydown = (event) => {
-        if (event.key === "Enter") {
+        if (event.key === "Enter" && nicknameInput.value.trim() !== "") {
             socket = getSocket(nicknameInput.value);
             setRegistrationStates(true);
 
