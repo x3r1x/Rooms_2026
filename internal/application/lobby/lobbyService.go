@@ -63,8 +63,10 @@ func (l *LobbyService) AddPlayerToLobby(nickname string, conn *websocket.Conn) s
 	l.mu.RLock()
 	currentCount := len(l.players)
 	l.mu.RUnlock()
-	if currentCount >= 10 {
-		conn.Close()
+	if currentCount >= domain.MaxPlayers {
+		if err := conn.Close(); err != nil {
+			log.Printf("Ошибка закрытия соединения для игрока %s: %v", nickname, err)
+		}
 		return ""
 	}
 	player := domain.NewLobbyPlayer(nickname)

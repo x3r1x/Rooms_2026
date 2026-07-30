@@ -67,11 +67,11 @@ func NewPlayerGameState(id, nickname, playerClass string) *PlayerGameState {
 func (p *PlayerGameState) setupSpeedByClass() {
 	switch p.PlayerClass {
 	case PlayerGun:
-		p.Speed = PlayerSpeed
+		p.Speed = PlayerSpeedGun
 	case PlayerRifle:
-		p.Speed = PlayerSpeed
+		p.Speed = PlayerSpeedRifle
 	case PlayerSom:
-		p.Speed = PlayerSpeed
+		p.Speed = PlayerSpeedSom
 	}
 }
 
