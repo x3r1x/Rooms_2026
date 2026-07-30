@@ -161,7 +161,7 @@ function checkAndSpawnDie(stateA, stateB){
 
     for (let i = 0; i < newPlayers.length; i++) {
         const newPlayer = newPlayers[i];
-        const oldPlayer = oldPlayer.find(e => e.id === newPlayer.id);
+        const oldPlayer = oldPlayers.find(e => e.id === newPlayer.id);
         if (oldPlayers && oldPlayer.h > 0 && newPlayer.h <= 0) {
             spawnEffect(
                 newPlayer.x,

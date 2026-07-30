@@ -15,7 +15,6 @@ function drawMainPlayer(context, player) {
     const spriteSheet = GAME_SPRITES.PLAYER[player.pc];
     const frameWidth = spriteSheet.width / 6;
     const frameHeight = spriteSheet.height;
-
     if (player.hp > 0) {
         deathScreen.style.display = "none"
         if (player.movementDirection.x !== 0 || player.movementDirection.y !== 0) {

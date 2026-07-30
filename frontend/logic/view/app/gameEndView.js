@@ -7,11 +7,10 @@ export function fillResultWindow(ownId, nicknamesList, resultsList) {
     resultList.innerHTML = resultsList.map(result => {
         i += 1;
         const isPlayer = result.id === ownId;
-        const playerStyle = `style="background-color: #dfff00b0"`;
         const KD = result.d !== 0 ? (result.k / result.d).toFixed(2) : "-"
 
         return `
-            <div class="result-list-element" ${isPlayer ? playerStyle : ""}>
+            <div class="result-list-element ${isPlayer ? 'is-me' : ''}">
                 <p>${i}. ${nicknamesList[result.id]}</p>
                 <p>Kills: ${result.k}</p>
                 <p>Deaths: ${result.d}</p>

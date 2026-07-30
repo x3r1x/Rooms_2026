@@ -23,7 +23,11 @@ export function updateLobbyView(ownId, playersInLobby) {
     lobbyList.innerHTML = playersInLobby.map(player => {
         const isPlayer = player.id === ownId;
 
-        return `<p class="lobby-list-element" ${player.r === true ? readyStyle : ""}>${player.n} ${isPlayer ? "(You!)" : ""}</p>`;
+        return `
+            <p class="lobby-list-element ${isPlayer ? 'is-me' : ''}" ${player.r === true ? readyStyle : ""}>
+                ${player.n} ${isPlayer ? "(You!)" : ""}
+            </p>
+        `;
     }).join('')
 }
 
