@@ -42,8 +42,8 @@ const (
 	PlayerShieldTimer = 200
 	// константы общие служебные
 	TickTime                     = 16
-	GameDuration                 = 30
-	MaxPlayers                   = 30
+	GameDuration                 = 120
+	MaxPlayers                   = 10
 	MinCountOfPlayers            = 2
 	MinBarrierType               = 1
 	MaxBarrierType               = 7

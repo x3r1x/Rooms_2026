@@ -4,16 +4,14 @@ import (
 	"encoding/json"
 	"gamedevRooms/internal/recovery"
 	"log"
-	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
 )
 
-const writeDeadline = 5 * time.Second
+const writeDeadline = 3 * time.Second
 
 type BroadcastService struct {
-	mu             sync.RWMutex
 	addConnChan    chan connectionEvent
 	removeConnChan chan string
 	broadcastChan  chan broadcastEvent
@@ -40,7 +38,7 @@ func NewBroadcastService() *BroadcastService {
 		addConnChan:    make(chan connectionEvent),
 		removeConnChan: make(chan string, 100),
 		broadcastChan:  make(chan broadcastEvent),
-		toPlayerChan:   make(chan playerEvent, 1000),
+		toPlayerChan:   make(chan playerEvent),
 		connections:    make(map[string]*websocket.Conn),
 	}
 	go bs.run()
@@ -52,9 +50,7 @@ func (bs *BroadcastService) run() {
 	for {
 		select {
 		case event := <-bs.addConnChan:
-			bs.mu.Lock()
 			bs.connections[event.playerId] = event.conn
-			bs.mu.Unlock()
 			log.Printf("Добавлено соединение для игрока %s", event.playerId)
 
 		case playerId := <-bs.removeConnChan:
@@ -104,24 +100,17 @@ func (bs *BroadcastService) sendToAll(message interface{}) {
 		log.Println("Ошибка маршалинга:", err)
 		return
 	}
-	bs.mu.RLock()
-	conns := make(map[string]*websocket.Conn, len(bs.connections))
-	for k, v := range bs.connections {
-		conns[k] = v
-	}
-	bs.mu.RUnlock()
 
-	for id, conn := range conns {
-		go func(pid string, c *websocket.Conn, d []byte) {
-			defer recovery.Recover()
-			if err := c.SetWriteDeadline(time.Now().Add(writeDeadline)); err != nil {
-				bs.RemoveConnection(pid)
-				return
-			}
-			if err := c.WriteMessage(websocket.TextMessage, d); err != nil {
-				bs.RemoveConnection(pid)
-			}
-		}(id, conn, data)
+	for id, conn := range bs.connections {
+		if err := conn.SetWriteDeadline(time.Now().Add(writeDeadline)); err != nil {
+			log.Printf("Ошибка установки дедлайна для игрока %s: %v", id, err)
+			bs.RemoveConnection(id)
+			continue
+		}
+		if err := conn.WriteMessage(websocket.TextMessage, data); err != nil {
+			log.Printf("Ошибка отправки игроку %s: %v", id, err)
+			bs.RemoveConnection(id)
+		}
 	}
 }
 
@@ -139,21 +128,18 @@ func (bs *BroadcastService) sendToPlayer(playerId string, message interface{}) {
 			return
 		}
 	}
-	bs.mu.RLock()
 	conn, exists := bs.connections[playerId]
-	bs.mu.RUnlock()
 	if !exists {
 		log.Printf("Соединение для игрока %s не найдено", playerId)
 		return
 	}
-	go func(c *websocket.Conn, pid string, d []byte) {
-		defer recovery.Recover()
-		if err := c.SetWriteDeadline(time.Now().Add(writeDeadline)); err != nil {
-			bs.RemoveConnection(pid)
-			return
-		}
-		if err := c.WriteMessage(websocket.TextMessage, d); err != nil {
-			bs.RemoveConnection(pid)
-		}
-	}(conn, playerId, data)
+	if err := conn.SetWriteDeadline(time.Now().Add(writeDeadline)); err != nil {
+		log.Printf("Ошибка установки дедлайна для игрока %s: %v", playerId, err)
+		bs.RemoveConnection(playerId)
+		return
+	}
+	if err := conn.WriteMessage(websocket.TextMessage, data); err != nil {
+		log.Printf("Ошибка отправки игроку %s: %v", playerId, err)
+		bs.RemoveConnection(playerId)
+	}
 }

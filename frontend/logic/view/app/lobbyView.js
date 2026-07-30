@@ -34,7 +34,7 @@ export function updateLobbyView(ownId, playersInLobby) {
 export function updatePlayerClass() {
     const weapons = [
         {
-            name: "ПИСТОЛЕТ",
+            name: "ЙОРШъ",
             img: "/assets/images/g.png",
             code: "g",
             description: `
