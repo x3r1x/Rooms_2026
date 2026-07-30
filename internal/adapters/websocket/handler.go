@@ -13,8 +13,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-const readDeadlineLobby = 30 * time.Second
-const readDeadlineGame = 10 * time.Second
+const readDeadlineLobby = 90 * time.Second
+const readDeadlineGame = 20 * time.Second
 
 type WebsocketHandler struct {
 	lobby *lobby.LobbyService

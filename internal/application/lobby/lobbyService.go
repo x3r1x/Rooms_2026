@@ -60,6 +60,13 @@ func NewLobbyService(
 }
 
 func (l *LobbyService) AddPlayerToLobby(nickname string, conn *websocket.Conn) string {
+	l.mu.RLock()
+	currentCount := len(l.players)
+	l.mu.RUnlock()
+	if currentCount >= 10 {
+		conn.Close()
+		return ""
+	}
 	player := domain.NewLobbyPlayer(nickname)
 	l.addChan <- lobbyAddEvent{
 		player: player,

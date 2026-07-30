@@ -89,6 +89,10 @@ func (gs *GameService) Run() {
 }
 
 func (gs *GameService) handleDelete(id string) {
+	if _, exists := gs.gameState.GetPlayer(id); !exists {
+		log.Printf("Игрок %s уже удален, пропускаем", id)
+		return
+	}
 	gs.gameState.RemovePlayer(id)
 	log.Printf("Игрок %s удален. Осталось: %d", id, len(gs.gameState.GetAllPlayers()))
 	if gs.gameState.IsGameActive() && len(gs.gameState.GetAllPlayers()) <= 1 {

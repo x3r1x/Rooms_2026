@@ -6,13 +6,13 @@ const (
 	BulletSpeedRifle  = 25.0
 	BulletSpeedSom    = 3.0
 	BulletLifeGun     = 60.0
-	BulletLifeRifle   = 4.0
+	BulletLifeRifle   = 40.0
 	BulletLifeSom     = 600
 	BulletDamageGun   = 12.0
-	BulletDamageRifle = 6.0
+	BulletDamageRifle = 5.0
 	BulletDamageSom   = 100.0
-	PelletCount       = 5
-	SpreadAngle       = 0.6
+	PelletCount       = 6
+	SpreadAngle       = 0.4
 
 	ShootCooldown     = 16
 	BulletLengthGun   = 16.0
